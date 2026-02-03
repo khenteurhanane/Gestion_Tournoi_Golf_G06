@@ -1,22 +1,182 @@
+/* ===========================================
+   STYLE GLOBAL - Tournoi de Golf G06
+   Thème : Mauve Gradient (par Chanez)
+   =========================================== */
+
+/* Variables de couleurs */
+:root {
+    --couleur-primaire: #7b2ff7;
+    --couleur-secondaire: #f107a3;
+    --couleur-hover: #5c13d1;
+    --couleur-texte: #333;
+    --couleur-fond: linear-gradient(to right, #7b2ff7, #f107a3);
+}
+
+/* Style général */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--couleur-fond);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navigation */
+.navbar {
+    background: white !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    color: var(--couleur-primaire) !important;
+    font-weight: bold;
+}
+
+.nav-link {
+    color: var(--couleur-texte) !important;
+}
+
+.nav-link:hover {
+    color: var(--couleur-primaire) !important;
+}
+
+/* Conteneur principal */
+.container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Titres */
+h1, h2, h3 {
+    color: var(--couleur-primaire);
+    margin-bottom: 20px;
+}
+
+/* Formulaires */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    font-weight: bold;
+    color: var(--couleur-texte);
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--couleur-primaire);
+    box-shadow: 0 0 5px rgba(123, 47, 247, 0.3);
+}
+
+/* Boutons */
+button, .btn, input[type="submit"] {
+    background-color: var(--couleur-primaire);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover, .btn:hover, input[type="submit"]:hover {
+    background-color: var(--couleur-hover);
+}
+
+/* Tableaux */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th {
+    background-color: var(--couleur-primaire);
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Badges */
+.badge-ouvert {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.badge-ferme {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Liens */
+a {
+    color: var(--couleur-primaire);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--couleur-hover);
+    text-decoration: underline;
+}
+
+/* Messages d'erreur */
+.error, .text-danger {
+    color: #dc3545;
+    font-size: 14px;
+}
+
+/* Messages de succès */
+.success, .text-success {
+    color: #28a745;
+    font-size: 14px;
+}
+
+/* Footer */
+.footer {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+    margin-top: auto;
 }
