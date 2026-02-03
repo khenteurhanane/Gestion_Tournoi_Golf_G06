@@ -1,0 +1,35 @@
+@model croupe_06_TournoiGolf.Models.Tournoi
+
+<h1>Créer un Tournoi</h1>
+
+<form method="post" action="/Tournoi/Create">
+    <table>
+        <tr>
+            <td>Nom du tournoi :</td>
+            <td><input type="text" name="Nom" value="@Model?.Nom" /></td>
+        </tr>
+        <tr>
+            <td>Date :</td>
+            <td><input type="date" name="DateTournoi" /></td>
+        </tr>
+        <tr>
+            <td>Lieu :</td>
+            <td><input type="text" name="Lieu" value="@Model?.Lieu" /></td>
+        </tr>
+        <tr>
+            <td>Description :</td>
+            <td><textarea name="Description">@Model?.Description</textarea></td>
+        </tr>
+        <tr>
+            <td>Nombre max de participants :</td>
+            <td><input type="number" name="NombreMaxParticipants" value="100" /></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button type="submit">Créer</button>
+                <a href="/Tournoi/Index">Annuler</a>
+            </td>
+        </tr>
+    </table>
+</form>
