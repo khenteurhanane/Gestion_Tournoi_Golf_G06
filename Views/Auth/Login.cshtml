@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Connexion";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to right, #7b2ff7, #f107a3); /* dégradé mauve */
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        flex-direction: column;
+    }
+
+    .project-title {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        letter-spacing: 1px;
+    }
+
+    .login-container {
+        background-color: white;
+        padding: 40px 50px;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+        width: 400px;
+        text-align: center;
+    }
+
+    .login-container h2 {
+        margin-bottom: 20px;
+        color: #7b2ff7;
+    }
+
+    .form-group {
+        text-align: left;
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    input:focus {
+        border-color: #7b2ff7;
+    }
+
+    button {
+        background-color: #7b2ff7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background-color: #5c13d1;
+    }
+
+    .error {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="project-title"> Tournoi de Golf – G06</div>
+
+<div class="login-container">
+    <h2>Connexion</h2>
+    <form asp-action="Login" method="post">
+        <div class="form-group">
+            <label>Messagerie électronique :</label>
+            <input type="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+            <label>Mot de passe :</label>
+            <input type="password" name="motDePasse" required />
+        </div>
+
+        <button type="submit">Se connecter</button>
+
+        @if (ViewBag.Error != null)
+        {
+                <p class="error">@ViewBag.Error</p>
+        }
+    </form>
+</div>

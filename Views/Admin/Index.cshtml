@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Espace Administrateur";
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background: linear-gradient(135deg, #8a2be2, #b266ff);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .admin-box {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        padding: 50px 70px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        backdrop-filter: blur(8px);
+    }
+
+    h1 {
+        color: #fff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .crown {
+        font-size: 1.3em;
+    }
+
+    p {
+        color: #f5f5f5;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
+
+    .logout-btn {
+        background-color: #fff;
+        color: #7a00cc;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1em;
+        font-weight: bold;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .logout-btn:hover {
+        background-color: #7a00cc;
+        color: white;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+</style>
+
+<div class="admin-box">
+    <h1><span class="crown"></span> Bienvenue dans l’espace administrateur</h1>
+    <p>Vous êtes connecté en tant qu’administrateur.</p>
+
+    <a class="logout-btn" href="/Auth/Logout">Se déconnecter</a>
+</div>

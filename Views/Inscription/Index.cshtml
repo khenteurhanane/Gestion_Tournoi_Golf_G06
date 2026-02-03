@@ -1,0 +1,39 @@
+﻿@model croupe_06_TournoiGolf.Models.Participant
+
+<h2>Inscription</h2>
+
+<form asp-action="Index" method="post">
+
+    <div>
+        <label>Prénom</label><br />
+        <input asp-for="Prenom" />
+        <span asp-validation-for="Prenom"></span>
+    </div>
+
+    <div>
+        <label>Nom</label><br />
+        <input asp-for="Nom" />
+        <span asp-validation-for="Nom"></span>
+    </div>
+
+    <div>
+        <label>Email</label><br />
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div>
+        <label>Téléphone</label><br />
+        <input asp-for="Telephone" />
+    </div>
+
+    <div>
+        <label>Mot de passe</label><br />
+        <input asp-for="MotDePasseHash" type="password" />
+        <span asp-validation-for="MotDePasseHash"></span>
+    </div>
+
+    <br />
+    <button type="submit">S'inscrire</button>
+
+</form>
