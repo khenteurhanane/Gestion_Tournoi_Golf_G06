@@ -1,39 +1,166 @@
 ﻿@model croupe_06_TournoiGolf.Models.Participant
 
-<h2>Inscription</h2>
+@{
+    ViewData["Title"] = "Inscription au tournoi";
+    Layout = null;
+}
 
-<form asp-action="Index" method="post">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription – Tournoi de golf</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0b6623, #2e8b57);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    <div>
-        <label>Prénom</label><br />
-        <input asp-for="Prenom" />
-        <span asp-validation-for="Prenom"></span>
+        .container {
+            background: white;
+            width: 420px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0b6623;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0b6623;
+            box-shadow: 0 0 0 2px rgba(11, 102, 35, 0.2);
+        }
+
+        .btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background-color: #0b6623;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #145a32;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .footer a {
+            color: #0b6623;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏌️ Inscription au tournoi</h1>
+
+    <form asp-action="Index" method="post">
+        <label>Prénom</label>
+        <input asp-for="Prenom" type="text" placeholder="Entrez votre prénom" />
+        <span asp-validation-for="Prenom" class="error"></span>
+
+        <label>Nom</label>
+        <input asp-for="Nom" type="text" placeholder="Entrez votre nom" />
+        <span asp-validation-for="Nom" class="error"></span>
+
+        <label>Adresse courriel</label>
+        <input asp-for="Email" type="email" placeholder="exemple@email.com" />
+        <span asp-validation-for="Email" class="error"></span>
+
+        <label>Téléphone</label>
+        <input asp-for="Telephone" type="tel" placeholder="514 000 0000" />
+
+        <label>Type de participant</label>
+        <select name="TypeParticipant">
+            <option value="employe">Employé</option>
+            <option value="retraite">Retraité</option>
+        </select>
+
+        <label>Choix d'équipe</label>
+        <select name="ChoixEquipe" id="choixEquipe" onchange="toggleCodeEquipe()">
+            <option value="creer">Créer une nouvelle équipe</option>
+            <option value="rejoindre">Rejoindre une équipe existante</option>
+        </select>
+
+        <div id="codeEquipeDiv">
+            <label>Code d'équipe (si applicable)</label>
+            <input type="text" name="CodeEquipe" placeholder="Code de l'équipe" />
+        </div>
+
+        <label>Mot de passe</label>
+        <input asp-for="MotDePasseHash" type="password" placeholder="Créez un mot de passe" />
+        <span asp-validation-for="MotDePasseHash" class="error"></span>
+
+        <button class="btn" type="submit">S'inscrire au tournoi</button>
+    </form>
+
+    <div class="footer">
+        Déjà inscrit ? <a asp-controller="Auth" asp-action="Login">Se connecter</a><br/>
+        Tournoi de golf – La Cité
     </div>
+</div>
 
-    <div>
-        <label>Nom</label><br />
-        <input asp-for="Nom" />
-        <span asp-validation-for="Nom"></span>
-    </div>
+<script>
+    function toggleCodeEquipe() {
+        var choix = document.getElementById('choixEquipe').value;
+        var codeDiv = document.getElementById('codeEquipeDiv');
+        if (choix === 'rejoindre') {
+            codeDiv.style.display = 'block';
+        } else {
+            codeDiv.style.display = 'none';
+        }
+    }
+    toggleCodeEquipe();
+</script>
 
-    <div>
-        <label>Email</label><br />
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
-    </div>
-
-    <div>
-        <label>Téléphone</label><br />
-        <input asp-for="Telephone" />
-    </div>
-
-    <div>
-        <label>Mot de passe</label><br />
-        <input asp-for="MotDePasseHash" type="password" />
-        <span asp-validation-for="MotDePasseHash"></span>
-    </div>
-
-    <br />
-    <button type="submit">S'inscrire</button>
-
-</form>
+</body>
+</html>
