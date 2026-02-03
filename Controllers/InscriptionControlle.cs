@@ -9,14 +9,17 @@ namespace croupe_06_TournoiGolf.Controllers
         private static List<Participant> listeParticipants = new List<Participant>();
 
         // Affiche le formulaire d'inscription
-        public IActionResult Index(int tournoiId)
+        // tournoiId est optionnel pour compatibilité avec le code existant
+        public IActionResult Index(int? tournoiId)
         {
-            // Vérifier si les inscriptions sont ouvertes
-            bool inscriptionsOuvertes = VerifierInscriptionsOuvertes(tournoiId);
-
-            if (inscriptionsOuvertes == false)
+            // Si un tournoiId est fourni, vérifier les inscriptions
+            if (tournoiId.HasValue)
             {
-                return View("InscriptionsFermees");
+                bool inscriptionsOuvertes = VerifierInscriptionsOuvertes(tournoiId.Value);
+                if (inscriptionsOuvertes == false)
+                {
+                    return View("InscriptionsFermees");
+                }
             }
 
             return View();
@@ -24,14 +27,16 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Enregistre le participant
         [HttpPost]
-        public IActionResult Index(Participant participant, int tournoiId)
+        public IActionResult Index(Participant participant, int? tournoiId)
         {
-            // Vérifier si les inscriptions sont ouvertes
-            bool inscriptionsOuvertes = VerifierInscriptionsOuvertes(tournoiId);
-
-            if (inscriptionsOuvertes == false)
+            // Si un tournoiId est fourni, vérifier les inscriptions
+            if (tournoiId.HasValue)
             {
-                return View("InscriptionsFermees");
+                bool inscriptionsOuvertes = VerifierInscriptionsOuvertes(tournoiId.Value);
+                if (inscriptionsOuvertes == false)
+                {
+                    return View("InscriptionsFermees");
+                }
             }
 
             // Validation du formulaire
@@ -68,8 +73,14 @@ namespace croupe_06_TournoiGolf.Controllers
                 }
             }
 
-            // Tournoi non trouvé = inscriptions fermées par défaut
-            return false;
+            // Tournoi non trouvé = inscriptions ouvertes par défaut
+            return true;
+        }
+
+        // Récupère la liste des participants (pour les autres contrôleurs)
+        public static List<Participant> GetListeParticipants()
+        {
+            return listeParticipants;
         }
     }
 }
