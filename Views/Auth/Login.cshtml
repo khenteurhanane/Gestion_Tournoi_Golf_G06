@@ -1,108 +1,296 @@
-﻿@{
-    ViewData["Title"] = "Connexion";
-}
-
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(to right, #7b2ff7, #f107a3); /* dégradé mauve */
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        flex-direction: column;
+﻿<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connexion — Tournoi de Golf</title>
+  <style>
+    :root{
+      --bg1:#0b3d2e;
+      --bg2:#0f6b4f;
+      --card:#0f172a;
+      --card2:#0b1220;
+      --text:#e7f6ef;
+      --muted:#b8d9cc;
+      --accent:#2dd4bf;
+      --accent2:#34d399;
+      --danger:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
     }
 
-    .project-title {
-        color: white;
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        letter-spacing: 1px;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 700px at 15% 10%, rgba(45,212,191,.35), transparent 60%),
+        radial-gradient(900px 700px at 90% 80%, rgba(52,211,153,.30), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
     }
 
-    .login-container {
-        background-color: white;
-        padding: 40px 50px;
-        border-radius: 15px;
-        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
-        width: 400px;
-        text-align: center;
+    .wrap{
+      width:100%;
+      max-width:980px;
+      display:grid;
+      gap:18px;
+      grid-template-columns: 1.1fr .9fr;
+      align-items:stretch;
     }
 
-    .login-container h2 {
-        margin-bottom: 20px;
-        color: #7b2ff7;
+    .hero{
+      border-radius: var(--radius);
+      padding:28px;
+      background: linear-gradient(180deg, rgba(15,23,42,.55), rgba(11,18,32,.65));
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-80px -80px auto auto;
+      width:260px; height:260px;
+      background: radial-gradient(circle, rgba(45,212,191,.35), transparent 70%);
+      transform: rotate(25deg);
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--muted);
+      font-size: 14px;
+      backdrop-filter: blur(6px);
+    }
+    .hero h1{
+      margin:14px 0 8px;
+      font-size: 34px;
+      line-height:1.1;
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      max-width: 48ch;
+    }
+    .bullets{
+      margin-top:18px;
+      display:grid;
+      gap:10px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .bullet{
+      display:flex; gap:10px; align-items:flex-start;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:10px 12px;
+      border-radius:14px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      margin-top:4px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      flex: 0 0 auto;
     }
 
-    .form-group {
-        text-align: left;
-        margin-bottom: 15px;
+    .card{
+      border-radius: var(--radius);
+      padding:26px;
+      background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(11,18,32,.92));
+      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,.10);
     }
 
-    label {
-        font-weight: bold;
-        color: #333;
+    .card h2{
+      margin:0 0 6px;
+      font-size: 22px;
+    }
+    .card .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:14px;
     }
 
-    input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 14px;
-        outline: none;
+    label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin:12px 0 6px;
+    }
+    .field{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 12px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      transition: .2s ease;
+    }
+    .field:focus-within{
+      border-color: rgba(45,212,191,.55);
+      box-shadow: 0 0 0 4px rgba(45,212,191,.12);
+    }
+    .icon{ opacity:.85; }
+    input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:15px;
+    }
+    input::placeholder{ color: rgba(231,246,239,.45); }
+
+    .row{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .check{
+      display:flex; align-items:center; gap:8px;
+      user-select:none;
+    }
+    .check input{ width:16px; height:16px; accent-color: var(--accent); }
+
+    a{
+      color: var(--accent);
+      text-decoration:none;
+    }
+    a:hover{ text-decoration: underline; }
+
+    .btn{
+      margin-top:16px;
+      width:100%;
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:600;
+      font-size:15px;
+      color:#062a22;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:active{ transform: translateY(0px); }
+
+    .footer{
+      margin-top:14px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
     }
 
-    input:focus {
-        border-color: #7b2ff7;
+    .error{
+      display:none;
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(251,113,133,.12);
+      border:1px solid rgba(251,113,133,.30);
+      color: #ffd0d9;
+      font-size:13px;
     }
 
-    button {
-        background-color: #7b2ff7;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-        width: 100%;
-        transition: 0.3s;
+    @@media (max-width: 860px){
+      .wrap{ grid-template-columns: 1fr; }
+      .hero h1{ font-size: 30px; }
     }
+  </style>
+</head>
 
-    button:hover {
-        background-color: #5c13d1;
-    }
+<body>
+  <main class="wrap">
+    <!-- Partie gauche (petite présentation) -->
+    <section class="hero" aria-label="Présentation">
+      <div class="badge">⛳ Plateforme Tournoi de Golf — La Cité</div>
+      <h1>Connexion</h1>
+      <p>Accède à ton espace pour t’inscrire, payer (simulation) et gérer ton équipe (code secret).</p>
 
-    .error {
-        color: red;
-        font-size: 14px;
-        margin-top: 10px;
-    }
-</style>
+      <div class="bullets">
+        <div class="bullet"><span class="dot"></span><div>Participant : inscription + création/rejoindre équipe</div></div>
+        <div class="bullet"><span class="dot"></span><div>Commanditaire : choix commandite + joueurs inclus</div></div>
+        <div class="bullet"><span class="dot"></span><div>Admin : gestion tournoi, équipes, inscriptions, sécurité</div></div>
+      </div>
+    </section>
 
-<div class="project-title"> Tournoi de Golf – G06</div>
+    <!-- Formulaire Login -->
+    <section class="card" aria-label="Formulaire de connexion">
+      <h2>Bienvenue 👋</h2>
+      <p class="sub">Connecte-toi pour continuer.</p>
 
-<div class="login-container">
-    <h2>Connexion</h2>
-    <form asp-action="Login" method="post">
-        <div class="form-group">
-            <label>Messagerie électronique :</label>
-            <input type="email" name="email" required />
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <div class="field">
+          <span class="icon">📧</span>
+          <input id="email" name="email" type="email" placeholder="ex: chanez@lacite.ca" required />
         </div>
 
-        <div class="form-group">
-            <label>Mot de passe :</label>
-            <input type="password" name="motDePasse" required />
+        <label for="password">Mot de passe</label>
+        <div class="field">
+          <span class="icon">🔒</span>
+          <input id="password" name="password" type="password" placeholder="••••••••" minlength="6" required />
         </div>
 
-        <button type="submit">Se connecter</button>
+        <div class="row">
+          <label class="check">
+            <input type="checkbox" id="remember" />
+            Se souvenir de moi
+          </label>
 
-        @if (ViewBag.Error != null)
-        {
-                <p class="error">@ViewBag.Error</p>
-        }
-    </form>
-</div>
+          <a href="forgot-password.html">Mot de passe oublié ?</a>
+        </div>
+
+        <div class="error" id="errorBox">Email ou mot de passe incorrect.</div>
+
+        <button class="btn" type="submit">Se connecter</button>
+
+        <div class="footer">
+          Pas de compte ? <a href="register.html">Créer un compte</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // Demo simple (sans backend) : validation côté client
+    // Remplace par ton appel API ASP.NET plus tard.
+    document.getElementById("loginForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const pwd = document.getElementById("password").value.trim();
+      const errorBox = document.getElementById("errorBox");
+
+      // Exemple ultra simple : si champs vides -> erreur
+      if(!email || !pwd){
+        errorBox.style.display = "block";
+        errorBox.textContent = "Veuillez remplir tous les champs.";
+        return;
+      }
+
+      // ✅ ICI tu feras ton vrai login (fetch vers ASP.NET)
+      // Pour l’instant, on simule une connexion réussie :
+      errorBox.style.display = "none";
+      alert("Connexion réussie ✅ (simulation)");
+      // window.location.href = "dashboard.html";
+    });
+  </script>
+</body>
+</html>
+
