@@ -1,7 +1,7 @@
--- =============================================================
+
 -- BASE DE DONNÉES : GolfTournoiDB
--- Projet : Tournoi de Golf G06 - La Cité
--- =============================================================
+-- Projet : Tournoi de Golf G06 
+
 
 -- 1) Créer la base de données
 IF DB_ID('GolfTournoiDB') IS NULL
@@ -19,9 +19,9 @@ IF OBJECT_ID('Tournois', 'U') IS NOT NULL DROP TABLE Tournois;
 IF OBJECT_ID('Utilisateurs', 'U') IS NOT NULL DROP TABLE Utilisateurs;
 GO
 
--- =============================================================
+
 -- TABLES
--- =============================================================
+
 
 -- 3) TABLE UTILISATEURS
 CREATE TABLE Utilisateurs (
@@ -86,9 +86,8 @@ CREATE TABLE Commandites (
 );
 GO
 
--- =============================================================
 -- CLÉS ÉTRANGÈRES
--- =============================================================
+
 
 ALTER TABLE Equipes
 ADD FOREIGN KEY (TournoiId) REFERENCES Tournois(TournoiId);
@@ -112,18 +111,18 @@ ALTER TABLE Commandites
 ADD FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(UtilisateurId);
 GO
 
--- =============================================================
+
 -- INDEX
--- =============================================================
+
 
 CREATE INDEX IX_Tournois_Id ON Tournois(TournoiId);
 CREATE INDEX IX_Participants_TournoiId ON Participants(TournoiId);
 CREATE INDEX IX_Equipes_TournoiId ON Equipes(TournoiId);
 GO
 
--- =============================================================
+
 -- PROCÉDURES STOCKÉES
--- =============================================================
+
 
 -- Ajouter un tournoi
 CREATE OR ALTER PROCEDURE sp_AjouterTournoi
@@ -167,9 +166,9 @@ BEGIN
 END;
 GO
 
--- =============================================================
+
 -- DONNÉES DE TEST
--- =============================================================
+
 
 -- Ajouter un tournoi de test
 EXEC sp_AjouterTournoi
@@ -218,9 +217,9 @@ UPDATE Participants
 SET EquipeId = (SELECT TOP 1 EquipeId FROM Equipes ORDER BY EquipeId DESC)
 WHERE TournoiId = @TournoiId AND UtilisateurId = @UtilisateurId;
 
--- =============================================================
+
 -- VÉRIFICATION
--- =============================================================
+
 
 SELECT 'Base de données' AS Test, DB_NAME() AS Resultat;
 SELECT * FROM Tournois;
