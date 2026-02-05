@@ -4,7 +4,7 @@ using croupe_06_TournoiGolf.Data;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class TournoiController : Controller
+    public class TournoiController : BaseController
     {
         private readonly GolfDbContext _context;
 
@@ -16,11 +16,6 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la liste des tournois
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetInt32("UserId") == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
-
             var listeTournois = _context.Tournois.ToList();
             return View(listeTournois);
         }
@@ -28,10 +23,6 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche le formulaire de création
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetInt32("UserId") == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
             return View();
         }
 

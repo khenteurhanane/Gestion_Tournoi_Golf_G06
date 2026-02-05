@@ -2,14 +2,11 @@
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetInt32("UserId") == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
+            // Pas besoin de vérifier la session, BaseController le fait
             return View();
         }
     }
