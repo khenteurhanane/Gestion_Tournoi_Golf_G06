@@ -14,17 +14,22 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult Login(string email, string motDePasse)
         {
+            // Simulation de connexion pour le développement
             if (email == "admin@test.com" && motDePasse == "1234")
             {
                 HttpContext.Session.SetString("IsLoggedIn", "true");
                 HttpContext.Session.SetString("UserRole", "Admin");
+                
+                // Redirection selon le rôle : Admin
                 return RedirectToAction("Index", "Admin");
             }
-            else if (email == "test@test.com" && motDePasse == "1234")
+            else if (email == "participant@test.com" && motDePasse == "1234")
             {
                 HttpContext.Session.SetString("IsLoggedIn", "true");
-                HttpContext.Session.SetString("UserRole", "User");
-                return RedirectToAction("Index", "Home");
+                HttpContext.Session.SetString("UserRole", "Participant");
+
+                // Redirection selon le rôle : Participant [US-02-T08]
+                return RedirectToAction("Index", "Inscription");
             }
 
             ViewBag.Error = "Email ou mot de passe incorrect.";
