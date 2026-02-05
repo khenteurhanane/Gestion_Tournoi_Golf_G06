@@ -17,12 +17,20 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la liste des tournois
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetInt32("UserId") == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
             return View(listeTournois);
         }
 
         // Affiche le formulaire de création
         public IActionResult Create()
         {
+            if (HttpContext.Session.GetInt32("UserId") == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
             return View();
         }
 

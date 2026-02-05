@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Sessions (US-02-T06)
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -13,8 +12,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-//  Service de hashage (OBLIGATOIRE étape 14)
+// Service de hashage
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -30,7 +31,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//  Activer les sessions (doit être AVANT Authorization)
 app.UseSession();
 
 app.UseAuthorization();
