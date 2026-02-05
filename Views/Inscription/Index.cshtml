@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Inscription au tournoi";
-    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -140,7 +139,7 @@
         <input asp-for="MotDePasseHash" type="password" placeholder="Créez un mot de passe" />
         <span asp-validation-for="MotDePasseHash" class="error"></span>
 
-        <button class="btn" type="submit">S'inscrire au tournoi</button>
+        <button class="btn btn-success" type="submit">S'inscrire au tournoi</button>
     </form>
 
     <div class="footer">
