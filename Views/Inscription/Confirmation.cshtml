@@ -1,11 +1,20 @@
-﻿<h1>Confirmation</h1>
+﻿@{
+    ViewData["Title"] = "Confirmation";
+}
 
-<p style="color:green; font-size:18px;">
-    Votre inscription a été enregistrée avec succès!
-</p>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <h2>Confirmation</h2>
+            
+            <div class="success">
+                Votre inscription a été enregistrée avec succès!
+            </div>
 
-<p>Un message de confirmation vous a été envoyé.</p>
+            <p>Un message de confirmation vous a été envoyé.</p>
+            <p>Merci pour votre inscription au tournoi de golf.</p>
 
-<p>Merci pour votre inscription au tournoi de golf.</p>
-
-<a href="/Tournoi/Index">Retour à la liste des tournois</a>
+            <a class="btn" asp-controller="Tournoi" asp-action="Index">Retour à la liste des tournois</a>
+        </div>
+    </div>
+</div>

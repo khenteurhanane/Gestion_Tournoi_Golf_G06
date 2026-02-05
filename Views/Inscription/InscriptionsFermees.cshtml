@@ -2,10 +2,18 @@
     ViewData["Title"] = "Inscriptions fermées";
 }
 
-<h1>Inscriptions fermées</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <h2>Inscriptions fermées</h2>
+            
+            <div class="error">
+                Les inscriptions pour ce tournoi sont actuellement fermées.
+            </div>
 
-<p>Les inscriptions pour ce tournoi sont actuellement fermées.</p>
+            <p>Veuillez réessayer plus tard ou contacter l'administrateur.</p>
 
-<p>Veuillez réessayer plus tard ou contacter l'administrateur.</p>
-
-<a href="/Tournoi/Index">Retour à la liste des tournois</a>
+            <a class="btn" asp-controller="Tournoi" asp-action="Index">Retour à la liste des tournois</a>
+        </div>
+    </div>
+</div>

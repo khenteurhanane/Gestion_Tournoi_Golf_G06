@@ -1,51 +1,66 @@
 @model List<croupe_06_TournoiGolf.Models.Tournoi>
 
+@{
+    ViewData["Title"] = "Liste des Tournois";
+}
+
 <h1>Liste des Tournois</h1>
 
-<a href="/Tournoi/Create">Créer un tournoi</a>
-<br /><br />
+<p>
+    <a class="btn" asp-action="Create">Créer un tournoi</a>
+</p>
 
-<table border="1">
-    <tr>
-        <th>Nom</th>
-        <th>Date</th>
-        <th>Lieu</th>
-        <th>Inscriptions</th>
-        <th>Actions</th>
-    </tr>
-    
-    @foreach (var tournoi in Model)
-    {
-        <tr>
-            <td>@tournoi.Nom</td>
-            <td>@tournoi.DateTournoi.ToShortDateString()</td>
-            <td>@tournoi.Lieu</td>
-            <td>
-                @if (tournoi.InscriptionsOuvertes)
-                {
-                    <span style="color:green;">Ouvertes</span>
-                }
-                else
-                {
-                    <span style="color:red;">Fermées</span>
-                }
-            </td>
-            <td>
-                @if (tournoi.InscriptionsOuvertes)
-                {
-                    <form action="/Tournoi/FermerInscriptions" method="post">
-                        <input type="hidden" name="id" value="@tournoi.Id" />
-                        <button type="submit">Fermer</button>
-                    </form>
-                }
-                else
-                {
-                    <form action="/Tournoi/OuvrirInscriptions" method="post">
-                        <input type="hidden" name="id" value="@tournoi.Id" />
-                        <button type="submit">Ouvrir</button>
-                    </form>
-                }
-            </td>
-        </tr>
-    }
-</table>
+@if (Model.Count == 0)
+{
+    <p class="text-muted">Aucun tournoi pour le moment.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Lieu</th>
+                <th>Inscriptions</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tournoi in Model)
+            {
+                <tr>
+                    <td>@tournoi.Nom</td>
+                    <td>@tournoi.DateTournoi.ToShortDateString()</td>
+                    <td>@tournoi.Lieu</td>
+                    <td>
+                        @if (tournoi.InscriptionsOuvertes)
+                        {
+                            <span class="badge badge-ouvert">Ouvertes</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-ferme">Fermées</span>
+                        }
+                    </td>
+                    <td>
+                        @if (tournoi.InscriptionsOuvertes)
+                        {
+                            <form asp-action="FermerInscriptions" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@tournoi.Id" />
+                                <button type="submit" class="btn btn-secondary">Fermer</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="OuvrirInscriptions" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@tournoi.Id" />
+                                <button type="submit" class="btn">Ouvrir</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

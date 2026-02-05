@@ -1,8 +1,40 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Accueil";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero">
+    <h1>Bienvenue au Tournoi de Golf</h1>
+    <p>Plateforme de gestion des tournois de golf - La Cité 2026</p>
+    
+    <div class="bullets">
+        <div class="bullet">
+            <span class="dot"></span>
+            <div>Inscrivez-vous aux tournois disponibles</div>
+        </div>
+        <div class="bullet">
+            <span class="dot"></span>
+            <div>Créez ou rejoignez une équipe</div>
+        </div>
+        <div class="bullet">
+            <span class="dot"></span>
+            <div>Gérez vos inscriptions en ligne</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <h2>Tournois</h2>
+            <p class="sub">Consultez les tournois disponibles et inscrivez-vous.</p>
+            <a class="btn" asp-controller="Tournoi" asp-action="Index">Voir les tournois</a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <h2>Inscription</h2>
+            <p class="sub">Créez votre compte pour participer.</p>
+            <a class="btn" asp-controller="Inscription" asp-action="Index">S'inscrire</a>
+        </div>
+    </div>
 </div>

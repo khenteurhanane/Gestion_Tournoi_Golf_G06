@@ -1,35 +1,46 @@
 @model croupe_06_TournoiGolf.Models.Tournoi
 
+@{
+    ViewData["Title"] = "Créer un Tournoi";
+}
+
 <h1>Créer un Tournoi</h1>
 
-<form method="post" action="/Tournoi/Create">
-    <table>
-        <tr>
-            <td>Nom du tournoi :</td>
-            <td><input type="text" name="Nom" value="@Model?.Nom" /></td>
-        </tr>
-        <tr>
-            <td>Date :</td>
-            <td><input type="date" name="DateTournoi" /></td>
-        </tr>
-        <tr>
-            <td>Lieu :</td>
-            <td><input type="text" name="Lieu" value="@Model?.Lieu" /></td>
-        </tr>
-        <tr>
-            <td>Description :</td>
-            <td><textarea name="Description">@Model?.Description</textarea></td>
-        </tr>
-        <tr>
-            <td>Nombre max de participants :</td>
-            <td><input type="number" name="NombreMaxParticipants" value="100" /></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <button type="submit">Créer</button>
-                <a href="/Tournoi/Index">Annuler</a>
-            </td>
-        </tr>
-    </table>
-</form>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <form asp-action="Create" method="post">
+                <div class="form-group">
+                    <label>Nom du tournoi</label>
+                    <input asp-for="Nom" type="text" placeholder="Nom du tournoi" />
+                    <span asp-validation-for="Nom" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input asp-for="DateTournoi" type="date" />
+                    <span asp-validation-for="DateTournoi" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Lieu</label>
+                    <input asp-for="Lieu" type="text" placeholder="Lieu du tournoi" />
+                    <span asp-validation-for="Lieu" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea asp-for="Description" placeholder="Description du tournoi"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre max de participants</label>
+                    <input asp-for="NombreMaxParticipants" type="number" value="100" />
+                </div>
+
+                <button type="submit" class="btn">Créer</button>
+                <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
