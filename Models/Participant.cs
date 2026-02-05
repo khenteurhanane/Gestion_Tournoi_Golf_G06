@@ -1,27 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace croupe_06_TournoiGolf.Models
 {
     public class Participant
     {
-        public int Id { get; set; }
+        [Key]
+        public int ParticipantId { get; set; }
 
-        [Required(ErrorMessage = "Le prénom est requis")]
-        [StringLength(50, ErrorMessage = "Maximum 50 caractères")]
-        public string Prenom { get; set; }
+        [ForeignKey("Tournoi")]
+        public int TournoiId { get; set; }
+        public Tournoi Tournoi { get; set; }
 
-        [Required(ErrorMessage = "Le nom est requis")]
-        [StringLength(50, ErrorMessage = "Maximum 50 caractères")]
-        public string Nom { get; set; }
+        [ForeignKey("Utilisateur")]
+        public int UtilisateurId { get; set; }
+        public Utilisateur Utilisateur { get; set; }
 
-        [Required(ErrorMessage = "Le courriel est requis")]
-        [EmailAddress(ErrorMessage = "Format de courriel invalide")]
-        public string Email { get; set; }
+        public int? EquipeId { get; set; }
 
-        [Required(ErrorMessage = "Le téléphone est requis")]
-        [Phone(ErrorMessage = "Format de téléphone invalide")]
-        public string Telephone { get; set; }
+        public string StatutInscription { get; set; } = "CONFIRMEE";
 
-        public string MotDePasseHash { get; set; }
+        public decimal MontantPaye { get; set; }
+
+        public DateTime CreeLe { get; set; } = DateTime.Now;
     }
 }

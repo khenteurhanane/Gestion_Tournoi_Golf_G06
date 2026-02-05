@@ -35,7 +35,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(tournoi);
             }
 
-            tournoi.DateCreation = DateTime.Now;
+            tournoi.CreeLe = DateTime.Now;
             _context.Tournois.Add(tournoi);
             _context.SaveChanges();
 

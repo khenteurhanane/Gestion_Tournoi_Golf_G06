@@ -1,33 +1,38 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace croupe_06_TournoiGolf.Models
 {
     public class Tournoi
     {
-        public int Id { get; set; }
+        [Key]
+        public int TournoiId { get; set; }
 
         [Required(ErrorMessage = "Le nom du tournoi est requis")]
         [StringLength(100, ErrorMessage = "Le nom ne peut pas dépasser 100 caractères")]
-        public string Nom { get; set; }
+        public string Nom { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La date est requise")]
         [DataType(DataType.Date)]
         public DateTime DateTournoi { get; set; }
 
         [StringLength(500)]
-        public string Description { get; set; }
+        [NotMapped]
+        public string? Description { get; set; }
 
         [Required]
-        public string Lieu { get; set; }
+        public string Lieu { get; set; } = string.Empty;
 
         // État des inscriptions (ouvert/fermé)
         public bool InscriptionsOuvertes { get; set; } = false;
 
         // Nombre maximum de participants
         [Range(1, 200, ErrorMessage = "Entre 1 et 200 participants")]
-        public int NombreMaxParticipants { get; set; } = 100;
+        [Column("PlacesParticipantsMax")]
+        public int PlacesParticipantsMax { get; set; } = 100;
 
         // Date de création automatique
-        public DateTime DateCreation { get; set; } = DateTime.Now;
+        [Column("CreeLe")]
+        public DateTime CreeLe { get; set; } = DateTime.Now;
     }
 }

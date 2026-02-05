@@ -47,14 +47,14 @@ else
                         @if (tournoi.InscriptionsOuvertes)
                         {
                             <form action="/Tournoi/FermerInscriptions" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="@tournoi.Id" />
+                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
                                 <button type="submit" class="btn btn-secondary">Fermer</button>
                             </form>
                         }
                         else
                         {
                             <form action="/Tournoi/OuvrirInscriptions" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="@tournoi.Id" />
+                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
                                 <button type="submit" class="btn">Ouvrir</button>
                             </form>
                         }

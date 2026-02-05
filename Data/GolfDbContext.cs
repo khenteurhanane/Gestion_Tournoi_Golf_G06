@@ -12,5 +12,6 @@ namespace croupe_06_TournoiGolf.Data
         // Tables de la base de données
         public DbSet<Tournoi> Tournois { get; set; }
         public DbSet<Participant> Participants { get; set; }
+        public DbSet<Utilisateur> Utilisateurs { get; set; }
     }
 }

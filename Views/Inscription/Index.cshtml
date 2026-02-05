@@ -1,4 +1,4 @@
-﻿@model croupe_06_TournoiGolf.Models.Participant
+﻿@model croupe_06_TournoiGolf.Models.ViewModels.InscriptionViewModel
 
 @{
     ViewData["Title"] = "Inscription au tournoi";
@@ -12,24 +12,35 @@
             <p class="sub">Remplis le formulaire pour t'inscrire.</p>
 
             <form action="/Inscription/Index" method="post" onsubmit="return validerFormulaire(this)">
+                
+                @if (Model != null && Model.TournoiId != null)
+                {
+                    <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
+                }
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error" style="color:red; margin-bottom:15px;">@ViewBag.Error</div>
+                }
+
                 <div class="form-group">
                     <label>Prénom</label>
-                    <input name="Prenom" type="text" placeholder="Entrez votre prénom" required />
+                    <input name="Prenom" type="text" placeholder="Entrez votre prénom" value="@Model?.Prenom" required />
                 </div>
 
                 <div class="form-group">
                     <label>Nom</label>
-                    <input name="Nom" type="text" placeholder="Entrez votre nom" required />
+                    <input name="Nom" type="text" placeholder="Entrez votre nom" value="@Model?.Nom" required />
                 </div>
 
                 <div class="form-group">
                     <label>Adresse courriel</label>
-                    <input name="Email" type="email" placeholder="exemple@email.com" required />
+                    <input name="Email" type="email" placeholder="exemple@email.com" value="@Model?.Email" required />
                 </div>
 
                 <div class="form-group">
                     <label>Téléphone</label>
-                    <input name="Telephone" type="tel" placeholder="514 000 0000" required />
+                    <input name="Telephone" type="tel" placeholder="514 000 0000" value="@Model?.Telephone" required />
                 </div>
 
                 <div class="form-group">
@@ -48,7 +59,7 @@
                     </select>
                 </div>
 
-                <div class="form-group" id="codeEquipeDiv">
+                <div class="form-group" id="codeEquipeDiv" style="display:none;">
                     <label>Code d'équipe (si applicable)</label>
                     <input type="text" name="CodeEquipe" placeholder="Code de l'équipe" />
                 </div>
