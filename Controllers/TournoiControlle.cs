@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using croupe_06_TournoiGolf.Models;
+using croupe_06_TournoiGolf.Data;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
     public class TournoiController : Controller
     {
-        // Liste des tournois en mémoire
-        private static List<Tournoi> listeTournois = new List<Tournoi>();
+        private readonly GolfDbContext _context;
 
-        // Permet aux autres contrôleurs d'accéder à la liste
-        public static List<Tournoi> GetListeTournois()
+        public TournoiController(GolfDbContext context)
         {
-            return listeTournois;
+            _context = context;
         }
 
         // Affiche la liste des tournois
@@ -21,6 +20,8 @@ namespace croupe_06_TournoiGolf.Controllers
             {
                 return RedirectToAction("Login", "Auth");
             }
+
+            var listeTournois = _context.Tournois.ToList();
             return View(listeTournois);
         }
 
@@ -38,18 +39,14 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult Create(Tournoi tournoi)
         {
-            // Validation
             if (ModelState.IsValid == false)
             {
                 return View(tournoi);
             }
 
-            // Générer un ID simple
-            tournoi.Id = listeTournois.Count + 1;
             tournoi.DateCreation = DateTime.Now;
-
-            // Ajouter à la liste
-            listeTournois.Add(tournoi);
+            _context.Tournois.Add(tournoi);
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -58,14 +55,11 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult OuvrirInscriptions(int id)
         {
-            // Chercher le tournoi avec une boucle
-            for (int i = 0; i < listeTournois.Count; i++)
+            var tournoi = _context.Tournois.Find(id);
+            if (tournoi != null)
             {
-                if (listeTournois[i].Id == id)
-                {
-                    listeTournois[i].InscriptionsOuvertes = true;
-                    break;
-                }
+                tournoi.InscriptionsOuvertes = true;
+                _context.SaveChanges();
             }
             return RedirectToAction("Index");
         }
@@ -74,14 +68,11 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult FermerInscriptions(int id)
         {
-            // Chercher le tournoi avec une boucle
-            for (int i = 0; i < listeTournois.Count; i++)
+            var tournoi = _context.Tournois.Find(id);
+            if (tournoi != null)
             {
-                if (listeTournois[i].Id == id)
-                {
-                    listeTournois[i].InscriptionsOuvertes = false;
-                    break;
-                }
+                tournoi.InscriptionsOuvertes = false;
+                _context.SaveChanges();
             }
             return RedirectToAction("Index");
         }

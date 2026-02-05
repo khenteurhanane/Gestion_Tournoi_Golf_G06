@@ -1,4 +1,6 @@
 using croupe_06_TournoiGolf.Services;
+using croupe_06_TournoiGolf.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// Connexion à la base de données
+builder.Services.AddDbContext<GolfDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Service de hashage
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
