@@ -1,9 +1,14 @@
-﻿<!doctype html>
+﻿@{
+    ViewData["Title"] = "Connexion — Tournoi de Golf";
+    Layout = null;
+}
+
+<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Connexion — Tournoi de Golf</title>
+  <title>@ViewData["Title"]</title>
   <style>
     :root{
       --bg1:#0b3d2e;
@@ -141,7 +146,6 @@
       border-color: rgba(45,212,191,.55);
       box-shadow: 0 0 0 4px rgba(45,212,191,.12);
     }
-    .icon{ opacity:.85; }
     input{
       width:100%;
       border:none;
@@ -197,7 +201,6 @@
     }
 
     .error{
-      display:none;
       margin-top:12px;
       padding:10px 12px;
       border-radius:12px;
@@ -211,16 +214,16 @@
       .wrap{ grid-template-columns: 1fr; }
       .hero h1{ font-size: 30px; }
     }
-  </style>
+</style>
 </head>
 
 <body>
   <main class="wrap">
-    <!-- Partie gauche (petite présentation) -->
+    <!-- Partie gauche -->
     <section class="hero" aria-label="Présentation">
-      <div class="badge">⛳ Plateforme Tournoi de Golf — La Cité</div>
+      <div class="badge">Plateforme Tournoi de Golf — La Cité</div>
       <h1>Connexion</h1>
-      <p>Accède à ton espace pour t’inscrire, payer (simulation) et gérer ton équipe (code secret).</p>
+      <p>Accède à ton espace pour t’inscrire, payer (simulation) et gérer ton équipe.</p>
 
       <div class="bullets">
         <div class="bullet"><span class="dot"></span><div>Participant : inscription + création/rejoindre équipe</div></div>
@@ -231,66 +234,39 @@
 
     <!-- Formulaire Login -->
     <section class="card" aria-label="Formulaire de connexion">
-      <h2>Bienvenue 👋</h2>
+      <h2>Bienvenue</h2>
       <p class="sub">Connecte-toi pour continuer.</p>
 
-      <form id="loginForm">
+      <form asp-action="Login" asp-controller="Auth" method="post">
         <label for="email">Email</label>
         <div class="field">
-          <span class="icon">📧</span>
-          <input id="email" name="email" type="email" placeholder="ex: chanez@lacite.ca" required />
+          <input id="email" name="email" type="email" placeholder="ex: admin@test.com" required />
         </div>
 
-        <label for="password">Mot de passe</label>
+        <label for="motDePasse">Mot de passe</label>
         <div class="field">
-          <span class="icon">🔒</span>
-          <input id="password" name="password" type="password" placeholder="••••••••" minlength="6" required />
+          <input id="motDePasse" name="motDePasse" type="password" placeholder="••••••••" required />
         </div>
 
         <div class="row">
           <label class="check">
-            <input type="checkbox" id="remember" />
+            <input type="checkbox" id="remember" name="remember" />
             Se souvenir de moi
           </label>
-
-          <a href="forgot-password.html">Mot de passe oublié ?</a>
         </div>
 
-        <div class="error" id="errorBox">Email ou mot de passe incorrect.</div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error">@ViewBag.Error</div>
+        }
 
         <button class="btn" type="submit">Se connecter</button>
 
         <div class="footer">
-          Pas de compte ? <a href="register.html">Créer un compte</a>
+          Pas de compte ? <a href="/Inscription">Créer un compte</a>
         </div>
       </form>
     </section>
   </main>
-
-  <script>
-    // Demo simple (sans backend) : validation côté client
-    // Remplace par ton appel API ASP.NET plus tard.
-    document.getElementById("loginForm").addEventListener("submit", function(e){
-      e.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const pwd = document.getElementById("password").value.trim();
-      const errorBox = document.getElementById("errorBox");
-
-      // Exemple ultra simple : si champs vides -> erreur
-      if(!email || !pwd){
-        errorBox.style.display = "block";
-        errorBox.textContent = "Veuillez remplir tous les champs.";
-        return;
-      }
-
-      // ✅ ICI tu feras ton vrai login (fetch vers ASP.NET)
-      // Pour l’instant, on simule une connexion réussie :
-      errorBox.style.display = "none";
-      alert("Connexion réussie ✅ (simulation)");
-      // window.location.href = "dashboard.html";
-    });
-  </script>
 </body>
 </html>
-
