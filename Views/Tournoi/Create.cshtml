@@ -9,37 +9,34 @@
 <div class="row">
     <div class="col-md-6">
         <div class="card">
-            <form asp-action="Create" method="post">
+            <form action="/Tournoi/Create" method="post">
                 <div class="form-group">
                     <label>Nom du tournoi</label>
-                    <input asp-for="Nom" type="text" placeholder="Nom du tournoi" />
-                    <span asp-validation-for="Nom" class="error"></span>
+                    <input name="Nom" type="text" placeholder="Nom du tournoi" required />
                 </div>
 
                 <div class="form-group">
                     <label>Date</label>
-                    <input asp-for="DateTournoi" type="date" />
-                    <span asp-validation-for="DateTournoi" class="error"></span>
+                    <input name="DateTournoi" type="date" required />
                 </div>
 
                 <div class="form-group">
                     <label>Lieu</label>
-                    <input asp-for="Lieu" type="text" placeholder="Lieu du tournoi" />
-                    <span asp-validation-for="Lieu" class="error"></span>
+                    <input name="Lieu" type="text" placeholder="Lieu du tournoi" required />
                 </div>
 
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea asp-for="Description" placeholder="Description du tournoi"></textarea>
+                    <textarea name="Description" placeholder="Description du tournoi"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Nombre max de participants</label>
-                    <input asp-for="NombreMaxParticipants" type="number" value="100" />
+                    <input name="NombreMaxParticipants" type="number" value="100" />
                 </div>
 
                 <button type="submit" class="btn">Créer</button>
-                <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+                <a href="/Tournoi/Index" class="btn btn-secondary">Annuler</a>
             </form>
         </div>
     </div>

@@ -9,7 +9,6 @@ namespace croupe_06_TournoiGolf.Controllers
         private static List<Participant> listeParticipants = new List<Participant>();
 
         // Affiche le formulaire d'inscription
-        // tournoiId est optionnel pour compatibilité avec le code existant
         public IActionResult Index(int? tournoiId)
         {
             // Si un tournoiId est fourni, vérifier les inscriptions
@@ -29,8 +28,18 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult Index(Participant participant)
         {
-            // Forcer la redirection pour valider US-05 (Preuve)
-            // TODO: Enregistrer plus tard dans la DB
+            // Vérifier si le formulaire est valide
+            if (ModelState.IsValid == false)
+            {
+                return View(participant);
+            }
+
+            // Générer un ID
+            participant.Id = listeParticipants.Count + 1;
+
+            // Ajouter à la liste
+            listeParticipants.Add(participant);
+
             return RedirectToAction("Confirmation");
         }
 
@@ -40,13 +49,11 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Vérifie si les inscriptions sont ouvertes pour un tournoi
+        // Vérifie si les inscriptions sont ouvertes
         private bool VerifierInscriptionsOuvertes(int tournoiId)
         {
-            // Accéder à la liste des tournois
             var listeTournois = TournoiController.GetListeTournois();
 
-            // Chercher le tournoi avec une boucle
             for (int i = 0; i < listeTournois.Count; i++)
             {
                 if (listeTournois[i].Id == tournoiId)
@@ -55,11 +62,10 @@ namespace croupe_06_TournoiGolf.Controllers
                 }
             }
 
-            // Tournoi non trouvé = inscriptions ouvertes par défaut
             return true;
         }
 
-        // Récupère la liste des participants (pour les autres contrôleurs)
+        // Récupère la liste des participants
         public static List<Participant> GetListeParticipants()
         {
             return listeParticipants;

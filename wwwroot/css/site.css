@@ -14,11 +14,13 @@
     --accent: #2dd4bf;
     --accent2: #34d399;
     --danger: #fb7185;
-    --shadow: 0 18px 50px rgba(0,0,0,.35);
+    --shadow: 0 18px 50px rgba(0, 0, 0, .35);
     --radius: 18px;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 html {
     font-size: 14px;
@@ -38,17 +40,17 @@ body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     color: var(--text);
     background:
-        radial-gradient(900px 700px at 15% 10%, rgba(45,212,191,.35), transparent 60%),
-        radial-gradient(900px 700px at 90% 80%, rgba(52,211,153,.30), transparent 55%),
+        radial-gradient(900px 700px at 15% 10%, rgba(45, 212, 191, .35), transparent 60%),
+        radial-gradient(900px 700px at 90% 80%, rgba(52, 211, 153, .30), transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
     background-attachment: fixed;
 }
 
 /* Navigation */
 .navbar {
-    background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(11,18,32,.92)) !important;
+    background: linear-gradient(180deg, rgba(15, 23, 42, .85), rgba(11, 18, 32, .92)) !important;
     box-shadow: var(--shadow);
-    border-bottom: 1px solid rgba(255,255,255,.10);
+    border-bottom: 1px solid rgba(255, 255, 255, .10);
     backdrop-filter: blur(10px);
 }
 
@@ -72,7 +74,7 @@ body {
 }
 
 .navbar-toggler {
-    border-color: rgba(255,255,255,.20);
+    border-color: rgba(255, 255, 255, .20);
 }
 
 .navbar-toggler-icon {
@@ -81,17 +83,19 @@ body {
 
 /* Conteneur principal */
 .container {
-    background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(11,18,32,.92));
+    background: linear-gradient(180deg, rgba(15, 23, 42, .85), rgba(11, 18, 32, .92));
     border-radius: var(--radius);
     padding: 30px;
     margin-top: 20px;
     margin-bottom: 20px;
     box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,.10);
+    border: 1px solid rgba(255, 255, 255, .10);
 }
 
 /* Titres */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     color: var(--text);
     margin-bottom: 20px;
 }
@@ -121,40 +125,49 @@ label {
     gap: 10px;
     padding: 12px;
     border-radius: 14px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
     transition: 0.2s ease;
 }
 
 .field:focus-within {
-    border-color: rgba(45,212,191,.55);
-    box-shadow: 0 0 0 4px rgba(45,212,191,.12);
+    border-color: rgba(45, 212, 191, .55);
+    box-shadow: 0 0 0 4px rgba(45, 212, 191, .12);
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
     width: 100%;
     padding: 12px;
-    border: 1px solid rgba(255,255,255,.12);
+    border: 1px solid rgba(255, 255, 255, .12);
     border-radius: 14px;
     font-size: 15px;
     outline: none;
     box-sizing: border-box;
-    background: rgba(255,255,255,.06);
+    background: rgba(255, 255, 255, .06);
     color: var(--text);
     transition: 0.2s ease;
 }
 
-input::placeholder, textarea::placeholder {
-    color: rgba(231,246,239,.45);
+input::placeholder,
+textarea::placeholder {
+    color: rgba(231, 246, 239, .45);
 }
 
-input:focus, textarea:focus, select:focus {
-    border-color: rgba(45,212,191,.55);
-    box-shadow: 0 0 0 4px rgba(45,212,191,.12);
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: rgba(45, 212, 191, .55);
+    box-shadow: 0 0 0 4px rgba(45, 212, 191, .12);
 }
 
 /* Boutons */
-button, .btn, input[type="submit"] {
+button,
+.btn,
+input[type="submit"],
+a.btn {
+    display: inline-block;
     border: none;
     cursor: pointer;
     border-radius: 14px;
@@ -164,25 +177,35 @@ button, .btn, input[type="submit"] {
     color: #062a22;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     transition: transform 0.12s ease, filter 0.12s ease;
+    text-decoration: none;
+    text-align: center;
 }
 
-button:hover, .btn:hover, input[type="submit"]:hover {
+button:hover,
+.btn:hover,
+input[type="submit"]:hover,
+a.btn:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
+    text-decoration: none;
+    color: #062a22;
 }
 
-button:active, .btn:active, input[type="submit"]:active {
+button:active,
+.btn:active,
+input[type="submit"]:active,
+a.btn:active {
     transform: translateY(0);
 }
 
 .btn-secondary {
-    background: rgba(255,255,255,.10);
+    background: rgba(255, 255, 255, .10);
     color: var(--text);
-    border: 1px solid rgba(255,255,255,.14);
+    border: 1px solid rgba(255, 255, 255, .14);
 }
 
 .btn-secondary:hover {
-    background: rgba(255,255,255,.15);
+    background: rgba(255, 255, 255, .15);
     color: var(--text);
 }
 
@@ -216,12 +239,12 @@ table th:last-child {
 
 table td {
     padding: 12px 14px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
     color: var(--muted);
 }
 
 table tr:hover {
-    background: rgba(255,255,255,.04);
+    background: rgba(255, 255, 255, .04);
 }
 
 table tr:last-child td:first-child {
@@ -244,15 +267,15 @@ table tr:last-child td:last-child {
 }
 
 .badge-ouvert {
-    background: rgba(45,212,191,.15);
+    background: rgba(45, 212, 191, .15);
     color: var(--accent);
-    border: 1px solid rgba(45,212,191,.30);
+    border: 1px solid rgba(45, 212, 191, .30);
 }
 
 .badge-ferme {
-    background: rgba(251,113,133,.12);
+    background: rgba(251, 113, 133, .12);
     color: var(--danger);
-    border: 1px solid rgba(251,113,133,.30);
+    border: 1px solid rgba(251, 113, 133, .30);
 }
 
 /* Liens */
@@ -268,25 +291,27 @@ a:hover {
 }
 
 /* Messages d'erreur */
-.error, .text-danger {
+.error,
+.text-danger {
     display: block;
     margin-top: 12px;
     padding: 10px 12px;
     border-radius: 12px;
-    background: rgba(251,113,133,.12);
-    border: 1px solid rgba(251,113,133,.30);
+    background: rgba(251, 113, 133, .12);
+    border: 1px solid rgba(251, 113, 133, .30);
     color: #ffd0d9;
     font-size: 13px;
 }
 
 /* Messages de succès */
-.success, .text-success {
+.success,
+.text-success {
     display: block;
     margin-top: 12px;
     padding: 10px 12px;
     border-radius: 12px;
-    background: rgba(45,212,191,.12);
-    border: 1px solid rgba(45,212,191,.30);
+    background: rgba(45, 212, 191, .12);
+    border: 1px solid rgba(45, 212, 191, .30);
     color: var(--accent);
     font-size: 13px;
 }
@@ -295,9 +320,9 @@ a:hover {
 .card {
     border-radius: var(--radius);
     padding: 26px;
-    background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(11,18,32,.92));
+    background: linear-gradient(180deg, rgba(15, 23, 42, .85), rgba(11, 18, 32, .92));
     box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,.10);
+    border: 1px solid rgba(255, 255, 255, .10);
 }
 
 .card h2 {
@@ -315,7 +340,7 @@ a:hover {
 .hero {
     border-radius: var(--radius);
     padding: 28px;
-    background: linear-gradient(180deg, rgba(15,23,42,.55), rgba(11,18,32,.65));
+    background: linear-gradient(180deg, rgba(15, 23, 42, .55), rgba(11, 18, 32, .65));
     box-shadow: var(--shadow);
     position: relative;
     overflow: hidden;
@@ -327,7 +352,7 @@ a:hover {
     inset: -80px -80px auto auto;
     width: 260px;
     height: 260px;
-    background: radial-gradient(circle, rgba(45,212,191,.35), transparent 70%);
+    background: radial-gradient(circle, rgba(45, 212, 191, .35), transparent 70%);
     transform: rotate(25deg);
 }
 
@@ -344,8 +369,8 @@ a:hover {
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .10);
     padding: 10px 12px;
     border-radius: 14px;
 }
@@ -361,11 +386,11 @@ a:hover {
 
 /* Footer */
 .footer {
-    background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(11,18,32,.92));
+    background: linear-gradient(180deg, rgba(15, 23, 42, .85), rgba(11, 18, 32, .92));
     padding: 20px;
     text-align: center;
     color: var(--muted);
-    border-top: 1px solid rgba(255,255,255,.10);
+    border-top: 1px solid rgba(255, 255, 255, .10);
 }
 
 .footer a {
@@ -403,7 +428,7 @@ a:hover {
         margin: 10px;
         padding: 20px;
     }
-    
+
     h1 {
         font-size: 1.75rem;
     }

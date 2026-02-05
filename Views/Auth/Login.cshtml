@@ -9,7 +9,7 @@
             <h2>Connexion</h2>
             <p class="sub">Connecte-toi pour accéder à ton espace.</p>
 
-            <form asp-action="Login" asp-controller="Auth" method="post">
+            <form action="/Auth/Login" method="post" onsubmit="return validerFormulaire(this)">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input id="email" name="email" type="email" placeholder="exemple@email.com" required />
@@ -29,7 +29,7 @@
             </form>
 
             <div class="footer">
-                Pas de compte ? <a asp-controller="Inscription" asp-action="Index">Créer un compte</a>
+                Pas de compte ? <a href="/Inscription/Index">Créer un compte</a>
             </div>
         </div>
 

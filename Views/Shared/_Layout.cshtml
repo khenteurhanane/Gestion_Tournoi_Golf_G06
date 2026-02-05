@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tournoi de Golf G06</title>
     <meta name="description" content="Plateforme de gestion de tournoi de golf - La Cité" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/croupe_06_TournoiGolf.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand" href="/">
                     Tournoi Golf G06
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
@@ -23,26 +22,26 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Accueil</a>
+                            <a class="nav-link" href="/">Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Tournoi" asp-action="Index">Tournois</a>
+                            <a class="nav-link" href="/Tournoi/Index">Tournois</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Inscription" asp-action="Index">Inscription</a>
+                            <a class="nav-link" href="/Inscription/Index">Inscription</a>
                         </li>
                         @using Microsoft.AspNetCore.Http
                         @inject IHttpContextAccessor HttpContextAccessor
                         @if (HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true")
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-warning" asp-area="" asp-controller="Auth" asp-action="Logout">Déconnexion</a>
+                                <a class="nav-link text-warning" href="/Auth/Logout">Déconnexion</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Auth" asp-action="Login">Connexion</a>
+                                <a class="nav-link" href="/Auth/Login">Connexion</a>
                             </li>
                         }
                     </ul>
@@ -59,13 +58,14 @@
 
     <footer class="footer text-muted">
         <div class="container" style="background: transparent; box-shadow: none; border: none; padding: 0;">
-            &copy; 2026 - Tournoi de Golf G06 - La Cité - <a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a>
+            &copy; 2026 - Tournoi de Golf G06 - La Cité
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js"></script>
+    <script src="/js/validation.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

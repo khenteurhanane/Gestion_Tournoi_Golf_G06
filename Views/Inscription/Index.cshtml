@@ -11,28 +11,25 @@
             <h2>Inscription au tournoi</h2>
             <p class="sub">Remplis le formulaire pour t'inscrire.</p>
 
-            <form asp-action="Index" method="post">
+            <form action="/Inscription/Index" method="post" onsubmit="return validerFormulaire(this)">
                 <div class="form-group">
                     <label>Prénom</label>
-                    <input asp-for="Prenom" type="text" placeholder="Entrez votre prénom" />
-                    <span asp-validation-for="Prenom" class="error"></span>
+                    <input name="Prenom" type="text" placeholder="Entrez votre prénom" required />
                 </div>
 
                 <div class="form-group">
                     <label>Nom</label>
-                    <input asp-for="Nom" type="text" placeholder="Entrez votre nom" />
-                    <span asp-validation-for="Nom" class="error"></span>
+                    <input name="Nom" type="text" placeholder="Entrez votre nom" required />
                 </div>
 
                 <div class="form-group">
                     <label>Adresse courriel</label>
-                    <input asp-for="Email" type="email" placeholder="exemple@email.com" />
-                    <span asp-validation-for="Email" class="error"></span>
+                    <input name="Email" type="email" placeholder="exemple@email.com" required />
                 </div>
 
                 <div class="form-group">
                     <label>Téléphone</label>
-                    <input asp-for="Telephone" type="tel" placeholder="514 000 0000" />
+                    <input name="Telephone" type="tel" placeholder="514 000 0000" required />
                 </div>
 
                 <div class="form-group">
@@ -58,32 +55,29 @@
 
                 <div class="form-group">
                     <label>Mot de passe</label>
-                    <input asp-for="MotDePasseHash" type="password" placeholder="Créez un mot de passe" />
-                    <span asp-validation-for="MotDePasseHash" class="error"></span>
+                    <input name="MotDePasseHash" type="password" placeholder="Créez un mot de passe" required />
                 </div>
 
                 <button class="btn" type="submit">S'inscrire au tournoi</button>
             </form>
 
             <div class="footer">
-                Déjà inscrit ? <a asp-controller="Auth" asp-action="Login">Se connecter</a>
+                Déjà inscrit ? <a href="/Auth/Login">Se connecter</a>
             </div>
         </div>
 
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        function toggleCodeEquipe() {
-            var choix = document.getElementById('choixEquipe').value;
-            var codeDiv = document.getElementById('codeEquipeDiv');
-            if (choix === 'rejoindre') {
-                codeDiv.style.display = 'block';
-            } else {
-                codeDiv.style.display = 'none';
-            }
+<script>
+    function toggleCodeEquipe() {
+        var choix = document.getElementById('choixEquipe').value;
+        var codeDiv = document.getElementById('codeEquipeDiv');
+        if (choix === 'rejoindre') {
+            codeDiv.style.display = 'block';
+        } else {
+            codeDiv.style.display = 'none';
         }
-        toggleCodeEquipe();
-    </script>
-}
+    }
+    toggleCodeEquipe();
+</script>

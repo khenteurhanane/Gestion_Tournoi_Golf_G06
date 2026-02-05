@@ -1,10 +1,18 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using croupe_06_TournoiGolf.Services;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IPasswordHasher _passwordHasher;
+
+        public AuthController(IPasswordHasher passwordHasher)
+        {
+            _passwordHasher = passwordHasher;
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -14,7 +22,12 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult Login(string email, string motDePasse)
         {
-            if (email == "admin@test.com" && motDePasse == "1234")
+            // Hash du mot de passe pour comparer
+            string motDePasseHash = _passwordHasher.HashPassword(motDePasse);
+
+            // Vérification admin
+            string adminHash = _passwordHasher.HashPassword("1234");
+            if (email == "admin@test.com" && motDePasseHash == adminHash)
             {
                 HttpContext.Session.SetInt32("UserId", 1);
                 HttpContext.Session.SetString("IsLoggedIn", "true");
@@ -22,7 +35,10 @@ namespace croupe_06_TournoiGolf.Controllers
                 
                 return RedirectToAction("Index", "Admin");
             }
-            else if (email == "participant@test.com" && motDePasse == "1234")
+
+            // Vérification participant
+            string participantHash = _passwordHasher.HashPassword("1234");
+            if (email == "participant@test.com" && motDePasseHash == participantHash)
             {
                 HttpContext.Session.SetInt32("UserId", 2);
                 HttpContext.Session.SetString("IsLoggedIn", "true");
