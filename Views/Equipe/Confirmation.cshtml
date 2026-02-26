@@ -1,0 +1,31 @@
+@model croupe_06_TournoiGolf.Models.Equipe
+
+@{
+    ViewData["Title"] = "Équipe créée";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+        <div class="card">
+            <h2>Équipe créée avec succès !</h2>
+            <p class="sub">Partage le code secret avec tes coéquipiers.</p>
+
+            <div class="form-group">
+                <label>Nom de l'équipe</label>
+                <p><strong>@Model.NomEquipe</strong></p>
+            </div>
+
+            <div class="form-group">
+                <label>Code secret</label>
+                <p style="font-size:2rem; font-weight:bold; letter-spacing:5px; color:#2e7d32;">@Model.CodeSecret</p>
+                <small>Donne ce code à tes coéquipiers pour qu'ils rejoignent l'équipe.</small>
+            </div>
+
+            <div class="footer">
+                <a href="/Inscription/Index">Retour à l'accueil</a>
+            </div>
+        </div>
+
+    </div>
+</div>

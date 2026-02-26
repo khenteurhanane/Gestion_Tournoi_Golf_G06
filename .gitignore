@@ -364,3 +364,7 @@ FodyWeavers.xsd
 
 # Documentation personnelle (ne pas commiter)
 Documentation_Rayane.md
+Documentation/Fiche_Oral_Tests.md
+
+# Dossier de tests local (ne pas commiter)
+Tests/
