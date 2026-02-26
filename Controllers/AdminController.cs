@@ -6,7 +6,13 @@ namespace croupe_06_TournoiGolf.Controllers
     {
         public IActionResult Index()
         {
-            // Pas besoin de vérifier la session, BaseController le fait
+            // Vérifier que l'utilisateur est administrateur
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
     }

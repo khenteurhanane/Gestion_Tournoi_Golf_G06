@@ -20,16 +20,30 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(listeTournois);
         }
 
-        // Affiche le formulaire de création
+        // Affiche le formulaire de création (admin seulement)
         public IActionResult Create()
         {
+            // Vérifier que l'utilisateur est administrateur
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
-        // Enregistre un nouveau tournoi
+        // Enregistre un nouveau tournoi (admin seulement)
         [HttpPost]
         public IActionResult Create(Tournoi tournoi)
         {
+            // Vérifier que l'utilisateur est administrateur
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid == false)
             {
                 return View(tournoi);
@@ -42,10 +56,17 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Index");
         }
 
-        // Ouvre les inscriptions
+        // Ouvre les inscriptions (admin seulement)
         [HttpPost]
         public IActionResult OuvrirInscriptions(int id)
         {
+            // Vérifier que l'utilisateur est administrateur
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
             {
@@ -55,10 +76,17 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Index");
         }
 
-        // Ferme les inscriptions
+        // Ferme les inscriptions (admin seulement)
         [HttpPost]
         public IActionResult FermerInscriptions(int id)
         {
+            // Vérifier que l'utilisateur est administrateur
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
             {
