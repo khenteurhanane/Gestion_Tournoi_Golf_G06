@@ -20,6 +20,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    @using Microsoft.AspNetCore.Http
+                    @inject IHttpContextAccessor HttpContextAccessor
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link" href="/">Accueil</a>
@@ -28,12 +30,25 @@
                             <a class="nav-link" href="/Tournoi/Index">Tournois</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Inscription/Index">Inscription</a>
+                            <a class="nav-link" href="/Home/Contact">Contact</a>
                         </li>
-                        @using Microsoft.AspNetCore.Http
-                        @inject IHttpContextAccessor HttpContextAccessor
                         @if (HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true")
                         {
+                            if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Admin/Index">Dashboard</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Auth/MesInscriptions">Mes inscriptions</a>
+                                </li>
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Auth/Profil">Mon profil</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-warning" href="/Auth/Logout">Déconnexion</a>
                             </li>
@@ -41,10 +56,17 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" href="/Auth/Login">Connexion</a>
+                                <a class="nav-link nav-btn-login" href="/Auth/Login">Connexion</a>
                             </li>
                         }
                     </ul>
+                    @if (HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true")
+                    {
+                        <span class="navbar-text" style="color:var(--gold); font-size:0.85rem;">
+                            @HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom")
+                            @HttpContextAccessor.HttpContext?.Session.GetString("UserNom")
+                        </span>
+                    }
                 </div>
             </div>
         </nav>
@@ -56,10 +78,12 @@
         </main>
     </div>
 
-    <footer class="footer text-muted">
-        <div class="container" style="background: transparent; box-shadow: none; border: none; padding: 0;">
-            &copy; 2026 - Tournoi de Golf G06 - La Cité
+    <footer class="site-footer">
+        <div class="footer-links">
+            <a href="/Home/Contact">Contact</a> |
+            <a href="/Home/Privacy">Confidentialité</a>
         </div>
+        &copy; 2026 - Tournoi de Golf G06 - La Cité
     </footer>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
