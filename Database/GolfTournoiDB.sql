@@ -43,10 +43,12 @@ CREATE TABLE Tournois (
     TournoiId INT IDENTITY PRIMARY KEY,
     Nom NVARCHAR(120),
     DateTournoi DATE,
+    Description NVARCHAR(500) NULL,
     Lieu NVARCHAR(150),
     InscriptionsOuvertes BIT DEFAULT 0,
     NbEquipesMax INT,
     PlacesParticipantsMax INT,
+    DateLimiteInscription DATE NULL,
     CreeLe DATETIME DEFAULT GETDATE()
 );
 GO
@@ -57,6 +59,7 @@ CREATE TABLE Equipes (
     TournoiId INT,
     NomEquipe NVARCHAR(80),
     CodeSecret NVARCHAR(20) UNIQUE,
+    NbJoueursMax INT DEFAULT 4,
     CreeParUtilisateurId INT,
     CreeLe DATETIME DEFAULT GETDATE()
 );
@@ -68,6 +71,7 @@ CREATE TABLE Participants (
     TournoiId INT,
     UtilisateurId INT,
     EquipeId INT NULL,
+    TypeParticipant NVARCHAR(30) DEFAULT 'employe',
     StatutInscription NVARCHAR(20) DEFAULT 'CONFIRMEE',
     MontantPaye DECIMAL(10,2),
     CreeLe DATETIME DEFAULT GETDATE()
@@ -130,11 +134,13 @@ CREATE OR ALTER PROCEDURE sp_AjouterTournoi
     @DateTournoi DATE,
     @Lieu NVARCHAR(150),
     @NbEquipesMax INT,
-    @PlacesParticipantsMax INT
+    @PlacesParticipantsMax INT,
+    @Description NVARCHAR(500) = NULL,
+    @DateLimiteInscription DATE = NULL
 AS
 BEGIN
-    INSERT INTO Tournois
-    VALUES (@Nom, @DateTournoi, @Lieu, 0, @NbEquipesMax, @PlacesParticipantsMax, GETDATE());
+    INSERT INTO Tournois (Nom, DateTournoi, Description, Lieu, InscriptionsOuvertes, NbEquipesMax, PlacesParticipantsMax, DateLimiteInscription, CreeLe)
+    VALUES (@Nom, @DateTournoi, @Description, @Lieu, 0, @NbEquipesMax, @PlacesParticipantsMax, @DateLimiteInscription, GETDATE());
 END;
 GO
 
@@ -177,6 +183,12 @@ EXEC sp_AjouterTournoi
     @Lieu = 'Ottawa',
     @NbEquipesMax = 20,
     @PlacesParticipantsMax = 80;
+
+-- Ajouter un compte administrateur de test
+-- Email: admin@test.com / Mot de passe: 1234
+DELETE FROM Utilisateurs WHERE Email = 'admin@test.com';
+INSERT INTO Utilisateurs (Email, MotDePasseHash, Role, Prenom, Nom, Telephone)
+VALUES ('admin@test.com', 'A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=', 'ADMIN', 'Admin', 'Test', '000-000-0000');
 
 -- Supprimer utilisateur test s'il existe
 DELETE FROM Utilisateurs WHERE Email = 'participant@lacite.ca';

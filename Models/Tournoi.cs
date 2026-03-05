@@ -17,7 +17,6 @@ namespace croupe_06_TournoiGolf.Models
         public DateTime DateTournoi { get; set; }
 
         [StringLength(500)]
-        [NotMapped]
         public string? Description { get; set; }
 
         [Required]
@@ -30,6 +29,10 @@ namespace croupe_06_TournoiGolf.Models
         [Range(1, 200, ErrorMessage = "Entre 1 et 200 participants")]
         [Column("PlacesParticipantsMax")]
         public int PlacesParticipantsMax { get; set; } = 100;
+
+        // Date limite d'inscription (optionnelle)
+        [DataType(DataType.Date)]
+        public DateTime? DateLimiteInscription { get; set; }
 
         // Date de création automatique
         [Column("CreeLe")]

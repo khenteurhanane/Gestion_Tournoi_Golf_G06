@@ -18,6 +18,9 @@ namespace croupe_06_TournoiGolf.Models
 
         public int? EquipeId { get; set; }
 
+        [StringLength(30)]
+        public string TypeParticipant { get; set; } = "employe";
+
         public string StatutInscription { get; set; } = "CONFIRMEE";
 
         public decimal MontantPaye { get; set; }
