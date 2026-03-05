@@ -1,61 +1,81 @@
 // Validation côté client pour les formulaires
-// - Rayane
+// - Groupe 06
 
 // Valide le formulaire avant l'envoi
 function validerFormulaire(formulaire) {
     var estValide = true;
 
-    // Récupérer tous les champs obligatoires
-    var champs = formulaire.querySelectorAll("input[required], textarea[required]");
+    // Enlever les anciennes erreurs
+    var anciennesErreurs = formulaire.querySelectorAll('.erreur-validation');
+    for (var i = 0; i < anciennesErreurs.length; i++) {
+        anciennesErreurs[i].remove();
+    }
 
-    // Vérifier chaque champ
+    // Récupérer tous les champs obligatoires
+    var champs = formulaire.querySelectorAll('input[required], textarea[required]');
+
     for (var i = 0; i < champs.length; i++) {
         var champ = champs[i];
 
-        if (champ.value.trim() === "") {
-            // Champ vide
-            champ.style.border = "2px solid red";
+        if (champ.value.trim() === '') {
+            champ.style.borderColor = 'var(--danger)';
+            afficherErreur(champ, 'Ce champ est obligatoire.');
             estValide = false;
         } else {
-            // Champ rempli
-            champ.style.border = "1px solid green";
+            champ.style.borderColor = 'rgba(45, 212, 191, 0.55)';
         }
     }
 
-    // Valider le format email si présent
+    // Valider le format email
     var champEmail = formulaire.querySelector("input[type='email']");
-    if (champEmail && champEmail.value !== "") {
+    if (champEmail && champEmail.value !== '' && !champEmail.readOnly) {
         if (validerEmail(champEmail.value) === false) {
-            champEmail.style.border = "2px solid red";
+            champEmail.style.borderColor = 'var(--danger)';
+            afficherErreur(champEmail, 'Format d\'email invalide.');
             estValide = false;
         }
     }
 
-    // Afficher message si invalide
-    if (estValide === false) {
-        alert("Veuillez remplir tous les champs obligatoires.");
+    // Valider les mots de passe s'ils existent
+    var mdp = formulaire.querySelector('#MotDePasse');
+    var confirmMdp = formulaire.querySelector('#ConfirmMotDePasse');
+    if (mdp && confirmMdp && mdp.value !== '' && confirmMdp.value !== '') {
+        if (mdp.value.length < 6) {
+            afficherErreur(mdp, 'Le mot de passe doit faire au moins 6 caractères.');
+            mdp.style.borderColor = 'var(--danger)';
+            estValide = false;
+        }
+        if (mdp.value !== confirmMdp.value) {
+            afficherErreur(confirmMdp, 'Les mots de passe ne correspondent pas.');
+            confirmMdp.style.borderColor = 'var(--danger)';
+            estValide = false;
+        }
     }
 
     return estValide;
 }
 
+// Affiche un message d'erreur sous un champ
+function afficherErreur(champ, message) {
+    var erreur = document.createElement('small');
+    erreur.className = 'erreur-validation';
+    erreur.style.color = '#fb7185';
+    erreur.style.display = 'block';
+    erreur.style.marginTop = '4px';
+    erreur.textContent = message;
+    champ.parentNode.appendChild(erreur);
+}
+
 // Vérifie le format email
 function validerEmail(email) {
-    // Format simple : texte@texte.texte
-    var position = email.indexOf("@");
-    var positionPoint = email.lastIndexOf(".");
-
-    if (position > 0 && positionPoint > position) {
-        return true;
-    }
-    return false;
+    // Regex simple pour valider le format email
+    var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
 }
 
 // Vérifie le format téléphone
 function validerTelephone(telephone) {
-    // Accepte les chiffres, tirets et espaces
-    var caracteres = "0123456789-() ";
-
+    var caracteres = '0123456789-() ';
     for (var i = 0; i < telephone.length; i++) {
         if (caracteres.indexOf(telephone[i]) === -1) {
             return false;
