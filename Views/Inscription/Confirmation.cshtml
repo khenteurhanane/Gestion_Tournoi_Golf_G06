@@ -5,14 +5,29 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card text-center">
-            <h2>Confirmation</h2>
+            <h2>Inscription confirmée!</h2>
             
             <div class="success">
                 Votre inscription a été enregistrée avec succès!
             </div>
 
-            <p>Un message de confirmation vous a été envoyé.</p>
-            <p>Merci pour votre inscription au tournoi de golf.</p>
+            @if (ViewBag.NomTournoi != null)
+            {
+                <p>Tournoi : <strong>@ViewBag.NomTournoi</strong></p>
+            }
+
+            <p>Montant : <strong>60,00 $</strong></p>
+
+            @if (ViewBag.NomEquipe != null)
+            {
+                <div class="card-flat">
+                    <p>Équipe : <strong>@ViewBag.NomEquipe</strong></p>
+                    <p>Code secret : <strong class="text-accent" style="font-size: 1.5rem; letter-spacing: 3px;">@ViewBag.CodeEquipe</strong></p>
+                    <small>Partage ce code avec tes coéquipiers pour qu'ils rejoignent l'équipe.</small>
+                </div>
+            }
+
+            <p style="margin-top: 15px;">Merci pour votre inscription au tournoi de golf!</p>
 
             <a class="btn" href="/Tournoi/Index">Retour à la liste des tournois</a>
         </div>

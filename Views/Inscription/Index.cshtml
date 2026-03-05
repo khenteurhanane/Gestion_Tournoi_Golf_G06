@@ -9,71 +9,80 @@
         
         <div class="card">
             <h2>Inscription au tournoi</h2>
-            <p class="sub">Remplis le formulaire pour t'inscrire.</p>
+            <p class="sub">Vous vous inscrivez au tournoi : <strong>@ViewBag.NomTournoi</strong></p>
+            <p class="sub">Date : @ViewBag.DateTournoi | Lieu : @ViewBag.LieuTournoi</p>
 
-            <form action="/Inscription/Index" method="post" onsubmit="return validerFormulaire(this)">
+            <form action="/Inscription/Index" method="post">
                 
-                @if (Model != null && Model.TournoiId != null)
-                {
-                    <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
-                }
+                <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
 
                 @if (ViewBag.Error != null)
                 {
-                    <div class="error" style="color:red; margin-bottom:15px;">@ViewBag.Error</div>
+                    <div class="error">@ViewBag.Error</div>
                 }
 
                 <div class="form-group">
                     <label>Prénom</label>
-                    <input name="Prenom" type="text" placeholder="Entrez votre prénom" value="@Model?.Prenom" required />
+                    <input name="Prenom" type="text" value="@Model?.Prenom" readonly />
                 </div>
 
                 <div class="form-group">
                     <label>Nom</label>
-                    <input name="Nom" type="text" placeholder="Entrez votre nom" value="@Model?.Nom" required />
+                    <input name="Nom" type="text" value="@Model?.Nom" readonly />
                 </div>
 
                 <div class="form-group">
                     <label>Adresse courriel</label>
-                    <input name="Email" type="email" placeholder="exemple@email.com" value="@Model?.Email" required />
+                    <input name="Email" type="email" value="@Model?.Email" readonly />
                 </div>
 
                 <div class="form-group">
                     <label>Téléphone</label>
-                    <input name="Telephone" type="tel" placeholder="514 000 0000" value="@Model?.Telephone" required />
+                    <input name="Telephone" type="tel" value="@Model?.Telephone" readonly />
                 </div>
 
                 <div class="form-group">
                     <label>Type de participant</label>
-                    <select name="TypeParticipant">
-                        <option value="employe">Employé</option>
-                        <option value="retraite">Retraité</option>
+                    <select name="TypeParticipant" id="typeParticipant" onchange="mettreAJourPrix()">
+                        <option value="employe">Employé (60,00 $)</option>
+                        <option value="retraite">Retraité (50,00 $)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Choix d'équipe</label>
-                    <select name="ChoixEquipe" id="choixEquipe" onchange="toggleCodeEquipe()">
-                        <option value="creer">Créer une nouvelle équipe</option>
-                        <option value="rejoindre">Rejoindre une équipe existante</option>
+                    <label>Montant à payer</label>
+                    <input type="text" id="montantAffiche" value="60,00 $" readonly style="font-weight:bold;" />
+                </div>
+
+                <!-- Section équipe -->
+                <div class="form-group">
+                    <label>Équipe</label>
+                    <select name="ChoixEquipe" id="choixEquipe" onchange="afficherEquipe()">
+                        <option value="aucune">Pas d'équipe</option>
+                        <option value="creer">Créer une équipe</option>
+                        <option value="rejoindre">Rejoindre une équipe</option>
                     </select>
                 </div>
 
-                <div class="form-group" id="codeEquipeDiv" style="display:none;">
-                    <label>Code d'équipe (si applicable)</label>
-                    <input type="text" name="CodeEquipe" placeholder="Code de l'équipe" />
+                <div id="sectionCreer" style="display:none;">
+                    <div class="form-group">
+                        <label>Nom de l'équipe</label>
+                        <input name="NomEquipe" type="text" placeholder="Ex: Les Aigles" />
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Mot de passe</label>
-                    <input name="MotDePasseHash" type="password" placeholder="Créez un mot de passe" required />
+                <div id="sectionRejoindre" style="display:none;">
+                    <div class="form-group">
+                        <label>Code secret de l'équipe</label>
+                        <input name="CodeEquipe" type="text" placeholder="Ex: ABC123" />
+                    </div>
                 </div>
 
-                <button class="btn" type="submit">S'inscrire au tournoi</button>
+                <button class="btn" type="submit">Confirmer mon inscription</button>
             </form>
 
-            <div class="footer">
-                Déjà inscrit ? <a href="/Auth/Login">Se connecter</a>
+            <div class="card-footer">
+                <a href="/Tournoi/Index">Retour à la liste des tournois</a>
             </div>
         </div>
 
@@ -81,14 +90,15 @@
 </div>
 
 <script>
-    function toggleCodeEquipe() {
+    function afficherEquipe() {
         var choix = document.getElementById('choixEquipe').value;
-        var codeDiv = document.getElementById('codeEquipeDiv');
-        if (choix === 'rejoindre') {
-            codeDiv.style.display = 'block';
-        } else {
-            codeDiv.style.display = 'none';
-        }
+        document.getElementById('sectionCreer').style.display = (choix === 'creer') ? 'block' : 'none';
+        document.getElementById('sectionRejoindre').style.display = (choix === 'rejoindre') ? 'block' : 'none';
     }
-    toggleCodeEquipe();
+
+    function mettreAJourPrix() {
+        var type = document.getElementById('typeParticipant').value;
+        var montant = (type === 'retraite') ? '50,00 $' : '60,00 $';
+        document.getElementById('montantAffiche').value = montant;
+    }
 </script>
