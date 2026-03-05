@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
+using croupe_06_TournoiGolf.Models;
 using System.Linq;
 using croupe_06_TournoiGolf.Models.ViewModels;
 namespace croupe_06_TournoiGolf.Controllers
@@ -38,6 +40,10 @@ namespace croupe_06_TournoiGolf.Controllers
                 HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
                 HttpContext.Session.SetString("IsLoggedIn", "true");
                 HttpContext.Session.SetString("UserRole", utilisateur.Role);
+                HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
+                HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
+                HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
+                HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
 
                 // Redirection selon le rôle
                 if (utilisateur.Role == "ADMIN")
@@ -46,19 +52,28 @@ namespace croupe_06_TournoiGolf.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Inscription");
+                    return RedirectToAction("Index", "Tournoi");
                 }
             }
 
             // Fallback: vérification admin de test (pour développement)
-            string adminHash = _passwordHasher.HashPassword("1234");
-            if (email == "admin@test.com" && motDePasseHash == adminHash)
+            if (email == "admin@test.com" && utilisateur == null)
             {
-                HttpContext.Session.SetInt32("UserId", 1);
-                HttpContext.Session.SetString("IsLoggedIn", "true");
-                HttpContext.Session.SetString("UserRole", "Admin");
-                
-                return RedirectToAction("Index", "Admin");
+                // L'admin n'a pas été trouvé par email, ou le hash ne correspondait pas
+                // On cherche l'admin dans la DB directement
+                var admin = _context.Utilisateurs.FirstOrDefault(u => u.Email == "admin@test.com");
+                if (admin != null && admin.MotDePasseHash == motDePasseHash)
+                {
+                    HttpContext.Session.SetInt32("UserId", admin.UtilisateurId);
+                    HttpContext.Session.SetString("IsLoggedIn", "true");
+                    HttpContext.Session.SetString("UserRole", "ADMIN");
+                    HttpContext.Session.SetString("UserPrenom", admin.Prenom ?? "Admin");
+                    HttpContext.Session.SetString("UserNom", admin.Nom ?? "Golf");
+                    HttpContext.Session.SetString("UserEmail", admin.Email);
+                    HttpContext.Session.SetString("UserTelephone", admin.Telephone ?? "");
+                    
+                    return RedirectToAction("Index", "Admin");
+                }
             }
 
             ViewBag.Error = "Email ou mot de passe incorrect.";
@@ -71,7 +86,58 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Login");
         }
 
-        // --- Mot de passe oublié (Début) ---
+        // --- Création de compte ---
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+
+            // Vérifier si le email existe déjà dans la BD
+            var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
+            if (utilisateurExistant != null)
+            {
+                ModelState.AddModelError("Email", "Un compte existe déjà avec cet email.");
+                return View(model);
+            }
+
+            // Créer le nouvel utilisateur dans la BD
+            var utilisateur = new Utilisateur
+            {
+                Email = model.Email,
+                Prenom = model.Prenom,
+                Nom = model.Nom,
+                MotDePasseHash = _passwordHasher.HashPassword(model.MotDePasse),
+                Role = "PARTICIPANT",
+                CreeLe = DateTime.Now
+            };
+
+            _context.Utilisateurs.Add(utilisateur);
+            _context.SaveChanges();
+
+            // Connecter l'utilisateur après création du compte
+            HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
+            HttpContext.Session.SetString("IsLoggedIn", "true");
+            HttpContext.Session.SetString("UserRole", utilisateur.Role);
+            HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
+            HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
+            HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
+            HttpContext.Session.SetString("UserTelephone", "");
+
+            // Rediriger vers la liste des tournois
+            return RedirectToAction("Index", "Tournoi");
+        }
+
+        // --- Mot de passe oublié ---
 
         [HttpGet]
         public IActionResult ForgotPassword()
@@ -135,7 +201,84 @@ namespace croupe_06_TournoiGolf.Controllers
             _context.SaveChanges();
 
             ViewBag.Message = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
-            return View("Login"); // Ou rediriger vers Login avec un TempData
+            return View("Login");
+        }
+
+        // --- Mon Profil ---
+
+        [HttpGet]
+        public IActionResult Profil()
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login");
+
+            var utilisateur = _context.Utilisateurs.Find(userId);
+            if (utilisateur == null) return RedirectToAction("Login");
+
+            return View(utilisateur);
+        }
+
+        [HttpPost]
+        public IActionResult Profil(string Prenom, string Nom, string Telephone, string? Adresse)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login");
+
+            var utilisateur = _context.Utilisateurs.Find(userId);
+            if (utilisateur == null) return RedirectToAction("Login");
+
+            // Mettre à jour les infos
+            utilisateur.Prenom = Prenom ?? "";
+            utilisateur.Nom = Nom ?? "";
+            utilisateur.Telephone = Telephone ?? "";
+            utilisateur.Adresse = Adresse;
+            _context.SaveChanges();
+
+            // Mettre à jour la session
+            HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom);
+            HttpContext.Session.SetString("UserNom", utilisateur.Nom);
+            HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone);
+
+            ViewBag.Success = "Profil mis à jour avec succès!";
+            return View(utilisateur);
+        }
+
+        // --- Mes Inscriptions ---
+
+        public IActionResult MesInscriptions()
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login");
+
+            var inscriptions = _context.Participants
+                .Where(p => p.UtilisateurId == userId)
+                .Include(p => p.Tournoi)
+                .ToList();
+
+            // Récupérer les équipes
+            var equipeIds = inscriptions.Where(p => p.EquipeId != null).Select(p => p.EquipeId.Value).ToList();
+            var equipes = _context.Equipes.Where(e => equipeIds.Contains(e.EquipeId)).ToDictionary(e => e.EquipeId);
+            ViewBag.Equipes = equipes;
+
+            return View(inscriptions);
+        }
+
+        // --- Annuler une inscription ---
+
+        [HttpPost]
+        public IActionResult AnnulerInscription(int participantId)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login");
+
+            var participant = _context.Participants.FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
+            if (participant != null)
+            {
+                _context.Participants.Remove(participant);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("MesInscriptions");
         }
 
         // --- Mot de passe oublié (Fin) ---

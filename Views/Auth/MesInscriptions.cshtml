@@ -1,0 +1,98 @@
+@model List<croupe_06_TournoiGolf.Models.Participant>
+@using croupe_06_TournoiGolf.Models
+
+@{
+    ViewData["Title"] = "Mes Inscriptions";
+    var equipes = (Dictionary<int, Equipe>)(ViewBag.Equipes ?? new Dictionary<int, Equipe>());
+}
+
+<h1>Mes Inscriptions</h1>
+
+@if (Model.Count == 0)
+{
+    <div class="card text-center">
+        <h3>Aucune inscription</h3>
+        <p>Vous n'êtes inscrit à aucun tournoi pour le moment.</p>
+        <a class="btn" href="/Tournoi/Index">Voir les tournois disponibles</a>
+    </div>
+}
+else
+{
+    <p>Vous êtes inscrit à <strong>@Model.Count</strong> tournoi(s).</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Tournoi</th>
+                <th>Date</th>
+                <th>Lieu</th>
+                <th>Type</th>
+                <th>Montant</th>
+                <th>Équipe</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var inscription in Model)
+            {
+                var nomEquipe = "—";
+                var codeEquipe = "";
+                if (inscription.EquipeId != null && equipes.ContainsKey(inscription.EquipeId.Value))
+                {
+                    nomEquipe = equipes[inscription.EquipeId.Value].NomEquipe;
+                    codeEquipe = equipes[inscription.EquipeId.Value].CodeSecret;
+                }
+
+                <tr>
+                    <td><strong>@inscription.Tournoi?.Nom</strong></td>
+                    <td>@inscription.Tournoi?.DateTournoi.ToShortDateString()</td>
+                    <td>@inscription.Tournoi?.Lieu</td>
+                    <td>
+                        @if (inscription.TypeParticipant == "retraite")
+                        {
+                            <span>Retraité</span>
+                        }
+                        else
+                        {
+                            <span>Employé</span>
+                        }
+                    </td>
+                    <td>@inscription.MontantPaye.ToString("C")</td>
+                    <td>
+                        @if (nomEquipe != "—")
+                        {
+                            <span>@nomEquipe</span>
+                            <br /><small style="color:var(--accent); letter-spacing:1px;">@codeEquipe</small>
+                        }
+                        else
+                        {
+                            <span>—</span>
+                        }
+                    </td>
+                    <td>
+                        @if (inscription.StatutInscription == "CONFIRMEE")
+                        {
+                            <span class="badge badge-ouvert">Confirmée</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-ferme">@inscription.StatutInscription</span>
+                        }
+                    </td>
+                    <td>
+                        <form action="/Auth/AnnulerInscription" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette inscription?');">
+                            <input type="hidden" name="participantId" value="@inscription.ParticipantId" />
+                            <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;">Annuler</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="card-footer">
+    <a href="/Tournoi/Index" class="btn">Voir les tournois</a>
+    <a href="/Auth/Profil" class="btn btn-secondary">Mon profil</a>
+</div>
