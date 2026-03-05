@@ -2,65 +2,171 @@
 
 @{
     ViewData["Title"] = "Liste des Tournois";
+
+    // Séparer les tournois à venir et les tournois passés
+    var tournoisAVenir = Model.Where(t => t.DateTournoi >= DateTime.Today).OrderBy(t => t.DateTournoi).ToList();
+    var tournoisPasses = Model.Where(t => t.DateTournoi < DateTime.Today).OrderByDescending(t => t.DateTournoi).ToList();
 }
 
-<h1>Liste des Tournois</h1>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
-<p>
-    <a class="btn" href="/Tournoi/Create">Créer un tournoi</a>
-</p>
+<h1>Tournois de Golf</h1>
 
-@if (Model.Count == 0)
-{
-    <p class="text-muted">Aucun tournoi pour le moment.</p>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Date</th>
-                <th>Lieu</th>
-                <th>Inscriptions</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var tournoi in Model)
-            {
+<!-- Barre de recherche -->
+<div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
+    <input type="text" id="rechercheTournoi" placeholder="Rechercher un tournoi..." 
+           style="flex:1; min-width:200px;" onkeyup="filtrerTournois()" />
+    @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
+    {
+        <a class="btn" href="/Tournoi/Create">+ Créer un tournoi</a>
+    }
+</div>
+
+<!-- Onglets : À venir / Passés -->
+<div style="display:flex; gap:10px; margin-bottom:20px;">
+    <button class="btn onglet-actif" id="btnAVenir" onclick="afficherOnglet('avenir')">
+        À venir (@tournoisAVenir.Count)
+    </button>
+    <button class="btn btn-secondary" id="btnPasses" onclick="afficherOnglet('passes')">
+        Historique (@tournoisPasses.Count)
+    </button>
+</div>
+
+<!-- Tournois à venir -->
+<div id="sectionAVenir">
+    @if (tournoisAVenir.Count == 0)
+    {
+        <p class="text-muted">Aucun tournoi à venir pour le moment.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
                 <tr>
-                    <td>@tournoi.Nom</td>
-                    <td>@tournoi.DateTournoi.ToShortDateString()</td>
-                    <td>@tournoi.Lieu</td>
-                    <td>
-                        @if (tournoi.InscriptionsOuvertes)
-                        {
-                            <span class="badge badge-ouvert">Ouvertes</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-ferme">Fermées</span>
-                        }
-                    </td>
-                    <td>
-                        @if (tournoi.InscriptionsOuvertes)
-                        {
-                            <form action="/Tournoi/FermerInscriptions" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
-                                <button type="submit" class="btn btn-secondary">Fermer</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <form action="/Tournoi/OuvrirInscriptions" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
-                                <button type="submit" class="btn">Ouvrir</button>
-                            </form>
-                        }
-                    </td>
+                    <th>Nom</th>
+                    <th>Date</th>
+                    <th>Lieu</th>
+                    <th>Inscrits</th>
+                    <th>Inscriptions</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var tournoi in tournoisAVenir)
+                {
+                    var nbInscrits = ((Dictionary<int, int>)(ViewBag.NbInscrits ?? new Dictionary<int, int>())).ContainsKey(tournoi.TournoiId)
+                        ? ((Dictionary<int, int>)ViewBag.NbInscrits)[tournoi.TournoiId] : 0;
+                    var placesRestantes = tournoi.PlacesParticipantsMax - nbInscrits;
+
+                    <tr class="ligne-tournoi">
+                        <td>@tournoi.Nom</td>
+                        <td>@tournoi.DateTournoi.ToShortDateString()</td>
+                        <td>@tournoi.Lieu</td>
+                        <td>
+                            <strong>@nbInscrits</strong> / @tournoi.PlacesParticipantsMax
+                            @if (placesRestantes <= 5 && placesRestantes > 0)
+                            {
+                                <br /><small style="color: orange;">Plus que @placesRestantes places!</small>
+                            }
+                            else if (placesRestantes <= 0)
+                            {
+                                <br /><small style="color: var(--danger);">Complet</small>
+                            }
+                        </td>
+                        <td>
+                            @if (tournoi.InscriptionsOuvertes)
+                            {
+                                <span class="badge badge-ouvert">Ouvertes</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-ferme">Fermées</span>
+                            }
+                        </td>
+                        <td>
+                            @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
+                            {
+                                <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary" style="margin-right:5px;">Détails</a>
+                                @if (tournoi.InscriptionsOuvertes)
+                                {
+                                    <form action="/Tournoi/FermerInscriptions" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                                        <button type="submit" class="btn btn-secondary">Fermer</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form action="/Tournoi/OuvrirInscriptions" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                                        <button type="submit" class="btn">Ouvrir</button>
+                                    </form>
+                                }
+                            }
+                            @if (HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true")
+                            {
+                                @if (((List<int>)(ViewBag.TournoiInscrits ?? new List<int>())).Contains(tournoi.TournoiId))
+                                {
+                                    <span class="btn btn-secondary" style="margin-left:5px; opacity:0.7; cursor:default;">Déjà inscrit</span>
+                                }
+                                else if (tournoi.InscriptionsOuvertes)
+                                {
+                                    <a href="/Inscription/Index?tournoiId=@tournoi.TournoiId" class="btn" style="margin-left:5px;">S'inscrire</a>
+                                }
+                            }
+                            else if (tournoi.InscriptionsOuvertes)
+                            {
+                                <a href="/Auth/Login" class="btn" style="margin-left:5px;">Connectez-vous pour s'inscrire</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- Historique des tournois passés -->
+<div id="sectionPasses" style="display:none;">
+    @if (tournoisPasses.Count == 0)
+    {
+        <p class="text-muted">Aucun tournoi passé dans l'historique.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Date</th>
+                    <th>Lieu</th>
+                    <th>Participants</th>
+                    @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
+                    {
+                        <th>Actions</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tournoi in tournoisPasses)
+                {
+                    var nbInscrits = ((Dictionary<int, int>)(ViewBag.NbInscrits ?? new Dictionary<int, int>())).ContainsKey(tournoi.TournoiId)
+                        ? ((Dictionary<int, int>)ViewBag.NbInscrits)[tournoi.TournoiId] : 0;
+
+                    <tr class="ligne-tournoi" style="opacity: 0.8;">
+                        <td>@tournoi.Nom</td>
+                        <td>@tournoi.DateTournoi.ToShortDateString()</td>
+                        <td>@tournoi.Lieu</td>
+                        <td><strong>@nbInscrits</strong> participants</td>
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
+                        {
+                            <td>
+                                <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary">Détails</a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
