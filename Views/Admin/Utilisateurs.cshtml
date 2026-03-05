@@ -1,0 +1,87 @@
+@model List<croupe_06_TournoiGolf.Models.Utilisateur>
+
+@{
+    ViewData["Title"] = "Gestion des utilisateurs";
+}
+
+<h1>Gestion des utilisateurs</h1>
+
+<p style="color:var(--muted); margin-bottom:20px;">
+    <strong>@Model.Count</strong> utilisateurs inscrits sur la plateforme.
+</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert" style="background: rgba(45, 212, 191, 0.15); border: 1px solid var(--accent); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert" style="background: rgba(251, 113, 133, 0.15); border: 1px solid var(--danger); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+        @TempData["Error"]
+    </div>
+}
+
+<!-- Barre de recherche -->
+<input type="text" id="rechercheUtilisateur" placeholder="Rechercher un utilisateur..." 
+       style="margin-bottom:15px; max-width:400px;" onkeyup="filtrerUtilisateurs()" />
+
+<table>
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Téléphone</th>
+            <th>Inscriptions</th>
+            <th>Membre depuis</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="tableUtilisateurs">
+        @foreach (var user in Model)
+        {
+            var nbInsc = ((Dictionary<int, int>)(ViewBag.NbInscriptions ?? new Dictionary<int, int>())).ContainsKey(user.UtilisateurId)
+                ? ((Dictionary<int, int>)ViewBag.NbInscriptions)[user.UtilisateurId] : 0;
+
+            <tr class="ligne-utilisateur">
+                <td>@user.Prenom @user.Nom</td>
+                <td>@user.Email</td>
+                <td>
+                    @if (user.Role == "ADMIN")
+                    {
+                        <span class="badge badge-ouvert">Admin</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-ferme">Participant</span>
+                    }
+                </td>
+                <td>@(user.Telephone ?? "—")</td>
+                <td>@nbInsc</td>
+                <td>@user.CreeLe.ToShortDateString()</td>
+                <td>
+                    @if (user.Role != "ADMIN")
+                    {
+                        <form action="/Admin/SupprimerUtilisateur" method="post" style="display:inline;"
+                              onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                            <input type="hidden" name="id" value="@user.UtilisateurId" />
+                            <button type="submit" class="btn btn-secondary" style="background: var(--danger); color: white; border-color: var(--danger);">
+                                Supprimer
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span style="color: var(--muted); font-size: 0.85rem;">Protégé</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div style="margin-top: 20px;">
+    <a class="btn btn-secondary" href="/Admin/Index">Retour au tableau de bord</a>
+</div>

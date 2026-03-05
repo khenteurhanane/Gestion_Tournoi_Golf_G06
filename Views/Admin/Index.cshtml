@@ -2,17 +2,87 @@
     ViewData["Title"] = "Espace Administrateur";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        
-        <div class="card text-center">
-            <h2>Bienvenue dans l'espace administrateur</h2>
-            <p class="sub">Vous êtes connecté en tant qu'administrateur.</p>
+<h1>Tableau de bord Administrateur</h1>
 
-            <a class="btn" href="/Tournoi/Index">Gérer les tournois</a>
-            <br /><br />
-            <a class="btn btn-secondary" href="/Auth/Logout">Se déconnecter</a>
-        </div>
+<!-- Statistiques -->
+<div class="stats-row">
+    <div class="stat-card">
+        <p class="stat-number">@ViewBag.NbTournois</p>
+        <p class="stat-label">Tournois</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-number">@ViewBag.NbTournoisOuverts</p>
+        <p class="stat-label">Inscriptions ouvertes</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-number">@ViewBag.NbParticipants</p>
+        <p class="stat-label">Inscriptions</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-number">@ViewBag.NbUtilisateurs</p>
+        <p class="stat-label">Utilisateurs</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-number">@ViewBag.NbEquipes</p>
+        <p class="stat-label">Équipes</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-number">@(((decimal)ViewBag.RevenuTotal).ToString("C"))</p>
+        <p class="stat-label">Revenus totaux</p>
+    </div>
+</div>
 
+<!-- Prochains tournois -->
+@{
+    var prochains = ViewBag.ProchainsTournois as List<croupe_06_TournoiGolf.Models.Tournoi>;
+}
+@if (prochains != null && prochains.Count > 0)
+{
+    <div class="card">
+        <h3>Prochains tournois</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Date</th>
+                    <th>Lieu</th>
+                    <th>Statut</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in prochains)
+                {
+                    <tr>
+                        <td>@t.Nom</td>
+                        <td>@t.DateTournoi.ToShortDateString()</td>
+                        <td>@t.Lieu</td>
+                        <td>
+                            @if (t.InscriptionsOuvertes)
+                            {
+                                <span class="badge badge-ouvert">Ouvertes</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-ferme">Fermées</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Tournoi/Details/@t.TournoiId" class="btn btn-secondary btn-sm">Détails</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<!-- Actions rapides -->
+<div class="card">
+    <h3>Actions rapides</h3>
+    <div class="btn-group">
+        <a class="btn" href="/Tournoi/Create">Créer un tournoi</a>
+        <a class="btn" href="/Tournoi/Index">Gérer les tournois</a>
+        <a class="btn btn-secondary" href="/Auth/Logout">Se déconnecter</a>
     </div>
 </div>
