@@ -61,6 +61,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Compter le nombre d'inscriptions par utilisateur
             var nbInscriptions = _context.Participants
+                .AsEnumerable()
                 .GroupBy(p => p.UtilisateurId)
                 .ToDictionary(g => g.Key, g => g.Count());
             ViewBag.NbInscriptions = nbInscriptions;
