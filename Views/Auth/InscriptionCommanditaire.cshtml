@@ -1,0 +1,84 @@
+@model croupe_06_TournoiGolf.Models.ViewModels.InscriptionCommanditaireViewModel
+
+@{
+    ViewData["Title"] = "Devenir Commanditaire";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h2 class="mb-0">Devenir Commanditaire</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-controller="Auth" asp-action="InscriptionCommanditaire" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 text-center">
+                                <label asp-for="Prenom" class="form-label fw-bold">Prénom</label>
+                                <input asp-for="Prenom" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <span asp-validation-for="Prenom" class="text-danger d-block mt-1"></span>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <label asp-for="Nom" class="form-label fw-bold">Nom</label>
+                                <input asp-for="Nom" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <span asp-validation-for="Nom" class="text-danger d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 text-center">
+                                <label asp-for="Email" class="form-label fw-bold">Courriel</label>
+                                <input asp-for="Email" type="email" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <span asp-validation-for="Email" class="text-danger d-block mt-1"></span>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <label asp-for="Telephone" class="form-label fw-bold">Téléphone</label>
+                                <input asp-for="Telephone" type="tel" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <span asp-validation-for="Telephone" class="text-danger d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 text-center">
+                            <label asp-for="NomEntreprise" class="form-label fw-bold">Nom de l'entreprise</label>
+                            <input asp-for="NomEntreprise" class="form-control text-center mx-auto" style="max-width:500px;" />
+                            <span asp-validation-for="NomEntreprise" class="text-danger d-block mt-1"></span>
+                            <small class="text-muted">Si vous agissez en tant qu'entreprise commanditaire.</small>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 text-center">
+                                <label asp-for="MotDePasse" class="form-label fw-bold">Mot de passe</label>
+                                <input asp-for="MotDePasse" type="password" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <span asp-validation-for="MotDePasse" class="text-danger d-block mt-1"></span>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <label asp-for="ConfirmationMotDePasse" class="form-label fw-bold">Confirmer le mot de passe</label>
+                                <input asp-for="ConfirmationMotDePasse" type="password" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <span asp-validation-for="ConfirmationMotDePasse" class="text-danger d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-success btn-lg mx-auto" style="max-width:300px;">
+                                <i class="bi bi-person-plus-fill me-2"></i>S'inscrire comme commanditaire
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light py-3">
+                    <p class="mb-0">Déjà inscrit ? <a asp-controller="Auth" asp-action="Login" class="text-success fw-bold">Se connecter</a></p>
+                    <p class="mb-0 mt-2">Vous n'êtes pas commanditaire ? <a asp-controller="Auth" asp-action="Register" class="text-secondary">Inscription standard</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

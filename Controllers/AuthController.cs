@@ -137,6 +137,62 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Index", "Tournoi");
         }
 
+        // --- Création de compte Commanditaire ---
+
+        [HttpGet]
+        public IActionResult InscriptionCommanditaire()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult InscriptionCommanditaire(InscriptionCommanditaireViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+
+            // Vérifier si le email existe déjà dans la BD
+            var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
+            if (utilisateurExistant != null)
+            {
+                ModelState.AddModelError("Email", "Un compte existe déjà avec cet email.");
+                return View(model);
+            }
+
+            // Créer le nouvel utilisateur commanditaire dans la BD
+            var utilisateur = new Utilisateur
+            {
+                Email = model.Email,
+                Prenom = model.Prenom,
+                Nom = model.Nom,
+                Telephone = model.Telephone,
+                // On peut stocker le nom de l'entreprise dans le prénom/nom ou l'adresse,
+                // mais puisque NomEntreprise est demandé on peut l'ajouter à l'adresse pour l'instant
+                // ou simplement le garder pour le contact (l'idéal serait une table Commanditaire)
+                Adresse = "Entreprise: " + model.NomEntreprise,
+                MotDePasseHash = _passwordHasher.HashPassword(model.MotDePasse),
+                Role = "COMMANDITAIRE",
+                CreeLe = DateTime.Now
+            };
+
+            _context.Utilisateurs.Add(utilisateur);
+            _context.SaveChanges();
+
+            // Connecter l'utilisateur après création du compte
+            HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
+            HttpContext.Session.SetString("IsLoggedIn", "true");
+            HttpContext.Session.SetString("UserRole", utilisateur.Role);
+            HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
+            HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
+            HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
+            HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
+
+            // Rediriger vers la page d'accueil ou tableau de bord admin selon la logique
+            return RedirectToAction("Index", "Tournoi");
+        }
+
         // --- Mot de passe oublié ---
 
         [HttpGet]
