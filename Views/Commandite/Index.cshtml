@@ -1,0 +1,55 @@
+@model IEnumerable<croupe_06_TournoiGolf.Models.Commandite>
+
+@{
+    ViewData["Title"] = "Mes Commandites";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mes Commandites</h2>
+        <a asp-action="Creer" class="btn btn-success">Nouvelle Commandite</a>
+    </div>
+
+    @if (ViewBag.Success != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @ViewBag.Success
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <p class="mb-0">Vous n'avez pas encore enregistré de commandite.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped shadow-sm">
+                <thead class="table-success">
+                    <tr>
+                        <th>Date</th>
+                        <th>Tournoi</th>
+                        <th>Type de Commandite</th>
+                        <th>Montant</th>
+                        <th>Commentaire</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.DateCreation.ToShortDateString()</td>
+                            <td>@item.Tournoi.Nom</td>
+                            <td><span class="badge bg-primary">@item.TypeCommandite</span></td>
+                            <td class="fw-bold text-success">@item.Montant.ToString("C")</td>
+                            <td class="text-muted">@(string.IsNullOrEmpty(item.Commentaire) ? "-" : item.Commentaire)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
