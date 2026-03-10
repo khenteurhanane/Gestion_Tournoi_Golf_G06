@@ -32,6 +32,9 @@ namespace croupe_06_TournoiGolf.Models
         [StringLength(150)]
         public string? Adresse { get; set; }
 
+        [StringLength(150)]
+        public string? NomEntreprise { get; set; }
+
         public DateTime CreeLe { get; set; } = DateTime.Now;
     }
 }

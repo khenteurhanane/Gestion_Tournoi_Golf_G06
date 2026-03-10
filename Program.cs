@@ -25,6 +25,14 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
+// S'assurer que la base de données est créée au démarrage
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<GolfDbContext>();
+    context.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
