@@ -1,0 +1,67 @@
+@model croupe_06_TournoiGolf.Models.Commandite
+@{
+    ViewData["Title"] = "Confirmation de Commandite";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-lg border-0 rounded-lg overflow-hidden">
+                <div class="bg-success p-5 text-white">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                    </div>
+                    <h1 class="display-4 fw-bold">Merci !</h1>
+                    <p class="lead">Votre commandite a été confirmée avec succès.</p>
+                </div>
+                
+                <div class="card-body p-5">
+                    <div class="mb-5">
+                        <h4 class="text-muted text-uppercase small fw-bold mb-3">Détails de la transaction</h4>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Numéro de confirmation :</span>
+                            <span class="fw-bold text-dark">#CMD-@Model.CommanditeId.ToString("D5")-@DateTime.Now.ToString("yyMM")</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Tournoi :</span>
+                            <span class="fw-bold">@Model.Tournoi.Nom</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Type :</span>
+                            <span class="badge bg-primary align-self-center">@Model.TypeCommandite</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Montant payé :</span>
+                            <span class="fw-bold text-success h4 mb-0">@Model.Montant.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span>Date :</span>
+                            <span>@DateTime.Now.ToString("g")</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <i class="fas fa-info-circle me-2"></i> 
+                        Un reçu officiel sera envoyé à votre adresse courriel sous peu. Toute mention de votre entreprise sera préparée selon vos instructions.
+                    </div>
+
+                    <div class="mt-5 d-grid gap-3 d-sm-flex justify-content-sm-center">
+                        <a asp-action="Index" class="btn btn-outline-success btn-lg px-5 rounded-pill">
+                            Voir mes commandites
+                        </a>
+                        <a href="/" class="btn btn-success btn-lg px-5 rounded-pill shadow">
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-muted py-3">
+                    © 2026 Tournoi de Golf G06 - Partenaire Officiel
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+}

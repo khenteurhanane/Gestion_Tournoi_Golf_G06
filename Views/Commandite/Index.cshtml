@@ -34,6 +34,7 @@
                         <th>Tournoi</th>
                         <th>Type de Commandite</th>
                         <th>Montant</th>
+                        <th>Statut</th>
                         <th>Commentaire</th>
                     </tr>
                 </thead>
@@ -45,10 +46,29 @@
                             <td>@item.Tournoi.Nom</td>
                             <td><span class="badge bg-primary">@item.TypeCommandite</span></td>
                             <td class="fw-bold text-success">@item.Montant.ToString("C")</td>
+                            <td>
+                                @if (item.Statut == "PAYEE")
+                                {
+                                    <span class="badge bg-success">Payée</span>
+                                }
+                                else
+                                {
+                                    <a asp-action="Paiement" asp-route-id="@item.CommanditeId" class="badge bg-warning text-dark text-decoration-none">
+                                        En attente (Payer ici)
+                                    </a>
+                                }
+                            </td>
                             <td class="text-muted">@(string.IsNullOrEmpty(item.Commentaire) ? "-" : item.Commentaire)</td>
                         </tr>
                     }
                 </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">Total des commandites :</td>
+                        <td class="fw-bold text-success h5">@Model.Sum(c => c.Montant).ToString("C")</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     }

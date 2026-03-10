@@ -86,8 +86,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 _context.Commandites.Add(model);
                 _context.SaveChanges();
 
-                ViewBag.Success = "Votre commandite a été enregistrée avec succès !";
-                return RedirectToAction("Index");
+                return RedirectToAction("Paiement", new { id = model.CommanditeId });
             }
 
             var tournois = _context.Tournois
@@ -96,6 +95,57 @@ namespace croupe_06_TournoiGolf.Controllers
             ViewBag.Tournois = tournois;
 
             return View(model);
+        }
+
+        // Affiche la page de paiement pour une commandite
+        public IActionResult Paiement(int id)
+        {
+            var commandite = _context.Commandites
+                .Include(c => c.Tournoi)
+                .Include(c => c.Utilisateur)
+                .FirstOrDefault(c => c.CommanditeId == id);
+
+            if (commandite == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(commandite);
+        }
+
+        // Simule le paiement de la commandite
+        [HttpPost]
+        public IActionResult SimulerPaiement(int commanditeId)
+        {
+            var commandite = _context.Commandites
+                .Include(c => c.Tournoi)
+                .FirstOrDefault(c => c.CommanditeId == commanditeId);
+
+            if (commandite == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Mettre à jour le statut
+            commandite.Statut = "PAYEE";
+            _context.SaveChanges();
+
+            return RedirectToAction("Confirmation", new { id = commandite.CommanditeId });
+        }
+
+        // Affiche la confirmation de paiement
+        public IActionResult Confirmation(int id)
+        {
+            var commandite = _context.Commandites
+                .Include(c => c.Tournoi)
+                .FirstOrDefault(c => c.CommanditeId == id);
+
+            if (commandite == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(commandite);
         }
     }
 }

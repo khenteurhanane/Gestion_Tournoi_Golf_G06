@@ -28,6 +28,9 @@ namespace croupe_06_TournoiGolf.Models
         [StringLength(500)]
         public string? Commentaire { get; set; }
 
+        [StringLength(50)]
+        public string Statut { get; set; } = "EN_ATTENTE_PAIEMENT";
+
         public DateTime DateCreation { get; set; } = DateTime.Now;
     }
 }

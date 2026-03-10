@@ -1,0 +1,230 @@
+@model croupe_06_TournoiGolf.Models.Commandite
+@{
+    ViewData["Title"] = "Paiement de la Commandite";
+}
+
+<div class="payment-container">
+    <div class="payment-card">
+        <h1 class="payment-title">Finalisez votre commandite</h1>
+        <p class="payment-subtitle">Tournoi : <strong>@Model.Tournoi.Nom</strong></p>
+        
+        <div class="payment-details">
+            <div class="detail-row">
+                <span>Type de commandite :</span>
+                <span class="detail-value">@Model.TypeCommandite</span>
+            </div>
+            <hr />
+            <div class="detail-row total-row">
+                <span>Montant à payer :</span>
+                <span class="total-amount">@Model.Montant.ToString("C")</span>
+            </div>
+        </div>
+
+        <div class="payment-form-section mt-4">
+            <h3 class="section-title">Détails de paiement</h3>
+            
+            <form asp-action="SimulerPaiement" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="commanditeId" value="@Model.CommanditeId" />
+                
+                <div class="form-group">
+                    <label>Nom de l'entreprise / Titulaire</label>
+                    <input type="text" value="@(string.IsNullOrEmpty(Model.Utilisateur.NomEntreprise) ? $"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}" : Model.Utilisateur.NomEntreprise)" readonly />
+                </div>
+                
+                <div class="form-group">
+                    <label>Numéro de carte de crédit</label>
+                    <div class="card-input-wrapper">
+                        <input type="text" value="4540 1234 5678 9012" readonly />
+                        <span class="card-type-icon">VISA / MC</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label>Expiration</label>
+                        <input type="text" value="12/28" readonly />
+                    </div>
+                    <div class="form-group col-half">
+                        <label>CVV</label>
+                        <input type="text" value="***" readonly />
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-3 text-start">
+                    <i class="fas fa-lock text-success"></i> Transaction sécurisée pour les partenaires du Tournoi G06.
+                </p>
+                
+                <button type="submit" class="btn btn-payment-simulate">
+                    <span class="btn-text">Payer @Model.Montant.ToString("C")</span>
+                    <span class="btn-icon">💳</span>
+                </button>
+            </form>
+        </div>
+        
+        <div class="mt-3">
+            <a asp-action="Index" class="text-muted text-decoration-none small">Annuler et revenir plus tard</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-gold: #D4AF37;
+        --dark-bg: #1a1a1a;
+        --card-bg: #ffffff;
+        --text-dark: #333;
+    }
+
+    .payment-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        padding: 2rem;
+        background: #f8f9fa;
+    }
+
+    .payment-card {
+        background-color: var(--card-bg);
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        padding: 3rem;
+        width: 100%;
+        max-width: 550px;
+        text-align: center;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .payment-title {
+        color: #198754;
+        font-weight: 800;
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .payment-subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    .payment-details {
+        background: #f1f8f5;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border: 1px dashed #198754;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #555;
+    }
+
+    .detail-value {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .total-row {
+        margin-top: 1rem;
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+    .total-amount {
+        color: #198754;
+        font-size: 1.8rem;
+        font-weight: 900;
+    }
+
+    .section-title {
+        color: #333;
+        font-size: 1.2rem;
+        text-align: left;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.5rem;
+    }
+
+    .form-group {
+        text-align: left;
+        margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: #777;
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        background: #fdfdfd;
+        border: 1.5px solid #dee2e6;
+        border-radius: 10px;
+        padding: 0.9rem;
+        color: #333;
+        transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+        border-color: #198754;
+        outline: none;
+    }
+
+    .card-input-wrapper {
+        position: relative;
+    }
+
+    .card-type-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: bold;
+        color: #666;
+        font-size: 0.8rem;
+        background: #eee;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .col-half {
+        flex: 1;
+    }
+
+    .btn-payment-simulate {
+        background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+        border: none;
+        color: white;
+        padding: 1.2rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 12px;
+        width: 100%;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+    }
+
+    .btn-payment-simulate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
+    }
+</style>
