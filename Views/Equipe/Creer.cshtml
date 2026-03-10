@@ -26,9 +26,22 @@
 
                 <div class="form-group">
                     <label>Code secret de l'équipe</label>
-                    <input name="CodeSecret" type="text" value="@Model.CodeSecret" readonly style="background-color:#f0f4ec; font-weight:bold; letter-spacing:3px;" />
+                    <div class="input-group">
+                        <input name="CodeSecret" id="codeEquipe" type="text" value="@Model.CodeSecret" readonly class="form-control" style="background-color:#f0f4ec; font-weight:bold; letter-spacing:3px;" />
+                        <button type="button" class="btn btn-outline-secondary" onclick="copierCode()">Copier le code</button>
+                    </div>
                     <small>Ce code sera partagé avec tes coéquipiers pour rejoindre l'équipe.</small>
                 </div>
+
+                <script>
+                function copierCode() {
+                    var code = document.getElementById("codeEquipe");
+                    code.select();
+                    code.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(code.value);
+                    alert("Code copié !");
+                }
+                </script>
 
                 <button class="btn" type="submit">Créer l'équipe</button>
             </form>

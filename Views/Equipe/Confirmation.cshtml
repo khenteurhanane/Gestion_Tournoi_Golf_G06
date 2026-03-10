@@ -16,11 +16,28 @@
                 <p><strong>@Model.NomEquipe</strong></p>
             </div>
 
-            <div class="form-group">
-                <label>Code secret</label>
-                <p style="font-size:2rem; font-weight:bold; letter-spacing:5px; color:var(--accent);">@Model.CodeSecret</p>
-                <small>Donne ce code à tes coéquipiers pour qu'ils rejoignent l'équipe.</small>
+            <div class="form-group mb-3">
+                <label class="fw-bold">Code secret de l'équipe :</label>
+                <div class="input-group">
+                    <input type="text" id="codeEquipe" value="@Model.CodeSecret" class="form-control text-center fw-bold" readonly style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent);" />
+                    <button class="btn btn-primary" onclick="copierCode()">
+                        Copier le code
+                    </button>
+                </div>
+                <small class="text-muted">Partage ce code avec tes coéquipiers pour qu'ils rejoignent l'équipe.</small>
             </div>
+
+            <script>
+            function copierCode() {
+                var code = document.getElementById("codeEquipe");
+                code.select();
+                code.setSelectionRange(0, 99999);
+
+                navigator.clipboard.writeText(code.value);
+
+                alert("Code copié !");
+            }
+            </script>
 
             <div class="footer">
                 <a href="/Inscription/Index">Retour à l'accueil</a>

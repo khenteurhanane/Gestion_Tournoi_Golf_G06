@@ -27,10 +27,25 @@
                     <h3 class="team-title">Votre Équipe : @ViewBag.NomEquipe</h3>
                     <div class="code-display">
                         <span class="code-label">CODE D'ÉQUIPE</span>
-                        <span class="code-value">@ViewBag.CodeEquipe</span>
+                        <div class="input-group mt-2">
+                            <input type="text" id="codeEquipeIns" value="@ViewBag.CodeEquipe" class="form-control text-center fw-bold bg-transparent border-0 text-white" readonly style="font-size: 1.5rem; letter-spacing: 5px; color: #c8a84e !important;" />
+                            <button class="btn btn-outline-warning btn-sm" onclick="copierCodeIns()">
+                                Copier
+                            </button>
+                        </div>
                     </div>
                     <p class="share-notice">Partagez ce code avec vos coéquipiers.</p>
                 </div>
+
+                <script>
+                function copierCodeIns() {
+                    var code = document.getElementById("codeEquipeIns");
+                    code.select();
+                    code.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(code.value);
+                    alert("Code copié !");
+                }
+                </script>
             }
         </div>
 
