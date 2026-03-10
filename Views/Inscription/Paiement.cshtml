@@ -1,0 +1,226 @@
+@model croupe_06_TournoiGolf.Models.Participant
+@{
+    ViewData["Title"] = "Paiement";
+}
+
+<div class="payment-container">
+    <div class="payment-card">
+        <h1 class="payment-title">Finalisez votre inscription</h1>
+        <p class="payment-subtitle">Tournoi : <strong>@Model.Tournoi.Nom</strong></p>
+        
+        <div class="payment-details">
+            <div class="detail-row">
+                <span>Type de participant:</span>
+                <span class="detail-value">@Model.TypeParticipant.ToUpper()</span>
+            </div>
+            <hr />
+            <div class="detail-row total-row">
+                <span>Total à payer:</span>
+                <span class="total-amount">@Model.MontantPaye.ToString("C")</span>
+            </div>
+        </div>
+
+        <div class="payment-form-section mt-4">
+            <h3 class="section-title">Détails de paiement</h3>
+            
+            <form asp-action="SimulerPaiement" method="post">
+                <input type="hidden" name="participantId" value="@Model.ParticipantId" />
+                
+                <div class="form-group">
+                    <label>Nom sur la carte</label>
+                    <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Numéro de carte</label>
+                    <div class="card-input-wrapper">
+                        <input type="text" value="4540 1234 5678 9012" />
+                        <span class="card-type-icon">VISA</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label>Expiration</label>
+                        <input type="text" value="12/28" />
+                    </div>
+                    <div class="form-group col-half">
+                        <label>CVV</label>
+                        <input type="text" value="***" />
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-3 text-start">
+                    <i class="fas fa-lock"></i> Ceci est une simulation sécurisée pour le projet G06.
+                </p>
+                
+                <button type="submit" class="btn btn-payment-simulate">
+                    <span class="btn-text">Confirmer le paiement</span>
+                    <span class="btn-icon">💳</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-gold: #D4AF37;
+        --dark-bg: #1a1a1a;
+        --card-bg: #2d2d2d;
+        --text-light: #f4f4f4;
+    }
+
+    .payment-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        padding: 2rem;
+    }
+
+    .payment-card {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .payment-title {
+        color: var(--primary-gold);
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .payment-subtitle {
+        color: #aaa;
+        margin-bottom: 2rem;
+    }
+
+    .payment-details {
+        background: rgba(0,0,0,0.2);
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #ccc;
+    }
+
+    .detail-value {
+        font-weight: bold;
+        color: white;
+    }
+
+    .total-row {
+        margin-top: 1rem;
+        font-size: 1.2rem;
+        color: white;
+    }
+
+    .total-amount {
+        color: var(--primary-gold);
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+    .section-title {
+        color: white;
+        font-size: 1.1rem;
+        text-align: left;
+        margin-bottom: 1.2rem;
+        opacity: 0.9;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        padding-bottom: 0.5rem;
+    }
+
+    .form-group {
+        text-align: left;
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: #aaa;
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 0.8rem;
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+        letter-spacing: 1px;
+    }
+
+    .card-input-wrapper {
+        position: relative;
+    }
+
+    .card-type-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 900;
+        font-style: italic;
+        color: #24292e;
+        background: #f1f1f1;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .col-half {
+        flex: 1;
+    }
+
+    .btn-payment-simulate {
+        background: linear-gradient(135deg, var(--primary-gold) 0%, #B8860B 100%);
+        border: none;
+        color: black;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 50px;
+        width: 100%;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 1rem;
+    }
+
+    .btn-payment-simulate:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        filter: brightness(1.1);
+    }
+
+    .btn-payment-simulate:active {
+        transform: translateY(-1px);
+    }
+</style>

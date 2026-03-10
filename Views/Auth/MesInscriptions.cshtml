@@ -81,6 +81,10 @@ else
                         }
                     </td>
                     <td>
+                        @if (inscription.StatutInscription == "EN_ATTENTE_PAIEMENT")
+                        {
+                            <a href="/Inscription/Paiement?participantId=@inscription.ParticipantId" class="btn btn-primary" style="font-size:0.85rem; margin-right:5px; background-color:var(--gold); color:black; border:none;">Payer</a>
+                        }
                         <form action="/Auth/AnnulerInscription" method="post" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette inscription?');">
                             <input type="hidden" name="participantId" value="@inscription.ParticipantId" />
                             <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;">Annuler</button>

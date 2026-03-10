@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using croupe_06_TournoiGolf.Models;
 using croupe_06_TournoiGolf.Models.ViewModels;
 using croupe_06_TournoiGolf.Data;
@@ -60,6 +61,10 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (dejaInscrit != null)
             {
+                if (dejaInscrit.StatutInscription == "EN_ATTENTE_PAIEMENT")
+                {
+                    return RedirectToAction("Paiement", new { participantId = dejaInscrit.ParticipantId });
+                }
                 ViewBag.Error = "Vous êtes déjà inscrit à ce tournoi.";
                 return View("DejaInscrit");
             }
@@ -114,6 +119,10 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (dejaInscrit != null)
             {
+                if (dejaInscrit.StatutInscription == "EN_ATTENTE_PAIEMENT")
+                {
+                    return RedirectToAction("Paiement", new { participantId = dejaInscrit.ParticipantId });
+                }
                 ViewBag.Error = "Vous êtes déjà inscrit à ce tournoi.";
                 return View("DejaInscrit");
             }
@@ -128,7 +137,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 UtilisateurId = userId,
                 TypeParticipant = model.TypeParticipant ?? "employe",
                 MontantPaye = montant,
-                StatutInscription = "CONFIRMEE",
+                StatutInscription = "EN_ATTENTE_PAIEMENT",
                 CreeLe = DateTime.Now
             };
 
@@ -182,8 +191,43 @@ namespace croupe_06_TournoiGolf.Controllers
             _context.Participants.Add(participant);
             _context.SaveChanges();
 
-            // Passer les infos à la page de confirmation
-            ViewBag.NomTournoi = tournoi.Nom;
+            return RedirectToAction("Paiement", new { participantId = participant.ParticipantId });
+        }
+
+        // Affiche la page de paiement
+        public IActionResult Paiement(int participantId)
+        {
+            var participant = _context.Participants
+                .Include(p => p.Tournoi)
+                .Include(p => p.Utilisateur)
+                .FirstOrDefault(p => p.ParticipantId == participantId);
+
+            if (participant == null)
+            {
+                return RedirectToAction("Index", "Tournoi");
+            }
+
+            return View(participant);
+        }
+
+        // Simule le paiement (GOLF-37)
+        [HttpPost]
+        public IActionResult SimulerPaiement(int participantId)
+        {
+            var participant = _context.Participants.Find(participantId);
+            if (participant == null)
+            {
+                return RedirectToAction("Index", "Tournoi");
+            }
+
+            // Mettre à jour le statut
+            participant.StatutInscription = "CONFIRMEE";
+            _context.SaveChanges();
+
+            // Préparer les infos pour la confirmation
+            var tournoi = _context.Tournois.Find(participant.TournoiId);
+            ViewBag.NomTournoi = tournoi?.Nom;
+
             if (participant.EquipeId != null)
             {
                 var eq = _context.Equipes.Find(participant.EquipeId);
