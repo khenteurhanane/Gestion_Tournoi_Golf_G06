@@ -50,6 +50,9 @@
                                 @if (item.Statut == "PAYEE")
                                 {
                                     <span class="badge bg-success">Payée</span>
+                                    <a asp-action="Joueurs" asp-route-id="@item.CommanditeId" class="btn btn-sm btn-outline-success ms-2">
+                                        <i class="fas fa-users"></i> Joueurs
+                                    </a>
                                 }
                                 else
                                 {

@@ -147,5 +147,80 @@ namespace croupe_06_TournoiGolf.Controllers
 
             return View(commandite);
         }
+        // --- US-12 : Gestion des joueurs commanditaires ---
+
+        // Affiche la liste des joueurs pour une commandite spécifique
+        public IActionResult Joueurs(int id)
+        {
+            var commandite = _context.Commandites
+                .Include(c => c.Tournoi)
+                .FirstOrDefault(c => c.CommanditeId == id);
+
+            if (commandite == null) return RedirectToAction("Index");
+
+            var joueurs = _context.Participants
+                .Where(p => p.CommanditeId == id)
+                .ToList();
+
+            ViewBag.Commandite = commandite;
+            return View(joueurs);
+        }
+
+        // Ajoute un joueur à une commandite
+        [HttpPost]
+        public IActionResult AjouterJoueur(int commanditeId, string prenom, string nom, string email)
+        {
+            var commandite = _context.Commandites.Find(commanditeId);
+            if (commandite == null) return RedirectToAction("Index");
+
+            // Vérifier si la commandite est payée
+            if (commandite.Statut != "PAYEE")
+            {
+                TempData["Error"] = "Vous devez payer votre commandite avant d'ajouter des joueurs.";
+                return RedirectToAction("Joueurs", new { id = commanditeId });
+            }
+
+            // Vérifier le nombre de joueurs (limite arbitraire ou selon le type, ici on met max 4 par défaut pour simplifier)
+            int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
+            if (nbJoueurs >= 4)
+            {
+                TempData["Error"] = "Vous avez atteint le maximum de 4 joueurs sponsorisés.";
+                return RedirectToAction("Joueurs", new { id = commanditeId });
+            }
+
+            var participant = new Participant
+            {
+                TournoiId = commandite.TournoiId,
+                CommanditeId = commanditeId,
+                Prenom = prenom,
+                Nom = nom,
+                Email = email,
+                TypeParticipant = "commandite",
+                StatutInscription = "CONFIRMEE",
+                MontantPaye = 0, // Inclus dans la commandite
+                CreeLe = DateTime.Now
+            };
+
+            _context.Participants.Add(participant);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Joueur ajouté avec succès.";
+            return RedirectToAction("Joueurs", new { id = commanditeId });
+        }
+
+        // Supprime un joueur d'une commandite
+        [HttpPost]
+        public IActionResult SupprimerJoueur(int participantId, int commanditeId)
+        {
+            var participant = _context.Participants.Find(participantId);
+            if (participant != null && participant.CommanditeId == commanditeId)
+            {
+                _context.Participants.Remove(participant);
+                _context.SaveChanges();
+                TempData["Success"] = "Joueur retiré de la commandite.";
+            }
+
+            return RedirectToAction("Joueurs", new { id = commanditeId });
+        }
     }
 }
