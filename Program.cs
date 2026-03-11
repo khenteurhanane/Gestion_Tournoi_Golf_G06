@@ -34,14 +34,23 @@ using (var scope = app.Services.CreateScope())
     // Créer la DB si elle n'existe pas
     context.Database.EnsureCreated();
 
-    // Correction temporaire : s'assurer que la colonne NomEntreprise existe (migration manuelle simplifiée)
+    // Correction pour la table Participants (US-12)
     try
     {
+        // Ajout de CommanditeId
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Participants') AND name = 'CommanditeId') ALTER TABLE Participants ADD CommanditeId INT NULL;");
+        
+        // Ajout de Nom, Prenom, Email pour les invités
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Participants') AND name = 'Nom') ALTER TABLE Participants ADD Nom NVARCHAR(60) NULL;");
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Participants') AND name = 'Prenom') ALTER TABLE Participants ADD Prenom NVARCHAR(60) NULL;");
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Participants') AND name = 'Email') ALTER TABLE Participants ADD Email NVARCHAR(150) NULL;");
+        
+        // Correction pour Utilisateurs (NomEntreprise)
         context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Utilisateurs') AND name = 'NomEntreprise') ALTER TABLE Utilisateurs ADD NomEntreprise NVARCHAR(100) NULL;");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Erreur lors de la vérification de la colonne NomEntreprise : " + ex.Message);
+        Console.WriteLine("Erreur lors de la mise à jour des colonnes : " + ex.Message);
     }
 }
 
