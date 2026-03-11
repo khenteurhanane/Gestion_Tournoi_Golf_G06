@@ -80,9 +80,28 @@
 <!-- Actions rapides -->
 <div class="card">
     <h3>Actions rapides</h3>
-    <div class="btn-group">
-        <a class="btn" href="/Tournoi/Create">Créer un tournoi</a>
-        <a class="btn" href="/Tournoi/Index">Gérer les tournois</a>
-        <a class="btn btn-secondary" href="/Auth/Logout">Se déconnecter</a>
+    <div class="admin-actions-grid">
+        <a class="btn" href="/Tournoi/Create"><i class="fas fa-plus"></i> Créer un tournoi</a>
+        <a class="btn" href="/Tournoi/Index"><i class="fas fa-golf-ball"></i> Gérer les tournois</a>
+        <a class="btn" href="/Admin/Utilisateurs"><i class="fas fa-users"></i> Gérer les utilisateurs</a>
+        <a class="btn" href="/Admin/Equipes"><i class="fas fa-users-cog"></i> Gérer les équipes</a>
+        <a class="btn btn-secondary" href="/Auth/Logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
     </div>
+
+    <style>
+        .admin-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .admin-actions-grid .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            height: auto;
+        }
+    </style>
 </div>

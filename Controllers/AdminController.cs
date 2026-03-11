@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 using croupe_06_TournoiGolf.Data;
 using croupe_06_TournoiGolf.Models;
 
@@ -101,5 +103,108 @@ namespace croupe_06_TournoiGolf.Controllers
             TempData["Success"] = "Utilisateur supprimé.";
             return RedirectToAction("Utilisateurs");
         }
+        // --- US-09 : Gestion des équipes (Admin) ---
+
+        // Liste de toutes les équipes
+        public IActionResult Equipes()
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            var equipes = _context.Equipes
+                .Include(e => e.Tournoi)
+                .Include(e => e.Createur)
+                .OrderByDescending(e => e.CreeLe)
+                .ToList();
+
+            // Compter les membres par équipe
+            var nbMembres = _context.Participants
+                .Where(p => p.EquipeId != null)
+                .GroupBy(p => p.EquipeId)
+                .ToDictionary(g => g.Key ?? 0, g => g.Count());
+            ViewBag.NbMembres = nbMembres;
+
+            return View(equipes);
+        }
+
+        // Détails d'une équipe pour l'admin
+        public IActionResult DetailsEquipe(int id)
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            var equipe = _context.Equipes
+                .Include(e => e.Tournoi)
+                .Include(e => e.Createur)
+                .FirstOrDefault(e => e.EquipeId == id);
+
+            if (equipe == null) return RedirectToAction("Equipes");
+
+            var membres = _context.Participants
+                .Include(p => p.Utilisateur)
+                .Where(p => p.EquipeId == id)
+                .ToList();
+
+            ViewBag.Membres = membres;
+            return View(equipe);
+        }
+
+        // Modifier une équipe (POST)
+        [HttpPost]
+        public IActionResult ModifierEquipe(int EquipeId, string NomEquipe, string CodeSecret)
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            var equipe = _context.Equipes.Find(EquipeId);
+            if (equipe != null)
+            {
+                equipe.NomEquipe = NomEquipe;
+                equipe.CodeSecret = CodeSecret.ToUpper();
+                _context.SaveChanges();
+                TempData["Success"] = "Équipe mise à jour avec succès.";
+            }
+
+            return RedirectToAction("DetailsEquipe", new { id = EquipeId });
+        }
+
+        // Retirer un membre d'une équipe
+        [HttpPost]
+        public IActionResult RetirerMembre(int participantId, int equipeId)
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            var participant = _context.Participants.Find(participantId);
+            if (participant != null && participant.EquipeId == equipeId)
+            {
+                participant.EquipeId = null;
+                _context.SaveChanges();
+                TempData["Success"] = "Le membre a été retiré de l'équipe.";
+            }
+
+            return RedirectToAction("DetailsEquipe", new { id = equipeId });
+        }
+
+        // Supprimer une équipe
+        [HttpPost]
+        public IActionResult SupprimerEquipe(int id)
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            var equipe = _context.Equipes.Find(id);
+            if (equipe != null)
+            {
+                // Détacher tous les participants de cette équipe
+                var membres = _context.Participants.Where(p => p.EquipeId == id).ToList();
+                foreach (var m in membres)
+                {
+                    m.EquipeId = null;
+                }
+
+                _context.Equipes.Remove(equipe);
+                _context.SaveChanges();
+                TempData["Success"] = $"L'équipe '{equipe.NomEquipe}' a été supprimée. Les membres sont désormais inscrits en individuel.";
+            }
+
+            return RedirectToAction("Equipes");
+        }
     }
 }
+
