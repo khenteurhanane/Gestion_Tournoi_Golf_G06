@@ -8,171 +8,89 @@
     string prenom = HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom") ?? "";
 }
 
-<!-- Hero principal avec nouveau design style affiche -->
-<div class="hero-poster">
-    <div class="poster-overlay">
-        <div class="poster-content">
-            <div class="poster-badge animate__animated animate__fadeInDown">
-                <span class="poster-golf-text">TOURNOI DE</span> <span class="poster-golf-title">GOLF</span>
-            </div>
-            <div class="poster-college animate__animated animate__fadeIn">
-                <div class="college-logo-wrapper">
-                    <span class="college-text-small">COLLÈGE</span>
-                    <h2 class="college-name">LA CITÉ</h2>
-                    <span class="college-location">Ottawa/Gatineau</span>
+<!-- Page d'accueil style affiche complète -->
+<div class="full-poster-page">
+    <div class="hero-poster">
+        <div class="poster-overlay">
+            <div class="poster-content">
+                <div class="poster-badge animate__animated animate__fadeInDown">
+                    <span class="poster-golf-text">TOURNOI DE</span> <span class="poster-golf-title">GOLF</span>
                 </div>
-            </div>
-
-            <div class="poster-cta-group animate__animated animate__fadeInUp">
-                @if (estConnecte)
-                {
-                    <p class="poster-welcome">Bienvenue, <strong>@prenom</strong> !</p>
-                    <div class="poster-btns">
-                        <a class="btn-poster-primary" href="/Tournoi/Index">Voir les tournois</a>
-                        @if (role == "ADMIN")
-                        {
-                            <a class="btn-poster-outline" href="/Admin/Index">Gestion Admin</a>
-                        }
-                        else
-                        {
-                            <a class="btn-poster-outline" href="/Auth/MesInscriptions">Mes inscriptions</a>
-                        }
+                
+                <div class="poster-college animate__animated animate__fadeIn">
+                    <div class="college-logo-wrapper">
+                        <span class="college-text-small">COLLÈGE</span>
+                        <h2 class="college-name">LA CITÉ</h2>
+                        <span class="college-location">Ottawa</span>
                     </div>
-                }
-                else
-                {
-                    <div class="poster-btns">
-                        <a class="btn-poster-primary" href="/Auth/Register">M'inscrire maintenant</a>
-                        <a class="btn-poster-outline" href="/Auth/Login">Me connecter</a>
+                </div>
+
+                <div class="poster-cta-group animate__animated animate__fadeInUp">
+                    @if (estConnecte)
+                    {
+                        <p class="poster-welcome">Bienvenue, <strong>@prenom</strong> !</p>
+                        <div class="poster-btns">
+                            <a class="btn-poster-primary" href="/Tournoi/Index">Voir les tournois</a>
+                            @if (role == "ADMIN")
+                            {
+                                <a class="btn-poster-outline" href="/Admin/Index">Gestion Admin</a>
+                            }
+                            else
+                            {
+                                <a class="btn-poster-outline" href="/Auth/MesInscriptions">Mes inscriptions</a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="poster-btns">
+                            <a class="btn-poster-primary" href="/Auth/Register">M'inscrire maintenant</a>
+                            <a class="btn-poster-outline" href="/Auth/Login">Me connecter</a>
+                        </div>
+                    }
+                </div>
+
+                <div class="poster-footer animate__animated animate__fadeInUp">
+                    <div class="footer-info-line">
+                        <span class="line"></span>
+                        <span class="info-text">Information & Réservation</span>
+                        <span class="line"></span>
                     </div>
-                }
-            </div>
-
-            <div class="poster-footer animate__animated animate__fadeInUp">
-                <div class="footer-info-line">
-                    <span class="line"></span>
-                    <span class="info-text">Information & Réservation</span>
-                    <span class="line"></span>
-                </div>
-                <div class="poster-phone">
-                    <span class="phone-icon">📞</span> (613) 742-2483
+                    <div class="poster-phone">
+                        <span class="phone-icon">📞</span> (613) 742-2483
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 3 features comme l'affiche -->
-<div class="grid grid-3 mt-3">
-    <div class="feature-card">
-        <div class="feature-icon">⛳</div>
-        <h3>Compétition amicale</h3>
-        <p>Participez en équipe de 4 joueurs dans une ambiance conviviale et sportive.</p>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">🎁</div>
-        <h3>Prix & Surprises</h3>
-        <p>Des prix pour les meilleures équipes et des surprises tout au long de la journée.</p>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">🍽️</div>
-        <h3>Cocktail & Déjeuner</h3>
-        <p>Profitez d'un cocktail de bienvenue et d'un déjeuner inclus dans l'inscription.</p>
-    </div>
-</div>
+<style>
+    /* On surcharge le conteneur principal pour cette page spécifique */
+    .container {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 0 !important;
+        max-width: 100% !important;
+    }
 
-<!-- Statistiques -->
-<div class="stats-row mt-3">
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbTournois</p>
-        <p class="stat-label">Tournois</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbTournoisOuverts</p>
-        <p class="stat-label">Inscriptions ouvertes</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbParticipants</p>
-        <p class="stat-label">Participants</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbEquipes</p>
-        <p class="stat-label">Équipes</p>
-    </div>
-</div>
+    .full-poster-page {
+        margin: -24px -15px; /* Compte tenu des marges par défaut */
+        overflow: hidden;
+    }
 
-<!-- Prochain tournoi -->
-@{
-    var prochain = ViewBag.ProchainTournoi as croupe_06_TournoiGolf.Models.Tournoi;
-}
-@if (prochain != null)
-{
-    <div class="card prochain-tournoi">
-        <div class="prochain-header">
-            <span class="prochain-badge">Prochain événement</span>
-        </div>
-        <h2>@prochain.Nom</h2>
-        <div class="prochain-details">
-            <div class="prochain-info">
-                <span class="prochain-icon">📅</span>
-                <span>@prochain.DateTournoi.ToString("dddd d MMMM yyyy")</span>
-            </div>
-            <div class="prochain-info">
-                <span class="prochain-icon">📍</span>
-                <span>@prochain.Lieu</span>
-            </div>
-        </div>
-        @if (prochain.InscriptionsOuvertes)
-        {
-            <a class="btn mt-2" href="/Inscription/Index?tournoiId=@prochain.TournoiId">S'inscrire à ce tournoi</a>
+    .hero-poster {
+        border-radius: 0;
+        min-height: calc(100vh - 150px); /* Ajusté pour remplir l'écran */
+        margin-bottom: 0;
+    }
+
+    @media (min-width: 1200px) {
+        .poster-content {
+            transform: scale(1.1);
         }
-        else
-        {
-            <p class="text-muted mt-1">Inscriptions pas encore ouvertes</p>
-        }
-    </div>
-}
-
-<!-- Tarifs -->
-<div class="card mt-3">
-    <h2>Tarifs d'inscription</h2>
-    <div class="grid grid-2">
-        <div class="tarif-card">
-            <p class="tarif-prix">60 $</p>
-            <p class="tarif-type">Employé</p>
-            <p class="tarif-desc">Inclut la participation, le déjeuner et le cocktail.</p>
-        </div>
-        <div class="tarif-card">
-            <p class="tarif-prix">50 $</p>
-            <p class="tarif-type">Retraité</p>
-            <p class="tarif-desc">Tarif préférentiel pour les retraités de La Cité.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Comment ça marche -->
-<div class="mt-3">
-    <h2 class="text-center mb-3">Comment participer ?</h2>
-    <div class="grid grid-4">
-        <div class="step-card">
-            <div class="step-number">📝</div>
-            <h3>Créez un compte</h3>
-            <p>Inscrivez-vous gratuitement sur la plateforme.</p>
-        </div>
-        <div class="step-card">
-            <div class="step-number">🏌️</div>
-            <h3>Choisissez un tournoi</h3>
-            <p>Parcourez les tournois et choisissez celui qui vous plaît.</p>
-        </div>
-        <div class="step-card">
-            <div class="step-number">👥</div>
-            <h3>Formez une équipe</h3>
-            <p>Créez une équipe ou rejoignez-en une avec un code secret.</p>
-        </div>
-        <div class="step-card">
-            <div class="step-number">⛳</div>
-            <h3>Jouez !</h3>
-            <p>Présentez-vous le jour du tournoi et profitez de la journée.</p>
-        </div>
-    </div>
-</div>
+    }
+</style>
