@@ -8,6 +8,21 @@
 
 <h1>Mes Inscriptions</h1>
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" style="background: rgba(40, 167, 69, 0.2); color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #28a745;">
+        <i class="fas fa-check-circle"></i> @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.2); color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #dc3545;">
+        <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
+    </div>
+}
+
+
 @if (Model.Count == 0)
 {
     <div class="card text-center">
@@ -67,8 +82,12 @@ else
                         }
                         else
                         {
-                            <span>—</span>
+                            <div style="display:flex; flex-direction:column; gap:5px;">
+                                <span style="color:#aaa;">Individuel</span>
+                                <a href="/Equipe/Rejoindre?participantId=@inscription.ParticipantId" class="btn btn-sm" style="font-size: 0.75rem; padding: 4px 8px; background-color: var(--accent); color: white; border: none; border-radius: 4px; text-decoration: none; display: inline-block; text-align: center;">Rejoindre une équipe</a>
+                            </div>
                         }
+
                     </td>
                     <td>
                         @if (inscription.StatutInscription == "CONFIRMEE")

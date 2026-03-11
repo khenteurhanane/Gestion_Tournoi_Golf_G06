@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Rejoindre une équipe";
+    var participantId = ViewBag.ParticipantId;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+        <div class="card">
+            <h2>Rejoindre une équipe</h2>
+            <p class="sub">Veuillez saisir le code secret fourni par le créateur de l'équipe.</p>
+
+            <form action="/Equipe/Rejoindre" method="post">
+                <input type="hidden" name="participantId" value="@participantId" />
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error" style="color:var(--danger); margin-bottom:15px; background: rgba(220, 53, 69, 0.1); padding: 10px; border-radius: 5px;">
+                        <i class="fas fa-exclamation-circle"></i> @ViewBag.Error
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label>Code secret de l'équipe</label>
+                    <input name="codeSecret" type="text" placeholder="Ex: A1B2C3" required 
+                           style="text-transform: uppercase; font-weight: bold; letter-spacing: 3px; text-align: center; font-size: 1.2rem;" />
+                    <small>Le code est composé de 6 caractères alphanumériques.</small>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button class="btn" type="submit" style="width: 100%;">Rejoindre maintenant</button>
+                </div>
+            </form>
+
+            <div class="footer" style="margin-top: 20px; text-align: center;">
+                <a href="/Auth/MesInscriptions" class="btn btn-secondary" style="background: none; border: 1px solid var(--text); color: var(--text);">Retour à mes inscriptions</a>
+            </div>
+        </div>
+
+    </div>
+</div>
