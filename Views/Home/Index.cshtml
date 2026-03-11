@@ -8,65 +8,57 @@
     string prenom = HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom") ?? "";
 }
 
-<!-- Hero principal -->
-<div class="hero-home">
-    <!-- Décorations visuelles -->
-    <div class="hero-sun">☀️</div>
-    <div class="hero-cloud cloud-1">☁️</div>
-    <div class="hero-cloud cloud-2">☁️</div>
-    <div class="hero-cloud cloud-3">⛅</div>
-    <div class="hero-ground"></div>
-    <div class="hero-deco hero-ball">⛳</div>
-    <div class="hero-deco hero-flag">🏌️</div>
-    <div class="hero-deco hero-cart">🏎️</div>
-    <div class="hero-deco hero-tree tree-1">🌳</div>
-    <div class="hero-deco hero-tree tree-2">🌲</div>
-    <div class="hero-deco hero-bird bird-1">🕊️</div>
-    <div class="hero-deco hero-bird bird-2">🐦</div>
-    <div class="hero-home-content">
-        @if (estConnecte)
-        {
-            <p class="hero-subtitle">Bonjour @prenom !</p>
-        }
-        <p class="hero-pre-title">Tournoi de</p>
-        <h1 class="hero-title-golf">GOLF</h1>
-        <p class="hero-tagline">Vivez une journée <strong>inoubliable</strong> sur le vert !</p>
+<!-- Hero principal avec nouveau design style affiche -->
+<div class="hero-poster">
+    <div class="poster-overlay">
+        <div class="poster-content">
+            <div class="poster-badge animate__animated animate__fadeInDown">
+                <span class="poster-golf-text">TOURNOI DE</span> <span class="poster-golf-title">GOLF</span>
+            </div>
+            <div class="poster-college animate__animated animate__fadeIn">
+                <div class="college-logo-wrapper">
+                    <span class="college-text-small">COLLÈGE</span>
+                    <h2 class="college-name">LA CITÉ</h2>
+                    <span class="college-location">Ottawa/Gatineau</span>
+                </div>
+            </div>
 
-        <div class="hero-features">
-            <div class="hero-feat">
-                <span class="hero-feat-icon">⛳</span>
-                <div><strong>Compétition</strong><br><em>amicale</em></div>
-            </div>
-            <div class="hero-feat">
-                <span class="hero-feat-icon">🏆</span>
-                <div><strong>Prix &</strong><br><em>Surprises</em></div>
-            </div>
-            <div class="hero-feat">
-                <span class="hero-feat-icon">🍽️</span>
-                <div><strong>Cocktail &</strong><br><em>Déjeuner</em></div>
-            </div>
-        </div>
-
-        <div class="hero-cta">
-            @if (estConnecte)
-            {
-                <a class="btn-hero" href="/Tournoi/Index">Voir les tournois →</a>
-                @if (role == "ADMIN")
+            <div class="poster-cta-group animate__animated animate__fadeInUp">
+                @if (estConnecte)
                 {
-                    <a class="btn-hero-outline" href="/Admin/Index">Dashboard Admin</a>
+                    <p class="poster-welcome">Bienvenue, <strong>@prenom</strong> !</p>
+                    <div class="poster-btns">
+                        <a class="btn-poster-primary" href="/Tournoi/Index">Voir les tournois</a>
+                        @if (role == "ADMIN")
+                        {
+                            <a class="btn-poster-outline" href="/Admin/Index">Gestion Admin</a>
+                        }
+                        else
+                        {
+                            <a class="btn-poster-outline" href="/Auth/MesInscriptions">Mes inscriptions</a>
+                        }
+                    </div>
                 }
                 else
                 {
-                    <a class="btn-hero-outline" href="/Auth/MesInscriptions">Mes inscriptions</a>
+                    <div class="poster-btns">
+                        <a class="btn-poster-primary" href="/Auth/Register">M'inscrire maintenant</a>
+                        <a class="btn-poster-outline" href="/Auth/Login">Me connecter</a>
+                    </div>
                 }
-            }
-            else
-            {
-                <a class="btn-hero" href="/Auth/Register">Inscrivez-vous dès maintenant ! →</a>
-                <a class="btn-hero-outline" href="/Auth/Login">Connexion</a>
-            }
+            </div>
+
+            <div class="poster-footer animate__animated animate__fadeInUp">
+                <div class="footer-info-line">
+                    <span class="line"></span>
+                    <span class="info-text">Information & Réservation</span>
+                    <span class="line"></span>
+                </div>
+                <div class="poster-phone">
+                    <span class="phone-icon">📞</span> (613) 742-2483
+                </div>
+            </div>
         </div>
-        <p class="hero-places">— Places limitées —</p>
     </div>
 </div>
 
