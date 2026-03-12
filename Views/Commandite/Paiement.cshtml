@@ -29,7 +29,7 @@
                 
                 <div class="form-group">
                     <label>Nom de l'entreprise / Titulaire</label>
-                    <input type="text" value="@(string.IsNullOrEmpty(Model.Utilisateur.NomEntreprise) ? $"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}" : Model.Utilisateur.NomEntreprise)" readonly />
+                    <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" readonly />
                 </div>
                 
                 <div class="form-group">
