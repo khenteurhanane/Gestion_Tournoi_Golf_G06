@@ -364,7 +364,13 @@ FodyWeavers.xsd
 
 # Documentation personnelle (ne pas commiter)
 Documentation_Rayane.md
-Documentation/Fiche_Oral_Tests.md
 
-# Dossier de tests local (ne pas commiter)
-Tests/
+# Fichiers de logs générés automatiquement par l'application
+app_error.txt
+run_log.txt
+run_log_utf8.txt
+*.log
+
+# Résultats de tests (générés automatiquement)
+Tests/TestResults/
+
