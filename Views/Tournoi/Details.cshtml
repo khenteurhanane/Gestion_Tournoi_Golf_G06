@@ -129,10 +129,10 @@
                     var equipeNom = equipes.FirstOrDefault(e => e.EquipeId == p.EquipeId)?.NomEquipe ?? "—";
                     <tr>
                         <td>@compteur</td>
-                        <td>@p.Utilisateur?.Prenom</td>
-                        <td>@p.Utilisateur?.Nom</td>
-                        <td>@p.Utilisateur?.Email</td>
-                        <td>@p.MontantPaye.ToString("C")</td>
+                        <td>@(p.Utilisateur?.Prenom ?? p.Prenom)</td>
+                        <td>@(p.Utilisateur?.Nom ?? p.Nom)</td>
+                        <td>@(p.Utilisateur?.Email ?? p.Email)</td>
+                        <td>@(p.CommanditeId != null ? "Sponsorisé" : p.MontantPaye.ToString("C"))</td>
                         <td>@equipeNom</td>
                         <td>@p.CreeLe.ToShortDateString()</td>
                     </tr>

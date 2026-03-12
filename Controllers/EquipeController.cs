@@ -85,5 +85,70 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             return Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
         }
+
+        // --- US-08 : Rejoindre une équipe existante ---
+
+        // Affiche le formulaire pour rejoindre une équipe
+        [HttpGet]
+        public IActionResult Rejoindre(int participantId)
+        {
+            var participant = _context.Participants.Find(participantId);
+            if (participant == null)
+            {
+                return RedirectToAction("MesInscriptions", "Auth");
+            }
+
+            // Vérifier si le participant est déjà dans une équipe
+            if (participant.EquipeId != null)
+            {
+                TempData["Error"] = "Vous faites déjà partie d'une équipe.";
+                return RedirectToAction("MesInscriptions", "Auth");
+            }
+
+            ViewBag.ParticipantId = participantId;
+            return View();
+        }
+
+        // Traite la demande pour rejoindre une équipe
+        [HttpPost]
+        public IActionResult Rejoindre(int participantId, string codeSecret)
+        {
+            if (string.IsNullOrEmpty(codeSecret))
+            {
+                ViewBag.Error = "Veuillez saisir un code secret.";
+                ViewBag.ParticipantId = participantId;
+                return View();
+            }
+
+            var participant = _context.Participants.Find(participantId);
+            if (participant == null) return RedirectToAction("MesInscriptions", "Auth");
+
+            // Chercher l'équipe par son code secret
+            var equipe = _context.Equipes
+                .FirstOrDefault(e => e.CodeSecret == codeSecret.Trim().ToUpper() && e.TournoiId == participant.TournoiId);
+
+            if (equipe == null)
+            {
+                ViewBag.Error = "Code d'équipe invalide ou introuvable pour ce tournoi.";
+                ViewBag.ParticipantId = participantId;
+                return View();
+            }
+
+            // Vérifier si l'équipe est pleine
+            int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
+            if (nbMembres >= equipe.NbJoueursMax)
+            {
+                ViewBag.Error = "Cette équipe est déjà complète (max 4 joueurs).";
+                ViewBag.ParticipantId = participantId;
+                return View();
+            }
+
+            // Rejoindre l'équipe
+            participant.EquipeId = equipe.EquipeId;
+            _context.SaveChanges();
+
+            TempData["Success"] = $"Vous avez rejoint l'équipe '{equipe.NomEquipe}' avec succès !";
+            return RedirectToAction("MesInscriptions", "Auth");
+        }
     }
 }

@@ -13,10 +13,22 @@ namespace croupe_06_TournoiGolf.Models
         public Tournoi Tournoi { get; set; }
 
         [ForeignKey("Utilisateur")]
-        public int UtilisateurId { get; set; }
-        public Utilisateur Utilisateur { get; set; }
+        public int? UtilisateurId { get; set; }
+        public Utilisateur? Utilisateur { get; set; }
 
         public int? EquipeId { get; set; }
+
+        [ForeignKey("Commandite")]
+        public int? CommanditeId { get; set; }
+        public Commandite? Commandite { get; set; }
+
+        // Pour les joueurs commanditaires qui n'ont pas encore de compte utilisateur
+        [StringLength(60)]
+        public string? Nom { get; set; }
+        [StringLength(60)]
+        public string? Prenom { get; set; }
+        [StringLength(150)]
+        public string? Email { get; set; }
 
         [StringLength(30)]
         public string TypeParticipant { get; set; } = "employe";

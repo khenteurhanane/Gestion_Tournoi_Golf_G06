@@ -212,9 +212,14 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Simule le paiement (GOLF-37)
         [HttpPost]
-        public IActionResult SimulerPaiement(int participantId)
+        public async Task<IActionResult> SimulerPaiement(int participantId)
         {
-            var participant = _context.Participants.Find(participantId);
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            
+            var participant = _context.Participants
+                .Include(p => p.Tournoi)
+                .FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
+
             if (participant == null)
             {
                 return RedirectToAction("Index", "Tournoi");
@@ -222,15 +227,14 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Mettre à jour le statut
             participant.StatutInscription = "CONFIRMEE";
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Préparer les infos pour la confirmation
-            var tournoi = _context.Tournois.Find(participant.TournoiId);
-            ViewBag.NomTournoi = tournoi?.Nom;
+            ViewBag.NomTournoi = participant.Tournoi?.Nom;
 
             if (participant.EquipeId != null)
             {
-                var eq = _context.Equipes.Find(participant.EquipeId);
+                var eq = await _context.Equipes.FindAsync(participant.EquipeId);
                 if (eq != null)
                 {
                     ViewBag.NomEquipe = eq.NomEquipe;

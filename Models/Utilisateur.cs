@@ -27,6 +27,9 @@ namespace croupe_06_TournoiGolf.Models
         [StringLength(30)]
         public string Telephone { get; set; } = string.Empty;
 
+        [StringLength(100)]
+        public string? NomEntreprise { get; set; }
+
         public DateTime? DateNaissance { get; set; }
 
         [StringLength(150)]

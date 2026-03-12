@@ -1,0 +1,68 @@
+@model List<croupe_06_TournoiGolf.Models.Equipe>
+@{
+    ViewData["Title"] = "Gestion des Équipes";
+    var nbMembres = (Dictionary<int, int>)ViewBag.NbMembres;
+}
+
+<div class="admin-header">
+    <h1><i class="fas fa-users-cog"></i> Gestion des Équipes</h1>
+    <a href="/Admin/Index" class="btn btn-secondary">Retour au Tableau de bord</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card mt-4">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom de l'équipe</th>
+                    <th>Tournoi</th>
+                    <th>Créateur</th>
+                    <th>Membres</th>
+                    <th>Code Secret</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var eq in Model)
+                {
+                    int count = nbMembres.ContainsKey(eq.EquipeId) ? nbMembres[eq.EquipeId] : 0;
+                    <tr>
+                        <td><strong>@eq.NomEquipe</strong></td>
+                        <td>@eq.Tournoi?.Nom</td>
+                        <td>@eq.Createur?.Prenom @eq.Createur?.Nom</td>
+                        <td>
+                            <span class="badge @(count >= eq.NbJoueursMax ? "badge-ferme" : "badge-ouvert")">
+                                @count / @eq.NbJoueursMax
+                            </span>
+                        </td>
+                        <td><code>@eq.CodeSecret</code></td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <a href="/Admin/DetailsEquipe/@eq.EquipeId" class="btn btn-sm">Gérer</a>
+                                <form action="/Admin/SupprimerEquipe" method="post" onsubmit="return confirm('Supprimer cette équipe ? Les membres deviendront des participants individuels.');">
+                                    <input type="hidden" name="id" value="@eq.EquipeId" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+    .badge-ouvert { background: #e8f5e9; color: #2e7d32; }
+    .badge-ferme { background: #ffebee; color: #c62828; }
+    .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+    .btn-danger { background-color: #dc3545; color: white; border: none; }
+    .btn-danger:hover { background-color: #c82333; }
+</style>

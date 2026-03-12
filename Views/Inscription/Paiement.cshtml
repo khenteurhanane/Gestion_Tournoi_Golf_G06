@@ -23,18 +23,18 @@
         <div class="payment-form-section mt-4">
             <h3 class="section-title">Détails de paiement</h3>
             
-            <form asp-action="SimulerPaiement" method="post">
+            <form asp-action="SimulerPaiement" method="post" id="paymentForm">
                 <input type="hidden" name="participantId" value="@Model.ParticipantId" />
                 
                 <div class="form-group">
                     <label>Nom sur la carte</label>
-                    <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" />
+                    <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" required />
                 </div>
                 
                 <div class="form-group">
                     <label>Numéro de carte</label>
                     <div class="card-input-wrapper">
-                        <input type="text" value="4540 1234 5678 9012" />
+                        <input type="text" value="4540 1234 5678 9012" required />
                         <span class="card-type-icon">VISA</span>
                     </div>
                 </div>
@@ -42,11 +42,11 @@
                 <div class="form-row">
                     <div class="form-group col-half">
                         <label>Expiration</label>
-                        <input type="text" value="12/28" />
+                        <input type="text" value="12/28" required />
                     </div>
                     <div class="form-group col-half">
                         <label>CVV</label>
-                        <input type="text" value="***" />
+                        <input type="text" value="***" required />
                     </div>
                 </div>
 
@@ -54,11 +54,33 @@
                     <i class="fas fa-lock"></i> Ceci est une simulation sécurisée pour le projet G06.
                 </p>
                 
-                <button type="submit" class="btn btn-payment-simulate">
-                    <span class="btn-text">Confirmer le paiement</span>
+                <button type="submit" class="btn btn-payment-simulate" id="submitBtn">
+                    <span class="btn-text" id="btnText">Confirmer le paiement</span>
                     <span class="btn-icon">💳</span>
+                    <div id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display:none;">
+                      <span class="visually-hidden">Chargement...</span>
+                    </div>
                 </button>
             </form>
+
+            <script>
+                document.getElementById('paymentForm').addEventListener('submit', function(e) {
+                    const btn = document.getElementById('submitBtn');
+                    const text = document.getElementById('btnText');
+                    const spinner = document.getElementById('spinner');
+                    
+                    e.preventDefault(); // On bloque l'envoi direct pour montrer l'animation
+                    
+                    btn.disabled = true;
+                    text.innerText = "Traitement en cours...";
+                    spinner.style.display = "inline-block";
+                    btn.style.filter = "grayscale(0.5)";
+                    
+                    setTimeout(() => {
+                        this.submit(); // On envoie le formulaire après 1.5s
+                    }, 1500);
+                });
+            </script>
         </div>
     </div>
 </div>
