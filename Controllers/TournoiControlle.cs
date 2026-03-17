@@ -6,6 +6,8 @@ using croupe_06_TournoiGolf.Data;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
+    // Extensions d'image acceptées
+    // Dossier de destination : wwwroot/images/tournois/
     public class TournoiController : BaseController
     {
         private readonly GolfDbContext _context;
@@ -52,22 +54,19 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche le formulaire de création (admin seulement)
         public IActionResult Create()
         {
-            // Vérifier que l'utilisateur est administrateur
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             if (role != "ADMIN")
             {
                 ViewBag.Error = "Accès refusé : droits insuffisants.";
                 return View("AccesRefuse");
             }
-
             return View();
         }
 
         // Enregistre un nouveau tournoi (admin seulement)
         [HttpPost]
-        public IActionResult Create(Tournoi tournoi)
+        public async Task<IActionResult> Create(Tournoi tournoi, IFormFile? imageFile)
         {
-            // Vérifier que l'utilisateur est administrateur
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             if (role != "ADMIN")
             {
@@ -75,10 +74,14 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View("AccesRefuse");
             }
 
-            if (ModelState.IsValid == false)
-            {
+            // Retirer ImageUrl de la validation (géré manuellement)
+            ModelState.Remove("ImageUrl");
+
+            if (!ModelState.IsValid)
                 return View(tournoi);
-            }
+
+            // Gestion de l'image
+            tournoi.ImageUrl = await SauvegarderImage(imageFile);
 
             tournoi.CreeLe = DateTime.Now;
             _context.Tournois.Add(tournoi);
@@ -184,19 +187,15 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Tournoi model)
+        public async Task<IActionResult> Edit(Tournoi model, IFormFile? imageFile)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             if (role != "ADMIN")
-            {
                 return View("AccesRefuse");
-            }
 
             var tournoi = _context.Tournois.Find(model.TournoiId);
             if (tournoi == null)
-            {
                 return RedirectToAction("Index");
-            }
 
             // Mettre à jour les champs
             tournoi.Nom = model.Nom;
@@ -205,9 +204,38 @@ namespace croupe_06_TournoiGolf.Controllers
             tournoi.Description = model.Description;
             tournoi.PlacesParticipantsMax = model.PlacesParticipantsMax;
             tournoi.DateLimiteInscription = model.DateLimiteInscription;
-            _context.SaveChanges();
 
+            // Nouvelle image uploadée ?
+            if (imageFile != null && imageFile.Length > 0)
+                tournoi.ImageUrl = await SauvegarderImage(imageFile);
+
+            _context.SaveChanges();
             return RedirectToAction("Details", new { id = tournoi.TournoiId });
+        }
+
+        // ─── Méthode privée : sauvegarde d'image ───────────────────────────
+        private async Task<string?> SauvegarderImage(IFormFile? fichier)
+        {
+            if (fichier == null || fichier.Length == 0)
+                return null;
+
+            var extensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+            var ext = Path.GetExtension(fichier.FileName).ToLowerInvariant();
+            if (!extensions.Contains(ext))
+                return null;
+
+            var dossier = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "tournois");
+            if (!Directory.Exists(dossier))
+                Directory.CreateDirectory(dossier);
+
+            // Nom unique basé sur timestamp
+            var nomFichier = $"tournoi_{DateTime.Now:yyyyMMddHHmmss}{ext}";
+            var chemin = Path.Combine(dossier, nomFichier);
+
+            using (var stream = new FileStream(chemin, FileMode.Create))
+                await fichier.CopyToAsync(stream);
+
+            return $"/images/tournois/{nomFichier}";
         }
 
         // Supprimer un tournoi (admin)

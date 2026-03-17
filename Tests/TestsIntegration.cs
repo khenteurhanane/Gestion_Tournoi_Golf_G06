@@ -79,7 +79,7 @@ namespace GolfTournoi.Tests
                 InscriptionsOuvertes = true,
                 PlacesParticipantsMax = 50
             };
-            tournoiController.Create(nouveauTournoi);
+            tournoiController.Create(nouveauTournoi, null).Wait();
 
             // Vérifier que le tournoi est bien en base
             Assert.Equal(1, context.Tournois.Count());

@@ -42,8 +42,8 @@
     <tbody id="tableUtilisateurs">
         @foreach (var user in Model)
         {
-            var nbInsc = ((Dictionary<int, int>)(ViewBag.NbInscriptions ?? new Dictionary<int, int>())).ContainsKey(user.UtilisateurId)
-                ? ((Dictionary<int, int>)ViewBag.NbInscriptions)[user.UtilisateurId] : 0;
+            var nbInscDict = ViewBag.NbInscriptions as Dictionary<int, int> ?? new Dictionary<int, int>();
+            var nbInsc = nbInscDict.ContainsKey(user.UtilisateurId) ? nbInscDict[user.UtilisateurId] : 0;
 
             <tr class="ligne-utilisateur">
                 <td>@user.Prenom @user.Nom</td>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
@@ -40,7 +40,26 @@ namespace croupe_06_TournoiGolf.Controllers
             ViewBag.NbEquipes = _context.Equipes.Count();
             ViewBag.RevenuTotal = _context.Participants.Sum(p => (decimal?)p.MontantPaye) ?? 0;
 
-            // Prochains tournois (pour afficher dans le dashboard)
+            // Inscriptions récentes
+            ViewBag.InscriptionsRecentes = _context.Participants
+                .Include(p => p.Tournoi)
+                .Include(p => p.Utilisateur)
+                .OrderByDescending(p => p.CreeLe)
+                .Take(5)
+                .ToList();
+
+            // Taux d'occupation des tournois actifs
+            var tStatus = _context.Tournois
+                .Where(t => t.DateTournoi >= DateTime.Today)
+                .Select(t => new TournoiStatusViewModel {
+                    TournoiId = t.TournoiId,
+                    Nom = t.Nom,
+                    PlacesParticipantsMax = t.PlacesParticipantsMax,
+                    NbInscrits = _context.Participants.Count(p => p.TournoiId == t.TournoiId)
+                }).ToList();
+            ViewBag.TournoiStatus = tStatus;
+
+            // Prochains tournois
             ViewBag.ProchainsTournois = _context.Tournois
                 .Where(t => t.DateTournoi >= DateTime.Today)
                 .OrderBy(t => t.DateTournoi)
@@ -63,8 +82,9 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Compter le nombre d'inscriptions par utilisateur
             var nbInscriptions = _context.Participants
+                .Where(p => p.UtilisateurId != null)
                 .AsEnumerable()
-                .GroupBy(p => p.UtilisateurId)
+                .GroupBy(p => p.UtilisateurId!.Value)
                 .ToDictionary(g => g.Key, g => g.Count());
             ViewBag.NbInscriptions = nbInscriptions;
 

@@ -34,6 +34,10 @@ namespace croupe_06_TournoiGolf.Models
         [DataType(DataType.Date)]
         public DateTime? DateLimiteInscription { get; set; }
 
+        // Image du tournoi (chemin relatif, ex: /images/tournois/mon-tournoi.png)
+        [StringLength(300)]
+        public string? ImageUrl { get; set; }
+
         // Date de création automatique
         [Column("CreeLe")]
         public DateTime CreeLe { get; set; } = DateTime.Now;

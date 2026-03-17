@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-6">
         <div class="card">
-            <form action="/Tournoi/Edit" method="post">
+            <form action="/Tournoi/Edit" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
 
                 <div class="form-group">
@@ -43,9 +43,76 @@
                     <small>Si vide, pas de date limite.</small>
                 </div>
 
-                <button type="submit" class="btn">Enregistrer</button>
-                <a href="/Tournoi/Details/@Model.TournoiId" class="btn btn-secondary">Annuler</a>
+                <!-- Image actuelle + option de remplacement -->
+                <div class="form-group">
+                    <label>Image du tournoi</label>
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div style="margin-bottom:10px;">
+                            <img src="@Model.ImageUrl" alt="Image actuelle"
+                                 style="max-height:120px; border-radius:8px; object-fit:cover; display:block; margin-bottom:6px;" />
+                            <small style="color:var(--muted);">Image actuelle — laissez vide pour la conserver</small>
+                        </div>
+                    }
+                    <div id="zone-upload" onclick="document.getElementById('imageFile').click()"
+                         style="border:2px dashed rgba(45,106,46,.35); border-radius:12px; padding:22px; text-align:center;
+                                cursor:pointer; background:rgba(45,106,46,.04);"
+                         ondragover="event.preventDefault(); this.style.borderColor='var(--accent)';"
+                         ondragleave="this.style.borderColor='rgba(45,106,46,.35)';"
+                         ondrop="handleDrop(event)">
+                        <input type="file" id="imageFile" name="imageFile"
+                               accept=".jpg,.jpeg,.png,.webp,.gif" style="display:none;"
+                               onchange="previewImage(this)" />
+                        <div id="upload-placeholder">
+                            <div style="font-size:1.8rem;">📷</div>
+                            <p style="margin:6px 0 2px; font-weight:600; color:var(--accent); font-size:.9rem;">Cliquer pour remplacer l'image</p>
+                            <small style="color:var(--muted);">JPG, PNG, WEBP — max 5 Mo</small>
+                        </div>
+                        <div id="upload-preview" style="display:none;">
+                            <img id="img-preview" src="" alt="Aperçu"
+                                 style="max-height:120px; border-radius:8px; object-fit:cover; max-width:100%;" />
+                            <p id="img-nom" style="margin-top:6px; font-size:.85rem; color:var(--muted);"></p>
+                            <button type="button" onclick="supprimerImage(event)"
+                                    style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:.85rem;">✕ Annuler</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="submit" class="btn">Enregistrer</button>
+                    <a href="/Tournoi/Details/@Model.TournoiId" class="btn btn-secondary">Annuler</a>
+                </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        var file = input.files[0];
+        if (file.size > 5 * 1024 * 1024) { alert('Image trop lourde (max 5 Mo).'); input.value = ''; return; }
+        reader.onload = function(e) {
+            document.getElementById('upload-placeholder').style.display = 'none';
+            document.getElementById('upload-preview').style.display = 'block';
+            document.getElementById('img-preview').src = e.target.result;
+            document.getElementById('img-nom').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+function supprimerImage(e) {
+    e.stopPropagation();
+    document.getElementById('imageFile').value = '';
+    document.getElementById('upload-placeholder').style.display = 'block';
+    document.getElementById('upload-preview').style.display = 'none';
+}
+function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('zone-upload').style.borderColor = 'rgba(45,106,46,.35)';
+    var input = document.getElementById('imageFile');
+    input.files = e.dataTransfer.files;
+    previewImage(input);
+}
+</script>

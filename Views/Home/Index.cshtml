@@ -74,21 +74,25 @@
         box-shadow: none !important;
         padding: 0 !important;
         margin-top: 0 !important;
+        margin-bottom: 0 !important;
         max-width: 100% !important;
+        width: 100% !important;
     }
 
     .full-poster-page {
-        margin: -24px -15px; /* Compte tenu des marges par défaut */
-        overflow: hidden;
+        margin: 0;
+        width: 100%;
     }
 
     .hero-poster {
         border-radius: 0;
-        min-height: calc(100vh - 150px); /* Ajusté pour remplir l'écran */
+        min-height: calc(100vh - 66px); /* 66px = hauteur navbar */
         margin-bottom: 0;
+        background-position: center center;
+        background-size: cover;
     }
 
-    @media (min-width: 1200px) {
+    @@media (min-width: 1200px) {
         .poster-content {
             transform: scale(1.1);
         }

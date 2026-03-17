@@ -43,7 +43,7 @@ namespace GolfTournoi.Tests
                     Lieu = "Quebec"
                 };
 
-                var resultat = controller.Create(tournoi);
+                var resultat = controller.Create(tournoi, null).Result;
 
                 var redirection = Assert.IsType<RedirectToActionResult>(resultat);
                 Assert.Equal("Index", redirection.ActionName);
@@ -66,7 +66,7 @@ namespace GolfTournoi.Tests
 
                 controller.ModelState.AddModelError("Nom", "Erreur test");
 
-                var resultat = controller.Create(tournoi);
+                var resultat = controller.Create(tournoi, null).Result;
 
                 var vue = Assert.IsType<ViewResult>(resultat);
                 Assert.Equal(0, context.Tournois.Count());
@@ -92,6 +92,7 @@ namespace GolfTournoi.Tests
                 var controller = CreerControllerAvecSession(context);
                 var resultat = controller.OuvrirInscriptions(tournoi.TournoiId);
                 var redirection = Assert.IsType<RedirectToActionResult>(resultat);
+                
                 var tournoiMaj = context.Tournois.Find(tournoi.TournoiId);
 
                 Assert.Equal("Index", redirection.ActionName);

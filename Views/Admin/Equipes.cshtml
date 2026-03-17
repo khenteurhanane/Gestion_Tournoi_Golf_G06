@@ -1,7 +1,7 @@
 @model List<croupe_06_TournoiGolf.Models.Equipe>
 @{
     ViewData["Title"] = "Gestion des Équipes";
-    var nbMembres = (Dictionary<int, int>)ViewBag.NbMembres;
+    var nbMembres = ViewBag.NbMembres as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
 <div class="admin-header">

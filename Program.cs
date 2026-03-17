@@ -47,6 +47,9 @@ using (var scope = app.Services.CreateScope())
         
         // Correction pour Utilisateurs (NomEntreprise)
         context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Utilisateurs') AND name = 'NomEntreprise') ALTER TABLE Utilisateurs ADD NomEntreprise NVARCHAR(100) NULL;");
+
+        // Ajout de ImageUrl pour les tournois
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'ImageUrl') ALTER TABLE Tournois ADD ImageUrl NVARCHAR(300) NULL;");
     }
     catch (Exception ex)
     {

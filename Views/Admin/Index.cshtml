@@ -1,107 +1,390 @@
-﻿@{
-    ViewData["Title"] = "Espace Administrateur";
-}
-
-<h1>Tableau de bord Administrateur</h1>
-
-<!-- Statistiques -->
-<div class="stats-row">
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbTournois</p>
-        <p class="stat-label">Tournois</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbTournoisOuverts</p>
-        <p class="stat-label">Inscriptions ouvertes</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbParticipants</p>
-        <p class="stat-label">Inscriptions</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbUtilisateurs</p>
-        <p class="stat-label">Utilisateurs</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@ViewBag.NbEquipes</p>
-        <p class="stat-label">Équipes</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-number">@(((decimal)ViewBag.RevenuTotal).ToString("C"))</p>
-        <p class="stat-label">Revenus totaux</p>
-    </div>
-</div>
-
-<!-- Prochains tournois -->
 @{
+    ViewData["Title"] = "Espace Administrateur";
     var prochains = ViewBag.ProchainsTournois as List<croupe_06_TournoiGolf.Models.Tournoi>;
-}
-@if (prochains != null && prochains.Count > 0)
-{
-    <div class="card">
-        <h3>Prochains tournois</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Date</th>
-                    <th>Lieu</th>
-                    <th>Statut</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var t in prochains)
-                {
-                    <tr>
-                        <td>@t.Nom</td>
-                        <td>@t.DateTournoi.ToShortDateString()</td>
-                        <td>@t.Lieu</td>
-                        <td>
-                            @if (t.InscriptionsOuvertes)
-                            {
-                                <span class="badge badge-ouvert">Ouvertes</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-ferme">Fermées</span>
-                            }
-                        </td>
-                        <td>
-                            <a href="/Tournoi/Details/@t.TournoiId" class="btn btn-secondary btn-sm">Détails</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    var inscriptionsRecentes = ViewBag.InscriptionsRecentes as List<croupe_06_TournoiGolf.Models.Participant>;
+    var tournoiStatus = ViewBag.TournoiStatus as List<croupe_06_TournoiGolf.Models.TournoiStatusViewModel>;
 }
 
-<!-- Actions rapides -->
-<div class="card">
-    <h3>Actions rapides</h3>
-    <div class="admin-actions-grid">
-        <a class="btn" href="/Tournoi/Create"><i class="fas fa-plus"></i> Créer un tournoi</a>
-        <a class="btn" href="/Tournoi/Index"><i class="fas fa-golf-ball"></i> Gérer les tournois</a>
-        <a class="btn" href="/Admin/Utilisateurs"><i class="fas fa-users"></i> Gérer les utilisateurs</a>
-        <a class="btn" href="/Admin/Equipes"><i class="fas fa-users-cog"></i> Gérer les équipes</a>
-        <a class="btn btn-secondary" href="/Auth/Logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
+<div class="admin-dashboard">
+    <div class="dashboard-header">
+        <div>
+            <h1 class="premium-title">Tableau de bord <span class="text-gradient">Administrateur</span></h1>
+            <p class="subtitle">Vue d'ensemble de l'activité des tournois</p>
+        </div>
+        <div class="header-actions">
+            <a class="btn btn-primary-premium" href="/Tournoi/Create">
+                <i class="fas fa-plus"></i> Nouveau Tournoi
+            </a>
+        </div>
     </div>
 
-    <style>
-        .admin-actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-        .admin-actions-grid .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            height: auto;
-        }
-    </style>
+    <!-- Statistiques -->
+    <div class="stats-grid">
+        <div class="stat-premium-card">
+            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+            <div class="stat-info">
+                <h3>@ViewBag.NbTournois</h3>
+                <p>Tournois Totaux</p>
+            </div>
+            <div class="stat-trend">+@ViewBag.NbTournoisOuverts actifs</div>
+        </div>
+        <div class="stat-premium-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <h3>@ViewBag.NbParticipants</h3>
+                <p>Inscriptions</p>
+            </div>
+        </div>
+        <div class="stat-premium-card">
+            <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+            <div class="stat-info">
+                <h3>@ViewBag.NbUtilisateurs</h3>
+                <p>Utilisateurs</p>
+            </div>
+        </div>
+        <div class="stat-premium-card">
+            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+            <div class="stat-info">
+                <h3>@(((decimal)ViewBag.RevenuTotal).ToString("C"))</h3>
+                <p>Revenus</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main-grid">
+        <!-- Section Gauche -->
+        <div class="grid-col-8">
+            <!-- Prochains Tournois et Occupation -->
+            <div class="premium-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-alt"></i> État des Tournois</h3>
+                </div>
+                <div class="occupation-list">
+                    @if (tournoiStatus != null && tournoiStatus.Any())
+                    {
+                        @foreach (var ts in tournoiStatus)
+                        {
+                            var percentage = ts.PlacesParticipantsMax > 0 ? (ts.NbInscrits * 100) / ts.PlacesParticipantsMax : 0;
+                            <div class="occupation-item">
+                                <div class="occ-info">
+                                    <span class="occ-name">@ts.Nom</span>
+                                    <span class="occ-count">@ts.NbInscrits / @ts.PlacesParticipantsMax</span>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: @(percentage)%"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Aucun tournoi actif.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="premium-card mt-20">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Liste des Prochains Tournois</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Lieu</th>
+                            <th>Statut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (prochains != null && prochains.Any())
+                        {
+                            @foreach (var t in prochains)
+                            {
+                                <tr>
+                                    <td class="font-bold">@t.Nom</td>
+                                    <td>@t.DateTournoi.ToShortDateString()</td>
+                                    <td>@t.Lieu</td>
+                                    <td>
+                                        @if (t.InscriptionsOuvertes)
+                                        {
+                                            <span class="badge badge-ouvert">Ouvert</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-ferme">Fermé</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="/Tournoi/Edit/@t.TournoiId" class="btn-icon" title="Modifier"><i class="fas fa-edit"></i></a>
+                                        <a href="/Tournoi/Details/@t.TournoiId" class="btn-icon" title="Détails"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" class="text-center">Aucun tournoi à venir.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section Droite -->
+        <div class="grid-col-4">
+            <!-- Actions Rapides -->
+            <div class="premium-card accent">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Actions Rapides</h3>
+                </div>
+                <div class="quick-actions">
+                    <a href="/Tournoi/Index" class="qa-item">
+                        <i class="fas fa-cog"></i> Gérer les tournois
+                    </a>
+                    <a href="/Admin/Utilisateurs" class="qa-item">
+                        <i class="fas fa-user-shield"></i> Gérer les utilisateurs
+                    </a>
+                    <a href="/Admin/Equipes" class="qa-item">
+                        <i class="fas fa-flag"></i> Gérer les équipes
+                    </a>
+                    <a href="/Commandite/Index" class="qa-item">
+                        <i class="fas fa-handshake"></i> Commandites
+                    </a>
+                </div>
+            </div>
+
+            <!-- Inscriptions Récentes -->
+            <div class="premium-card mt-20">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> Inscriptions Récentes</h3>
+                </div>
+                <div class="recent-list">
+                    @if (inscriptionsRecentes != null && inscriptionsRecentes.Any())
+                    {
+                        @foreach (var ins in inscriptionsRecentes)
+                        {
+                            <div class="recent-item">
+                                <div class="recent-icon"><i class="fas fa-user-plus"></i></div>
+                                <div class="recent-details">
+                                    <span class="recent-user">@(ins.Utilisateur?.Prenom ?? ins.Prenom) @(ins.Utilisateur?.Nom ?? ins.Nom)</span>
+                                    <span class="recent-tournoi">@ins.Tournoi.Nom</span>
+                                    <span class="recent-time">@ins.CreeLe.ToShortDateString()</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Aucune inscription récente.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    :root {
+        --premium-bg: #f4f7f6;
+        --card-bg: #ffffff;
+        --primary-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        --accent-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        --text-dark: #2c3e50;
+        --text-muted: #7f8c8d;
+        --success: #27ae60;
+        --danger: #e74c3c;
+    }
+
+    .admin-dashboard {
+        padding: 30px;
+        background-color: var(--premium-bg);
+        min-height: 100vh;
+        color: var(--text-dark);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .premium-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .text-gradient {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+        color: var(--text-muted);
+        margin-top: 5px;
+        font-size: 1.1rem;
+    }
+
+    /* Grid Layout */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-main-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 20px;
+    }
+
+    .grid-col-8 { grid-column: span 8; }
+    .grid-col-4 { grid-column: span 4; }
+
+    /* Cards */
+    .stat-premium-card {
+        background: var(--card-bg);
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-premium-card:hover { transform: translateY(-5px); }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 20px;
+    }
+
+    .stat-info h3 { font-size: 1.8rem; margin: 0; font-weight: 700; }
+    .stat-info p { color: var(--text-muted); margin: 0; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+    
+    .stat-trend {
+        position: absolute;
+        bottom: 10px;
+        right: 15px;
+        font-size: 0.75rem;
+        color: var(--success);
+        font-weight: bold;
+    }
+
+    .premium-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        padding: 25px;
+    }
+
+    .premium-card.accent { border-left: 5px solid #3498db; }
+
+    .card-header {
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+
+    .card-header h3 { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 0.85rem; border-bottom: 2px solid #f8f9fa; }
+    td { padding: 15px 12px; border-bottom: 1px solid #f8f9fa; }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-ouvert { background: rgba(46, 204, 113, 0.15); color: #27ae60; }
+    .badge-ferme { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+
+    /* Buttons */
+    .btn-primary-premium {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        transition: all 0.3s;
+    }
+
+    .btn-primary-premium:hover { transform: scale(1.05); color: white; }
+
+    .btn-icon { color: var(--text-muted); margin: 0 5px; transition: color 0.2s; }
+    .btn-icon:hover { color: var(--text-dark); }
+
+    /* Occupation Progress */
+    .occupation-item { margin-bottom: 20px; }
+    .occ-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+    .progress-bar-bg { background: #eee; height: 10px; border-radius: 5px; overflow: hidden; }
+    .progress-bar-fill { background: var(--primary-gradient); height: 100%; border-radius: 5px; transition: width 1s ease-out; }
+
+    /* Quick Actions */
+    .quick-actions { display: grid; gap: 10px; }
+    .qa-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 600;
+        transition: all 0.2s;
+        gap: 12px;
+    }
+    .qa-item:hover { background: #3498db; color: white; transform: translateX(5px); }
+
+    /* Recent List */
+    .recent-item {
+        display: flex;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    .recent-icon {
+        width: 40px;
+        height: 40px;
+        background: #f0f3f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3498db;
+    }
+    .recent-details { display: flex; flex-direction: column; }
+    .recent-user { font-weight: 600; font-size: 0.9rem; }
+    .recent-tournoi { font-size: 0.8rem; color: var(--text-muted); }
+    .recent-time { font-size: 0.75rem; color: #bdc3c7; }
+
+    .mt-20 { margin-top: 20px; }
+
+    @@media (max-width: 1024px) {
+        .dashboard-main-grid { grid-template-columns: 1fr; }
+        .grid-col-8, .grid-col-4 { grid-column: span 12; }
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
