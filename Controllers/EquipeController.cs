@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using croupe_06_TournoiGolf.Models;
 using croupe_06_TournoiGolf.Data;
@@ -12,6 +13,20 @@ namespace croupe_06_TournoiGolf.Controllers
         public EquipeController(GolfDbContext context)
         {
             _context = context;
+        }
+
+        // Liste toutes les équipes (pour les participants)
+        public IActionResult Index()
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login", "Auth");
+
+            var equipes = _context.Equipes
+                .Include(e => e.Tournoi)
+                .Include(e => e.Createur)
+                .ToList();
+
+            return View(equipes);
         }
 
         // Affiche le formulaire de création d'équipe
@@ -63,6 +78,14 @@ namespace croupe_06_TournoiGolf.Controllers
 
             _context.Equipes.Add(model);
             _context.SaveChanges();
+
+            // Ajouter automatiquement le créateur à l'équipe en tant que participant (si possible)
+            var participant = _context.Participants.FirstOrDefault(p => p.UtilisateurId == userId && p.TournoiId == model.TournoiId);
+            if (participant != null)
+            {
+                participant.EquipeId = model.EquipeId;
+                _context.SaveChanges();
+            }
 
             return RedirectToAction("Confirmation", new { equipeId = model.EquipeId });
         }
@@ -149,6 +172,94 @@ namespace croupe_06_TournoiGolf.Controllers
 
             TempData["Success"] = $"Vous avez rejoint l'équipe '{equipe.NomEquipe}' avec succès !";
             return RedirectToAction("MesInscriptions", "Auth");
+        }
+        // --- Gestion de l'équipe par le créateur ---
+
+        // Affiche la page de gestion pour le créateur
+        public IActionResult Gestion(int id)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login", "Auth");
+
+            var equipe = _context.Equipes
+                .Include(e => e.Tournoi)
+                .Include(e => e.Createur)
+                .FirstOrDefault(e => e.EquipeId == id);
+
+            if (equipe == null) return RedirectToAction("Index");
+
+            // Vérifier que l'utilisateur est bien le créateur ou un admin
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (equipe.CreeParUtilisateurId != userId && role != "ADMIN")
+            {
+                return RedirectToAction("Index");
+            }
+
+            var membres = _context.Participants
+                .Include(p => p.Utilisateur)
+                .Where(p => p.EquipeId == id)
+                .ToList();
+
+            ViewBag.Membres = membres;
+            return View(equipe);
+        }
+
+        // Modifier le nom de l'équipe (par le créateur)
+        [HttpPost]
+        public IActionResult ModifierNom(int EquipeId, string NomEquipe)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var equipe = _context.Equipes.Find(EquipeId);
+
+            if (equipe != null && equipe.CreeParUtilisateurId == userId)
+            {
+                equipe.NomEquipe = NomEquipe;
+                _context.SaveChanges();
+                TempData["Success"] = "Le nom de l'équipe a été modifié.";
+            }
+
+            return RedirectToAction("Gestion", new { id = EquipeId });
+        }
+
+        // Supprimer l'équipe (par le créateur)
+        [HttpPost]
+        public IActionResult SupprimerEquipe(int id)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var equipe = _context.Equipes.Find(id);
+
+            if (equipe != null && equipe.CreeParUtilisateurId == userId)
+            {
+                // Détacher les membres
+                var membres = _context.Participants.Where(p => p.EquipeId == id).ToList();
+                foreach (var m in membres) m.EquipeId = null;
+
+                _context.Equipes.Remove(equipe);
+                _context.SaveChanges();
+                TempData["Success"] = $"L'équipe '{equipe.NomEquipe}' a été supprimée.";
+            }
+
+            return RedirectToAction("Index");
+        }
+        // Retirer un membre de l'équipe (par le créateur)
+        [HttpPost]
+        public IActionResult RetirerMembre(int participantId, int equipeId)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var equipe = _context.Equipes.Find(equipeId);
+
+            if (equipe != null && equipe.CreeParUtilisateurId == userId)
+            {
+                var participant = _context.Participants.Find(participantId);
+                if (participant != null && participant.EquipeId == equipeId)
+                {
+                    participant.EquipeId = null;
+                    _context.SaveChanges();
+                    TempData["Success"] = "Le membre a été retiré de l'équipe.";
+                }
+            }
+
+            return RedirectToAction("Gestion", new { id = equipeId });
         }
     }
 }

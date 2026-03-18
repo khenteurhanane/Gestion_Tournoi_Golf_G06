@@ -1,0 +1,90 @@
+@model croupe_06_TournoiGolf.Models.Equipe
+@{
+    ViewData["Title"] = "Gérer l'équipe";
+    var membres = (List<Participant>)ViewBag.Membres;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-edit"></i> Équipe : @Model.NomEquipe</h1>
+    <a href="/Equipe/Index" class="btn btn-secondary">Retour à mes équipes</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="row">
+    <!-- Paramètres -->
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <h3>Paramètres de l'équipe</h3>
+            <form action="/Equipe/ModifierNom" method="post">
+                <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
+                <div class="form-group mb-3">
+                    <label>Nom de l'équipe</label>
+                    <input type="text" name="NomEquipe" value="@Model.NomEquipe" class="form-control" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Code Secret (Partagez ce code avec vos coéquipiers)</label>
+                    <input type="text" value="@Model.CodeSecret" class="form-control text-center font-weight-bold" readonly style="letter-spacing:3px; background:#f8f9fa;" />
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-2">Enregistrer les modifications</button>
+            </form>
+            <form action="/Equipe/SupprimerEquipe" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe ?');">
+                <input type="hidden" name="id" value="@Model.EquipeId" />
+                <button type="submit" class="btn btn-outline-danger w-100">Supprimer l'équipe</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Membres -->
+    <div class="col-md-7">
+        <div class="card">
+            <h3>Membres (@membres.Count / @Model.NbJoueursMax)</h3>
+            @if (membres.Count == 0)
+            {
+                <p class="text-muted">Aucun membre pour le moment.</p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in membres)
+                        {
+                            <tr>
+                                <td>@m.Utilisateur?.Prenom @m.Utilisateur?.Nom</td>
+                                <td>
+                                    @if (m.UtilisateurId != Model.CreeParUtilisateurId)
+                                    {
+                                        <form action="/Equipe/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce membre ?');">
+                                            <input type="hidden" name="participantId" value="@m.ParticipantId" />
+                                            <input type="hidden" name="equipeId" value="@Model.EquipeId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-ouvert">Créateur</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-outline-danger { color: #dc3545; border-color: #dc3545; }
+    .btn-outline-danger:hover { background-color: #dc3545; color: white; }
+    .badge-ouvert { background: rgba(46, 204, 113, 0.1); color: #27ae60; }
+</style>

@@ -1,0 +1,53 @@
+@model List<croupe_06_TournoiGolf.Models.Equipe>
+@{
+    ViewData["Title"] = "Mes Équipes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-users"></i> Mes Équipes</h1>
+    <a href="/Tournoi/Index" class="btn btn-primary">+ Créer une nouvelle équipe</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card text-center p-5">
+        <i class="fas fa-user-friends fa-3x mb-3" style="color:var(--muted);"></i>
+        <h3>Aucune équipe trouvée</h3>
+        <p>Vous n'avez pas encore créé ou rejoint d'équipe.</p>
+        <a href="/Tournoi/Index" class="btn">Voir les tournois pour créer une équipe</a>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var equipe in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 tournoi-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h3 class="card-title h5 mb-0">@equipe.NomEquipe</h3>
+                            <span class="badge badge-ouvert">@equipe.CodeSecret</span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-golf-ball"></i> @equipe.Tournoi?.Nom
+                        </p>
+                        <hr />
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small font-weight-bold">
+                                <i class="fas fa-calendar-alt"></i> @equipe.CreeLe.ToShortDateString()
+                            </span>
+                            <a href="/Equipe/Gestion/@equipe.EquipeId" class="btn btn-sm">Gérer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .tournoi-card { transition: transform 0.2s; border-radius: 12px; }
+    .tournoi-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .badge-ouvert { background: rgba(46, 204, 113, 0.1); color: #27ae60; font-family: monospace; letter-spacing: 1px; }
+</style>
