@@ -16,8 +16,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Date</label>
-                    <input name="DateTournoi" type="date" required />
+                    <label>Date du tournoi</label>
+                    <input id="DateTournoi" name="DateTournoi" type="date" min-today required />
                 </div>
 
                 <div class="form-group">
@@ -37,7 +37,7 @@
 
                 <div class="form-group">
                     <label>Date limite d'inscription (optionnel)</label>
-                    <input name="DateLimiteInscription" type="date" />
+                    <input id="DateLimiteInscription" name="DateLimiteInscription" type="date" data-before="DateTournoi" />
                     <small>Si vide, pas de date limite.</small>
                 </div>
 

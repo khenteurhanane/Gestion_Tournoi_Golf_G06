@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrammes de Séquence Finaux</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default', sequence: { showSequenceNumbers: true } });
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background-color: #fafdfc;}
+        h1, h2, p { color: #2c3e50; text-align: center; }
+        .diagram-container { border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto 50px auto; background: white; max-width: 900px;}
+    </style>
+</head>
+<body>
+    <h1>Diagrammes de Séquence (UML)</h1>
+    <p>Voici l'équivalent parfait de vos logigrammes (votre image) transformés en <b>Diagrammes de Séquence UML !</b><br>
+    Faites votre capture <b>(Windows + Maj + S)</b> pour l'ajouter à votre projet.</p>
+
+    <h2>1. Séquence : Inscription au Tournoi</h2>
+    <div class="diagram-container">
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Participant
+    participant Plateforme as Plateforme (Système)
+    participant DB as Base de Données
+
+    Participant->>Plateforme: Accède à la plateforme
+    Participant->>Plateforme: S'inscrit / Se connecte
+    Participant->>Plateforme: Remplit le formulaire d'inscription
+    Plateforme->>Plateforme: Vérifie les informations (Valides ?)
+    
+    alt Informations Non Valides
+        Plateforme-->>Participant: Affiche les erreurs (Demande de corriger)
+    else Informations Valides
+        Participant->>Plateforme: Crée une équipe / Rejoindre une équipe
+        Participant->>Plateforme: Effectue le paiement
+        Plateforme->>Plateforme: Vérifie le statut du paiement
+        
+        alt Paiement Refusé
+            Plateforme-->>Participant: Demande une autre méthode / Réessayer
+        else Paiement Accepté
+            Plateforme->>DB: Sauvegarde l'inscription et le paiement
+            DB-->>Plateforme: Confirmation d'enregistrement
+            Plateforme-->>Participant: Confirme l'inscription au tournoi (Fin)
+        end
+    end
+        </div>
+    </div>
+
+    <h2>2. Séquence : Gestion des Équipes</h2>
+    <div class="diagram-container">
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Utilisateur
+    participant Plateforme as Plateforme (Système)
+    participant DB as Base de Données
+
+    Utilisateur->>Plateforme: Se connecte à l'application
+    
+    alt L'utilisateur choisit la Création d'équipe
+        Utilisateur->>Plateforme: Crée l'équipe (nom + joueurs)
+        Plateforme->>DB: Enregistre la nouvelle équipe en base
+        DB-->>Plateforme: Confirmation de l'équipe créée
+        Plateforme-->>Utilisateur: Confirme la création de l'équipe (Équipe confirmée)
+        
+    else L'utilisateur choisit de Rejoindre (Code)
+        Utilisateur->>Plateforme: Entre le code de l'équipe existante
+        Plateforme->>DB: Vérifie si le code est correct
+        DB-->>Plateforme: Retourne le résultat (Valide ou Invalide)
+        
+        alt Code Invalide
+            Plateforme-->>Utilisateur: Affiche erreur (code invalide, réessayer)
+        else Code Valide
+            Plateforme->>DB: Ajoute l'utilisateur à l'équipe
+            DB-->>Plateforme: Confirmation
+            Plateforme-->>Utilisateur: Rejoint l'équipe avec succès (Équipe confirmée)
+        end
+    end
+        </div>
+    </div>
+</body>
+</html>

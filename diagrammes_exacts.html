@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrammes Exacts - Copie Conforme</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; background-color: #ffffff;}
+        .diagram-container { border: 2px solid #333; padding: 20px; margin-bottom: 40px; background: white; width: 95%; display: inline-block;}
+        h4 { text-align: left; background-color: black; color: white; display: inline-block; padding: 5px 10px; font-size: 12px; margin: 0; }
+    </style>
+</head>
+<body>
+    <p><i>Faites simplement <b>Windows + Maj + S</b> pour capturer ces images !</i></p>
+
+    <div class="diagram-container">
+        <h4>Processus d'inscription au Tournoi de Golf</h4>
+        <div class="mermaid">
+flowchart LR
+    Start([Début]) --> A[Accéder à la<br/>plateforme]
+    A --> B[S'inscrire / Se<br/>connecter]
+    B --> C[Remplir le<br/>formulaire<br/>d'inscription]
+    C --> D{Informations<br/>valides ?}
+    
+    D -- Non --> E[Afficher<br/>erreurs /<br/>Corriger]
+    E --> C
+    
+    D -- Oui --> F[Créer une équipe<br/>/ Rejoindre une<br/>équipe]
+    F --> G[Effectuer le<br/>paiement]
+    
+    G --> H{Paiement<br/>accepté ?}
+    
+    H -- Non --> I[Choisir autre<br/>méthode /<br/>Réessayer]
+    I --> G
+    
+    H -- Oui --> J[Confirmer<br/>l'inscription]
+    J --> End([Fin])
+
+    style D fill:#ff66cc,stroke:#333,stroke-width:1px
+    style H fill:#ff66cc,stroke:#333,stroke-width:1px
+    style Start fill:#ccffff,stroke:#333,stroke-width:1px
+    style End fill:#ccffff,stroke:#333,stroke-width:1px
+    style A fill:#ccffff,stroke:#333,stroke-width:1px
+    style B fill:#ccffff,stroke:#333,stroke-width:1px
+    style C fill:#ccffff,stroke:#333,stroke-width:1px
+    style E fill:#ccffff,stroke:#333,stroke-width:1px
+    style F fill:#ccffff,stroke:#333,stroke-width:1px
+    style G fill:#ccffff,stroke:#333,stroke-width:1px
+    style I fill:#ccffff,stroke:#333,stroke-width:1px
+    style J fill:#ccffff,stroke:#333,stroke-width:1px
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <h4>Gestion des Équipes - Tournoi de Golf</h4>
+        <div class="mermaid">
+flowchart TD
+    Start([Début]) --> A[Se<br/>connecter]
+    A --> B{Créer une<br/>équipe ?}
+    
+    B -- Oui --> C[Créer l'équipe<br/>(nom +<br/>joueurs)]
+    C --> D[Confirmer<br/>la création]
+    D --> E[Équipe<br/>confirmée]
+    E --> End([Fin])
+    
+    B -- Non --> F[Entrer code<br/>équipe]
+    F --> G{Code<br/>valide ?}
+    
+    G -- Oui --> H[Rejoindre<br/>l'équipe]
+    H --> E
+    
+    G -- Non --> I[Afficher<br/>erreur (code<br/>invalide)]
+    I --> J[Réessayer<br/>le code]
+    J --> F
+
+    style B fill:#ff66cc,stroke:#333,stroke-width:1px
+    style G fill:#ff66cc,stroke:#333,stroke-width:1px
+    style Start fill:#ccffff,stroke:#333,stroke-width:1px
+    style End fill:#ccffff,stroke:#333,stroke-width:1px
+    style A fill:#ccffff,stroke:#333,stroke-width:1px
+    style C fill:#ccffff,stroke:#333,stroke-width:1px
+    style D fill:#ccffff,stroke:#333,stroke-width:1px
+    style E fill:#ccffff,stroke:#333,stroke-width:1px
+    style F fill:#ccffff,stroke:#333,stroke-width:1px
+    style H fill:#ccffff,stroke:#333,stroke-width:1px
+    style I fill:#ccffff,stroke:#333,stroke-width:1px
+    style J fill:#ccffff,stroke:#333,stroke-width:1px
+        </div>
+    </div>
+</body>
+</html>

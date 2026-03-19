@@ -33,12 +33,12 @@
                         <div class="row mb-3">
                             <div class="col-md-6 text-center">
                                 <label asp-for="Email" class="form-label fw-bold">Courriel</label>
-                                <input asp-for="Email" type="email" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <input asp-for="Email" id="Email" type="email" class="form-control text-center mx-auto" style="max-width:300px;" required />
                                 <span asp-validation-for="Email" class="text-danger d-block mt-1"></span>
                             </div>
                             <div class="col-md-6 text-center">
                                 <label asp-for="Telephone" class="form-label fw-bold">Téléphone</label>
-                                <input asp-for="Telephone" type="tel" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <input asp-for="Telephone" id="Telephone" type="tel" class="form-control text-center mx-auto" style="max-width:300px;" required />
                                 <span asp-validation-for="Telephone" class="text-danger d-block mt-1"></span>
                             </div>
                         </div>
@@ -53,12 +53,12 @@
                         <div class="row mb-4">
                             <div class="col-md-6 text-center">
                                 <label asp-for="MotDePasse" class="form-label fw-bold">Mot de passe</label>
-                                <input asp-for="MotDePasse" type="password" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <input asp-for="MotDePasse" id="MotDePasse" type="password" class="form-control text-center mx-auto" style="max-width:300px;" required />
                                 <span asp-validation-for="MotDePasse" class="text-danger d-block mt-1"></span>
                             </div>
                             <div class="col-md-6 text-center">
                                 <label asp-for="ConfirmationMotDePasse" class="form-label fw-bold">Confirmer le mot de passe</label>
-                                <input asp-for="ConfirmationMotDePasse" type="password" class="form-control text-center mx-auto" style="max-width:300px;" />
+                                <input asp-for="ConfirmationMotDePasse" id="ConfirmationMotDePasse" type="password" class="form-control text-center mx-auto" style="max-width:300px;" required />
                                 <span asp-validation-for="ConfirmationMotDePasse" class="text-danger d-block mt-1"></span>
                             </div>
                         </div>

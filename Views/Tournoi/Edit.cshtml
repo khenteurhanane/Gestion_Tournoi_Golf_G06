@@ -18,8 +18,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Date</label>
-                    <input name="DateTournoi" type="date" value="@Model.DateTournoi.ToString("yyyy-MM-dd")" required />
+                    <label>Date du tournoi</label>
+                    <input id="DateTournoi" name="DateTournoi" type="date" value="@Model.DateTournoi.ToString("yyyy-MM-dd")" min-today required />
                 </div>
 
                 <div class="form-group">
@@ -39,7 +39,7 @@
 
                 <div class="form-group">
                     <label>Date limite d'inscription (optionnel)</label>
-                    <input name="DateLimiteInscription" type="date" value="@(Model.DateLimiteInscription?.ToString("yyyy-MM-dd"))" />
+                    <input id="DateLimiteInscription" name="DateLimiteInscription" type="date" value="@(Model.DateLimiteInscription?.ToString("yyyy-MM-dd"))" data-before="DateTournoi" />
                     <small>Si vide, pas de date limite.</small>
                 </div>
 
