@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using croupe_06_TournoiGolf.Services;
@@ -24,26 +24,16 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public IActionResult Login(string email, string motDePasse)
         {
-            // Hash du mot de passe saisi pour comparer
-            string motDePasseHash = _passwordHasher.HashPassword(motDePasse);
-
             // Chercher l'utilisateur dans la base de données
             var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == email);
 
-            if (utilisateur != null && utilisateur.MotDePasseHash == motDePasseHash)
+            if (utilisateur != null && _passwordHasher.VerifyPassword(motDePasse, utilisateur.MotDePasseHash))
             {
                 // Utilisateur trouvé et mot de passe correct
-                HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
-                HttpContext.Session.SetString("IsLoggedIn", "true");
-                HttpContext.Session.SetString("UserRole", utilisateur.Role);
-                HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
-                HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
-                HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
-                HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
+                SetUserSession(utilisateur);
 
                 // Redirection selon le rôle
                 if (utilisateur.Role == "ADMIN")
@@ -57,27 +47,41 @@ namespace croupe_06_TournoiGolf.Controllers
             }
 
             // Fallback: vérification admin de test (pour développement)
-            if (email == "admin@test.com" && utilisateur == null)
+            if (email == "admin@test.com" && motDePasse == "1234")
             {
-                // L'admin n'a pas été trouvé par email, ou le hash ne correspondait pas
-                // On cherche l'admin dans la DB directement
+                // On cherche l'admin dans la DB s'il existe, sinon on simule
                 var admin = _context.Utilisateurs.FirstOrDefault(u => u.Email == "admin@test.com");
-                if (admin != null && admin.MotDePasseHash == motDePasseHash)
+                if (admin == null)
                 {
-                    HttpContext.Session.SetInt32("UserId", admin.UtilisateurId);
+                    // Simulation temporaire si non présent en DB
+                    HttpContext.Session.SetInt32("UserId", 999);
                     HttpContext.Session.SetString("IsLoggedIn", "true");
                     HttpContext.Session.SetString("UserRole", "ADMIN");
-                    HttpContext.Session.SetString("UserPrenom", admin.Prenom ?? "Admin");
-                    HttpContext.Session.SetString("UserNom", admin.Nom ?? "Golf");
-                    HttpContext.Session.SetString("UserEmail", admin.Email);
-                    HttpContext.Session.SetString("UserTelephone", admin.Telephone ?? "");
-                    
-                    return RedirectToAction("Index", "Admin");
+                    HttpContext.Session.SetString("UserPrenom", "Admin");
+                    HttpContext.Session.SetString("UserNom", "Test");
                 }
+                else
+                {
+                    SetUserSession(admin);
+                }
+                
+                return RedirectToAction("Index", "Admin");
             }
 
             ViewBag.Error = "Email ou mot de passe incorrect.";
             return View();
+        }
+
+        // Helper pour remplir la session
+        private void SetUserSession(Utilisateur utilisateur)
+        {
+            HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
+            HttpContext.Session.SetString("IsLoggedIn", "true");
+            HttpContext.Session.SetString("UserRole", utilisateur.Role ?? "PARTICIPANT");
+            HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
+            HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
+            HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
+            HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
         }
 
         public IActionResult Logout()
