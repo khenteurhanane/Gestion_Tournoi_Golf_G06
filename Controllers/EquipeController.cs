@@ -34,10 +34,16 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             var model = new Equipe();
 
-            if (tournoiId.HasValue)
+            if (tournoiId.HasValue && tournoiId.Value > 0)
             {
                 model.TournoiId = tournoiId.Value;
             }
+
+            // Récupérer la liste des tournois actifs pour la sélection
+            ViewBag.ListeTournois = _context.Tournois
+                .Where(t => t.DateTournoi >= DateTime.Today && t.InscriptionsOuvertes)
+                .OrderBy(t => t.DateTournoi)
+                .ToList();
 
             // Générer le code secret automatiquement (GOLF-41)
             model.CodeSecret = GenererCodeSecret();

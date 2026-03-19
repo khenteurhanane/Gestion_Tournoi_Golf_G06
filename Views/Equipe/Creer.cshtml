@@ -12,7 +12,23 @@
             <p class="sub">Ton code secret sera généré automatiquement.</p>
 
             <form action="/Equipe/Creer" method="post">
-                <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
+                @if (Model.TournoiId > 0)
+                {
+                    <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
+                }
+                else
+                {
+                    <div class="form-group mb-3">
+                        <label>Choisir un tournoi</label>
+                        <select name="TournoiId" class="form-control" required style="padding: 12px; border-radius: 8px; border: 1px solid #ddd; width: 100%;">
+                            <option value="">-- Sélectionner un tournoi --</option>
+                            @foreach (var t in (List<Tournoi>)ViewBag.ListeTournois)
+                            {
+                                <option value="@t.TournoiId">@t.Nom (@t.DateTournoi.ToShortDateString())</option>
+                            }
+                        </select>
+                    </div>
+                }
 
                 @if (ViewBag.Error != null)
                 {
