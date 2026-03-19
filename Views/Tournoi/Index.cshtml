@@ -64,7 +64,16 @@
                 var placesRestantes = tournoi.PlacesParticipantsMax - nb;
                 var pct = (int)Math.Min(100, nb * 100.0 / Math.Max(1, tournoi.PlacesParticipantsMax));
                 var dejaInscrit = tournoiInscrits.Contains(tournoi.TournoiId);
-                var imgSrc = string.IsNullOrEmpty(tournoi.ImageUrl) ? "/images/golf-hero.png" : tournoi.ImageUrl;
+                
+                // Images par défaut rotatives (US-06-T10)
+                string[] defaultImages = { 
+                    "/images/tournois/tournament_summer.png", 
+                    "/images/tournois/tournament_classic.png", 
+                    "/images/tournois/tournament_competition.png" 
+                };
+                var imgSrc = string.IsNullOrEmpty(tournoi.ImageUrl) 
+                    ? defaultImages[tournoi.TournoiId % defaultImages.Length] 
+                    : tournoi.ImageUrl;
 
                 <!-- Compteur : jours avant le tournoi -->
                 var joursRestants = (tournoi.DateTournoi - DateTime.Today).Days;
