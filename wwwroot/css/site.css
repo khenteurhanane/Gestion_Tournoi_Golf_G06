@@ -768,18 +768,18 @@ footer.site-footer .footer-links {
 .hero-poster {
     border-radius: 20px;
     margin-bottom: 28px;
-    min-height: 600px;
-    background: url('/images/golf-hero.png') no-repeat center center;
+    min-height: calc(100vh - 86px);
+    background: url('/images/hero-new.png') no-repeat center center;
     background-size: cover;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
 }
 
 .poster-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0.7) 100%);
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.45) 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -801,7 +801,7 @@ footer.site-footer .footer-links {
 .poster-golf-text {
     font-size: 2.2rem;
     font-weight: 500;
-    color: #ffffff;
+    color: #F8BD13;
     font-style: italic;
     letter-spacing: 2px;
     display: block;
@@ -809,12 +809,17 @@ footer.site-footer .footer-links {
 }
 
 .poster-golf-title {
-    font-size: 6rem;
+    font-size: 7.5rem;
     font-weight: 900;
     color: #ffffff;
-    letter-spacing: 15px;
-    line-height: 1;
-    text-shadow: 3px 3px 0px #2d6a2e, 6px 6px 12px rgba(0, 0, 0, 0.5);
+    letter-spacing: 12px;
+    line-height: 0.9;
+    background: linear-gradient(180deg, #F8BD13 0%, #B88A00 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+    text-transform: uppercase;
 }
 
 .poster-college {
@@ -876,42 +881,35 @@ footer.site-footer .footer-links {
     justify-content: center;
 }
 
-.btn-poster-primary {
-    background: #ffffff;
-    color: #1a532d;
-    padding: 14px 30px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 1rem;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+.btn-poster-primary.luxury-btn {
+    background: linear-gradient(135deg, #F8BD13 0%, #B88A00 100%);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(248, 189, 19, 0.4);
+    border: none;
 }
 
-.btn-poster-primary:hover {
-    transform: scale(1.05);
-    background: #eef5e4;
-    color: #14532d;
-    text-decoration: none;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+.btn-poster-primary.luxury-btn:hover {
+    box-shadow: 0 8px 25px rgba(248, 189, 19, 0.6);
 }
 
-.btn-poster-outline {
-    background: transparent;
-    color: #ffffff;
-    border: 2px solid #ffffff;
-    padding: 12px 28px;
-    border-radius: 50px;
+.btn-poster-outline.luxury-outline {
+    border: 2px solid #F8BD13;
+    color: #F8BD13;
+}
+
+.btn-poster-outline.luxury-outline:hover {
+    background: rgba(248, 189, 19, 0.15);
+    color: #fff;
+    border-color: #fff;
+}
+
+.poster-subtitle {
+    color: #F8BD13;
+    letter-spacing: 5px;
+    font-size: 0.9rem;
     font-weight: 600;
-    font-size: 1rem;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-}
-
-.btn-poster-outline:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    text-decoration: none;
+    margin-top: 15px;
+    opacity: 0.9;
 }
 
 .poster-footer {
@@ -949,17 +947,18 @@ footer.site-footer .footer-links {
 
 .phone-icon {
     display: inline-block;
-    background: #ffffff;
-    color: #3d8b3e;
-    width: 40px;
-    height: 40px;
+    background: linear-gradient(135deg, #F8BD13, #B88A00);
+    color: #000;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    font-size: 1.2rem;
-    line-height: 40px;
+    font-size: 1.3rem;
+    line-height: 44px;
     text-align: center;
     font-style: normal;
-    margin-right: 10px;
+    margin-right: 12px;
     vertical-align: middle;
+    box-shadow: 0 0 15px rgba(248,189,19,0.3);
 }
 
 @media (max-width: 768px) {

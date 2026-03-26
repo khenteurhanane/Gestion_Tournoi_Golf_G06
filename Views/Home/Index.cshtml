@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
@@ -14,7 +14,9 @@
         <div class="poster-overlay">
             <div class="poster-content">
                 <div class="poster-badge animate__animated animate__fadeInDown">
-                    <span class="poster-golf-text">TOURNOI DE</span> <span class="poster-golf-title">GOLF</span>
+                    <span class="poster-golf-text">CONCOURS ANNUEL</span>
+                    <h1 class="poster-golf-title">GOLF</h1>
+                    <p class="poster-subtitle">L'ÉVÉNEMENT PRESTIGE DE L'ANNÉE</p>
                 </div>
                 
                 <div class="poster-college animate__animated animate__fadeIn">
@@ -28,24 +30,24 @@
                 <div class="poster-cta-group animate__animated animate__fadeInUp">
                     @if (estConnecte)
                     {
-                        <p class="poster-welcome">Bienvenue, <strong>@prenom</strong> !</p>
+                        <p class="poster-welcome">Heureux de vous revoir, <strong>@prenom</strong></p>
                         <div class="poster-btns">
-                            <a class="btn-poster-primary" href="/Tournoi/Index">Voir les tournois</a>
+                            <a class="btn-poster-primary luxury-btn" href="/Tournoi/Index">Découvrir les tournois</a>
                             @if (role == "ADMIN")
                             {
-                                <a class="btn-poster-outline" href="/Admin/Index">Gestion Admin</a>
+                                <a class="btn-poster-outline luxury-outline" href="/Admin/Index">Tableau de Bord</a>
                             }
                             else
                             {
-                                <a class="btn-poster-outline" href="/Auth/MesInscriptions">Mes inscriptions</a>
+                                <a class="btn-poster-outline luxury-outline" href="/Auth/MesInscriptions">Mon Profil</a>
                             }
                         </div>
                     }
                     else
                     {
                         <div class="poster-btns">
-                            <a class="btn-poster-primary" href="/Auth/Register">M'inscrire maintenant</a>
-                            <a class="btn-poster-outline" href="/Auth/Login">Me connecter</a>
+                            <a class="btn-poster-primary luxury-btn" href="/Auth/Register">Rejoindre l'aventure</a>
+                            <a class="btn-poster-outline luxury-outline" href="/Auth/Login">Accès Membre</a>
                         </div>
                     }
                 </div>
