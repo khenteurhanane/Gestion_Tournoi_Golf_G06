@@ -33,4 +33,28 @@ namespace croupe_06_TournoiGolf.Models
 
         public DateTime DateCreation { get; set; } = DateTime.Now;
     }
+
+    public static class TypesCommandite
+    {
+        public const string Bronze = "Bronze";
+        public const string Argent = "Argent";
+        public const string Or = "Or";
+        public const string Autre = "Autre";
+
+        public static decimal GetMontant(string type) => type switch
+        {
+            Bronze => 500m,
+            Argent => 1500m,
+            Or => 3000m,
+            _ => 0m
+        };
+
+        public static int GetLimiteJoueurs(string type) => type switch
+        {
+            Bronze => 1,
+            Argent => 2,
+            Or => 4,
+            _ => 1
+        };
+    }
 }

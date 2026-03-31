@@ -180,11 +180,13 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 
-            // Vérifier le nombre de joueurs (limite arbitraire ou selon le type, ici on met max 4 par défaut pour simplifier)
+            // Vérifier le nombre de joueurs selon le type de commandite
             int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
-            if (nbJoueurs >= 4)
+            int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
+
+            if (nbJoueurs >= limiteJoueurs)
             {
-                TempData["Error"] = "Vous avez atteint le maximum de 4 joueurs sponsorisés.";
+                TempData["Error"] = $"Vous avez atteint le maximum de {limiteJoueurs} joueur(s) pour une commandite de type {commandite.TypeCommandite}.";
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 

@@ -31,12 +31,12 @@
 
                         <div class="mb-3">
                             <label asp-for="TypeCommandite" class="form-label fw-bold">Type de commandite</label>
-                            <select asp-for="TypeCommandite" class="form-select" required>
+                            <select asp-for="TypeCommandite" class="form-select" id="TypeCommandite" required>
                                 <option value="">-- Sélectionnez un type --</option>
-                                <option value="Commanditaire Principal">Commanditaire Principal (10 000$+)</option>
-                                <option value="Commanditaire de Trou">Commanditaire de Trou (1 000$)</option>
-                                <option value="Commanditaire de Déjeuner/Dîner">Commanditaire de Repas (5 000$)</option>
-                                <option value="Autre Montant">Autre don</option>
+                                <option value="Bronze">Bronze (500 $)</option>
+                                <option value="Argent">Argent (1 500 $)</option>
+                                <option value="Or">Or (3 000 $)</option>
+                                <option value="Autre">Autre montant</option>
                             </select>
                             <span asp-validation-for="TypeCommandite" class="text-danger"></span>
                         </div>
@@ -89,17 +89,17 @@
                 const selectedValue = this.value;
                 
                 switch (selectedValue) {
-                    case "Commanditaire Principal":
-                        montantInput.value = "10000.00";
+                    case "Bronze":
+                        montantInput.value = "500.00";
                         break;
-                    case "Commanditaire de Trou":
-                        montantInput.value = "1000.00";
+                    case "Argent":
+                        montantInput.value = "1500.00";
                         break;
-                    case "Commanditaire de Déjeuner/Dîner":
-                        montantInput.value = "5000.00";
+                    case "Or":
+                        montantInput.value = "3000.00";
                         break;
                     default:
-                        if (selectedValue === "Autre Montant") {
+                        if (selectedValue === "Autre") {
                              if(montantInput.value === "0" || montantInput.value === "") {
                                  montantInput.value = "";
                              }
