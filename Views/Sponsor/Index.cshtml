@@ -1,0 +1,150 @@
+@using croupe_06_TournoiGolf.Models
+@{
+    ViewData["Title"] = "Paliers de Commandite";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Devenir Commanditaire</h1>
+        <p class="lead text-muted">Soutenez le tournoi annuel du Collège La Cité et profitez d'une visibilité exceptionnelle.</p>
+        <hr class="mx-auto" style="width: 100px; height: 3px; background-color: var(--accent); opacity: 1;">
+    </div>
+
+    <div class="row justify-content-center g-4 mt-4">
+        <!-- Bronze -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center sponsor-card bronze">
+                <div class="card-header bg-transparent pt-4">
+                    <div class="sponsor-icon mx-auto mb-3" style="background-color: #cd7f32;">
+                        <i class="bi bi-award-fill text-white fs-1"></i>
+                    </div>
+                    <h2 class="card-title h4 fw-bold">Bronze</h2>
+                </div>
+                <div class="card-body">
+                    <div class="h2 fw-bold mb-4">500 $ <span class="fs-6 text-muted font-normal">/ tournoi</span></div>
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i><strong>1 place</strong> de joueur incluse</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Logo sur notre site web</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Mention lors de la remise des prix</li>
+                        <li class="text-muted"><i class="bi bi-check2-circle me-2 opacity-50"></i>Pancarte personnalisée (N/A)</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-4">
+                    <a href="/Auth/InscriptionCommanditaire" class="btn btn-outline-dark w-100 py-2">Choisir Bronze</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Or (Mis en avant) -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-lg text-center sponsor-card gold-premium transform-scale">
+                <div class="ribbon">TOP VENTE</div>
+                <div class="card-header bg-transparent pt-4">
+                    <div class="sponsor-icon mx-auto mb-3" style="background-color: var(--gold);">
+                        <i class="bi bi-trophy-fill text-white fs-1"></i>
+                    </div>
+                    <h2 class="card-title h3 fw-bold">Or</h2>
+                </div>
+                <div class="card-body">
+                    <div class="h2 fw-bold mb-4">3 000 $ <span class="fs-6 text-muted font-normal">/ tournoi</span></div>
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i><strong>4 places</strong> de joueurs incluses (Équipe complète)</li>
+                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i>Logo premium sur le site & affiches</li>
+                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i>Pancarte personnalisée sur un trou</li>
+                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i>Espace kiosque au club-house</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-4">
+                    <a href="/Auth/InscriptionCommanditaire" class="btn btn-warning w-100 py-2 fw-bold shadow-sm">Choisir Or</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Argent -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center sponsor-card silver">
+                <div class="card-header bg-transparent pt-4">
+                    <div class="sponsor-icon mx-auto mb-3" style="background-color: #c0c0c0;">
+                        <i class="bi bi-star-fill text-white fs-1"></i>
+                    </div>
+                    <h2 class="card-title h4 fw-bold">Argent</h2>
+                </div>
+                <div class="card-body">
+                    <div class="h2 fw-bold mb-4">1 500 $ <span class="fs-6 text-muted font-normal">/ tournoi</span></div>
+                    <ul class="list-unstyled text-start mb-4">
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i><strong>2 places</strong> de joueurs incluses</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Logo sur notre site web & affiches</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Mention spéciale au coup d'envoi</li>
+                        <li class="text-muted"><i class="bi bi-check2-circle me-2 opacity-50"></i>Espace kiosque (N/A)</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-4">
+                    <a href="/Auth/InscriptionCommanditaire" class="btn btn-outline-dark w-100 py-2">Choisir Argent</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 p-4 bg-light rounded text-center border">
+        <h4>Intéressé par une commandite sur mesure ?</h4>
+        <p class="mb-0">Contactez notre équipe pour discuter de solutions personnalisées adaptées à vos besoins.</p>
+        <a href="/Home/Contact" class="btn btn-link text-success fw-bold">Nous contacter <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>
+
+<style>
+    .sponsor-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        border-radius: 20px !important;
+    }
+    
+    .sponsor-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+    }
+    
+    .transform-scale {
+        transform: scale(1.05);
+    }
+    
+    .transform-scale:hover {
+        transform: scale(1.08) translateY(-8px);
+    }
+
+    .sponsor-icon {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .gold-premium {
+        border: 2px solid var(--gold) !important;
+        position: relative;
+    }
+
+    .ribbon {
+        position: absolute;
+        top: 20px;
+        right: -10px;
+        background-color: var(--danger);
+        color: white;
+        padding: 5px 15px;
+        font-weight: bold;
+        font-size: 0.75rem;
+        border-radius: 3px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .ribbon::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        right: 0;
+        border-left: 10px solid transparent;
+        border-top: 5px solid #8B0000;
+    }
+</style>
