@@ -54,6 +54,13 @@
                             <span asp-validation-for="Commentaire" class="text-danger"></span>
                         </div>
 
+                        <div id="avantagesSection" class="mb-4 d-none">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-star-fill text-warning me-2"></i>Avantages du palier :</h6>
+                            <ul id="avantagesListe" class="list-unstyled small text-muted mb-0">
+                                <!-- Rempli par JS -->
+                            </ul>
+                        </div>
+
                         <div class="mb-4 p-3 bg-light rounded border border-success">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="h6 mb-0 text-muted">Places incluses :</span>
@@ -105,22 +112,31 @@
                 }
 
                 const displayPlaces = document.getElementById("displayPlaces");
+                const avantagesSection = document.getElementById("avantagesSection");
+                const avantagesListe = document.getElementById("avantagesListe");
                 
+                let avantages = [];
+                avantagesSection.classList.remove("d-none");
+
                 switch (selectedValue) {
                     case "Bronze":
                         montantInput.value = "500.00";
                         displayPlaces.innerText = "1 joueur inclus";
+                        avantages = ["Logo sur le site web", "Mention lors de la remise des prix"];
                         break;
                     case "Argent":
                         montantInput.value = "1500.00";
                         displayPlaces.innerText = "2 joueurs inclus";
+                        avantages = ["Logo sur le site web & affiches", "Mention spéciale au coup d'envoi", "Soutien officiel Argent"];
                         break;
                     case "Or":
                         montantInput.value = "3000.00";
                         displayPlaces.innerText = "4 joueurs inclus";
+                        avantages = ["Logo premium (Toutes plateformes)", "Pancarte personnalisée (Trou)", "Espace kiosque au club-house", "Équipe de 4 joueurs incluse"];
                         break;
                     default:
                         displayPlaces.innerText = "1 joueur inclus";
+                        avantagesSection.classList.add("d-none");
                         if (selectedValue === "Autre") {
                              if(montantInput.value === "500.00" || montantInput.value === "1500.00" || montantInput.value === "3000.00" || montantInput.value === "0") {
                                  montantInput.value = "";
@@ -128,6 +144,15 @@
                         }
                         break;
                 }
+
+                // Afficher les avantages
+                avantagesListe.innerHTML = "";
+                avantages.forEach(txt => {
+                    const li = document.createElement("li");
+                    li.innerHTML = '<i class="bi bi-check2-circle text-success me-2"></i>' + txt;
+                    avantagesListe.appendChild(li);
+                });
+
                 updateDisplay();
             });
 
