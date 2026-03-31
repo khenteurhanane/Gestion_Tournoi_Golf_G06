@@ -187,6 +187,14 @@ namespace croupe_06_TournoiGolf.Controllers
                 ViewBag.ParticipantId = participantId;
                 return View();
             }
+
+            // Rejoindre l'équipe (GOLF-49)
+            participant.EquipeId = equipe.EquipeId;
+            _context.SaveChanges();
+
+            TempData["Success"] = $"Vous avez rejoint l'équipe '{equipe.NomEquipe}' avec succès !";
+            return RedirectToAction("MesInscriptions", "Auth");
+        }
         // --- Gestion de l'équipe par le créateur ---
 
         // Affiche la page de gestion pour le créateur
