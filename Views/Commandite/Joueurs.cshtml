@@ -19,6 +19,7 @@
                         @if (commandite.Statut == "PAYEE") { <span class="badge bg-success">Payée</span> }
                         else { <span class="badge bg-warning text-dark">En attente</span> }
                     </p>
+                    <p><strong>Places incluses :</strong> @croupe_06_TournoiGolf.Models.TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite) joueur(s)</p>
                 </div>
                 <div class="col-md-6 text-end">
                     <a asp-action="Index" class="btn btn-outline-secondary">Retour à mes commandites</a>
@@ -68,7 +69,10 @@
 
                 <!-- Liste des joueurs -->
                 <div class="col-md-8">
-                    <h6>Joueurs inscrits (@Model.Count() / 4)</h6>
+                    @{
+                        int limite = croupe_06_TournoiGolf.Models.TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
+                    }
+                    <h6>Joueurs inscrits (@Model.Count() / @limite) @(Model.Count() >= limite ? Html.Raw("<span class='badge bg-danger'>Complet</span>") : (object)"")</h6>
                     @if (!Model.Any())
                     {
                         <div class="text-center py-4 bg-white border rounded">
