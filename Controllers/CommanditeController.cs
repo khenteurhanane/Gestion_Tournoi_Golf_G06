@@ -77,9 +77,20 @@ namespace croupe_06_TournoiGolf.Controllers
             model.UtilisateurId = userId;
             model.DateCreation = DateTime.Now;
 
+            // Configuration automatique du prix selon le type si ce n'est pas "Autre"
+            if (model.TypeCommandite != TypesCommandite.Autre)
+            {
+                model.Montant = TypesCommandite.GetMontant(model.TypeCommandite);
+            }
+            else if (model.Montant <= 0)
+            {
+                ModelState.AddModelError("Montant", "Veuillez entrer un montant valide pour une commandite personnalisée.");
+            }
+
             // Retirer certaines validations non pertinentes à ce stade du ModelState
             ModelState.Remove("Utilisateur");
             ModelState.Remove("Tournoi");
+            ModelState.Remove("TypeCommandite"); // Éviter des soucis de validation sur l'enum si c'en devient un un jour
 
             if (ModelState.IsValid)
             {

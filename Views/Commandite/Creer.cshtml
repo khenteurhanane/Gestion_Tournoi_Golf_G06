@@ -43,8 +43,9 @@
 
                         <div class="mb-3">
                             <label asp-for="Montant" class="form-label fw-bold">Montant ($)</label>
-                            <input asp-for="Montant" type="number" step="10.00" class="form-control" placeholder="1000.00" required />
+                            <input asp-for="Montant" id="Montant" type="number" step="10.00" class="form-control" placeholder="1000.00" required />
                             <span asp-validation-for="Montant" class="text-danger"></span>
+                            <small id="montantInfo" class="text-muted d-none">Ce montant est fixe pour ce type de commandite.</small>
                         </div>
 
                         <div class="mb-4">
@@ -87,7 +88,18 @@
 
             typeSelect.addEventListener("change", function () {
                 const selectedValue = this.value;
+                const montantInfo = document.getElementById("montantInfo");
                 
+                if (selectedValue !== "Autre" && selectedValue !== "") {
+                    // Type prédéfini
+                    montantInput.readOnly = true;
+                    montantInfo.classList.remove("d-none");
+                } else {
+                    // Type personnalisé ou vide
+                    montantInput.readOnly = false;
+                    montantInfo.classList.add("d-none");
+                }
+
                 switch (selectedValue) {
                     case "Bronze":
                         montantInput.value = "500.00";
@@ -100,7 +112,7 @@
                         break;
                     default:
                         if (selectedValue === "Autre") {
-                             if(montantInput.value === "0" || montantInput.value === "") {
+                             if(montantInput.value === "500.00" || montantInput.value === "1500.00" || montantInput.value === "3000.00" || montantInput.value === "0") {
                                  montantInput.value = "";
                              }
                         }
