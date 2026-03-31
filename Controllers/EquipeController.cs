@@ -183,7 +183,8 @@ namespace croupe_06_TournoiGolf.Controllers
             int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
             if (nbMembres >= equipe.NbJoueursMax)
             {
-                // [À IMPLÉMENTER: GOLF-50]
+                ViewBag.Error = "Cette équipe est déjà complète (max 4 joueurs).";
+                ViewBag.ParticipantId = participantId;
                 return View();
             }
         // --- Gestion de l'équipe par le créateur ---
