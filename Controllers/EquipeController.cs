@@ -142,6 +142,9 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult Rejoindre(int participantId, string codeSecret)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0) return RedirectToAction("Login", "Auth");
+
             if (string.IsNullOrEmpty(codeSecret))
             {
                 ViewBag.Error = "Veuillez saisir un code secret.";
@@ -150,11 +153,24 @@ namespace croupe_06_TournoiGolf.Controllers
             }
 
             var participant = _context.Participants.Find(participantId);
-            if (participant == null) return RedirectToAction("MesInscriptions", "Auth");
+            
+            // Sécurité : Vérifier l'appartenance
+            if (participant == null || participant.UtilisateurId != userId)
+            {
+                return RedirectToAction("MesInscriptions", "Auth");
+            }
 
-            // Chercher l'équipe par son code secret
+            // Vérifier si déjà dans une équipe
+            if (participant.EquipeId != null)
+            {
+                TempData["Error"] = "Vous faites déjà partie d'une équipe.";
+                return RedirectToAction("MesInscriptions", "Auth");
+            }
+
+            // Chercher l'équipe par son code secret (GOLF-47)
+            var codeNettoye = codeSecret.Trim().ToUpper();
             var equipe = _context.Equipes
-                .FirstOrDefault(e => e.CodeSecret == codeSecret.Trim().ToUpper() && e.TournoiId == participant.TournoiId);
+                .FirstOrDefault(e => e.CodeSecret == codeNettoye && e.TournoiId == participant.TournoiId);
 
             if (equipe == null)
             {
@@ -163,20 +179,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View();
             }
 
-            // Vérifier si l'équipe est pleine
-            int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
-            if (nbMembres >= equipe.NbJoueursMax)
-            {
-                ViewBag.Error = "Cette équipe est déjà complète (max 4 joueurs).";
-                ViewBag.ParticipantId = participantId;
-                return View();
-            }
-
-            // Rejoindre l'équipe
-            participant.EquipeId = equipe.EquipeId;
-            _context.SaveChanges();
-
-            TempData["Success"] = $"Vous avez rejoint l'équipe '{equipe.NomEquipe}' avec succès !";
+            // [À IMPLÉMENTER: GOLF-48, 49, 50]
             return RedirectToAction("MesInscriptions", "Auth");
         }
         // --- Gestion de l'équipe par le créateur ---
