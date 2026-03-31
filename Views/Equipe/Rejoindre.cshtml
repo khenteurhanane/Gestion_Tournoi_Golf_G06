@@ -3,39 +3,207 @@
     var participantId = ViewBag.ParticipantId;
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
+    <div class="col-md-10 col-lg-8">
 
-        <div class="card">
-            <h2>Rejoindre une équipe</h2>
-            <p class="sub">Veuillez saisir le code secret fourni par le créateur de l'équipe.</p>
+        <div class="glass-container animate-fade-in">
+            <!-- Header Premium -->
+            <div class="premium-header">
+                <div class="icon-pulse">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h2>REJOINDRE UNE ÉQUIPE</h2>
+                <div class="header-divider"></div>
+                <p>Entrez le code secret pour rejoindre vos coéquipiers.</p>
+            </div>
 
-            <form action="/Equipe/Rejoindre" method="post">
-                <input type="hidden" name="participantId" value="@participantId" />
+            <div class="card-body p-5">
+                <form action="/Equipe/Rejoindre" method="post" id="formRejoindre">
+                    <input type="hidden" name="participantId" value="@participantId" />
 
-                @if (ViewBag.Error != null)
-                {
-                    <div class="error" style="color:var(--danger); margin-bottom:15px; background: rgba(220, 53, 69, 0.1); padding: 10px; border-radius: 5px;">
-                        <i class="fas fa-exclamation-circle"></i> @ViewBag.Error
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="error-toast animate-slide-up">
+                            <i class="fas fa-exclamation-triangle"></i> @ViewBag.Error
+                        </div>
+                    }
+
+                    <div class="form-group text-center">
+                        <label style="font-size: 1rem; color: var(--accent); margin-bottom: 20px; display: block; font-weight: 700; letter-spacing: 2px;">CODE SECRET DE L'ÉQUIPE</label>
+                        
+                        <div style="position: relative; max-width: 380px; margin: 0 auto;" class="input-focus-effect">
+                            <input name="codeSecret" type="text" placeholder="••••••" required maxlength="6"
+                                   autocomplete="off"
+                                   style="text-transform: uppercase; font-family: 'Outfit', 'Courier New', Courier, monospace; font-weight: 800; letter-spacing: 15px; text-align: center; font-size: 2.8rem; padding: 25px; border: 3px solid rgba(45, 106, 46, 0.3); border-radius: 20px; background: rgba(255,255,255,0.8); box-shadow: 0 10px 40px rgba(0,0,0,0.08); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); outline: none; width: 100%;"
+                                   oninput="this.value = this.value.toUpperCase(); validateCode(this)"
+                                   onfocus="this.parentElement.classList.add('active')"
+                                   onblur="this.parentElement.classList.remove('active')" />
+                            
+                            <div class="input-indicator" id="charCount">0/6</div>
+                        </div>
+                        
+                        <p style="margin-top: 15px; color: #666; font-size: 0.9rem; font-style: italic;">
+                            6 caractères alphanumériques
+                        </p>
                     </div>
-                }
 
-                <div class="form-group">
-                    <label>Code secret de l'équipe</label>
-                    <input name="codeSecret" type="text" placeholder="Ex: A1B2C3" required 
-                           style="text-transform: uppercase; font-weight: bold; letter-spacing: 3px; text-align: center; font-size: 1.2rem;" />
-                    <small>Le code est composé de 6 caractères alphanumériques.</small>
-                </div>
-
-                <div style="margin-top: 25px;">
-                    <button class="btn" type="submit" style="width: 100%;">Rejoindre maintenant</button>
-                </div>
-            </form>
-
-            <div class="footer" style="margin-top: 20px; text-align: center;">
-                <a href="/Auth/MesInscriptions" class="btn btn-secondary" style="background: none; border: 1px solid var(--text); color: var(--text);">Retour à mes inscriptions</a>
+                    <div style="margin-top: 40px; display: flex; flex-direction: column; gap: 15px;">
+                        <button class="btn btn-premium" type="submit">
+                            <i class="fas fa-arrow-right"></i> REJOINDRE MAINTENANT
+                        </button>
+                        <a href="/Auth/MesInscriptions" class="btn btn-outline">
+                            <i class="fas fa-times"></i> ANNULER
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
 
     </div>
 </div>
+
+<style>
+    :root {
+        --accent: #2d6a2e;
+        --accent-glow: rgba(45, 106, 46, 0.4);
+    }
+
+    .glass-container {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .premium-header {
+        background: linear-gradient(135deg, var(--accent), #1e4d1f);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        position: relative;
+    }
+
+    .premium-header h2 {
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin-top: 15px;
+        font-size: 1.8rem;
+    }
+
+    .header-divider {
+        width: 60px;
+        height: 4px;
+        background: #ffd700;
+        margin: 15px auto;
+        border-radius: 2px;
+    }
+
+    .icon-pulse {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 2rem;
+        animation: pulse 2s infinite;
+    }
+
+    .input-indicator {
+        position: absolute;
+        bottom: -25px;
+        right: 15px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--accent);
+        opacity: 0.7;
+    }
+
+    .btn-premium {
+        background: var(--accent);
+        color: white;
+        padding: 18px;
+        border-radius: 15px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        border: none;
+        box-shadow: 0 10px 20px var(--accent-glow);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-premium:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px var(--accent-glow);
+        background: #1e4d1f;
+    }
+
+    .btn-outline {
+        padding: 15px;
+        border-radius: 12px;
+        border: 2px solid #ddd;
+        color: #666;
+        background: white;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-outline:hover {
+        background: #f8f8f8;
+        border-color: #bbb;
+        color: #333;
+    }
+
+    .error-toast {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 30px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-left: 5px solid #dc3545;
+    }
+
+    .input-focus-effect.active input {
+        border-color: var(--accent);
+        box-shadow: 0 10px 40px rgba(45, 106, 46, 0.2);
+        background: white;
+    }
+
+    @@keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); }
+        70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.8s ease-out; }
+    .animate-slide-up { animation: slideUp 0.5s ease-out; }
+
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+
+<script>
+    function validateCode(input) {
+        document.getElementById('charCount').innerText = input.value.length + '/6';
+    }
+</script>
