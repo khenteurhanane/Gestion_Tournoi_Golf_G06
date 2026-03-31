@@ -179,9 +179,13 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View();
             }
 
-            // [À IMPLÉMENTER: GOLF-48, 49, 50]
-            return RedirectToAction("MesInscriptions", "Auth");
-        }
+            // Vérifier si l'équipe est pleine (GOLF-48)
+            int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
+            if (nbMembres >= equipe.NbJoueursMax)
+            {
+                // [À IMPLÉMENTER: GOLF-50]
+                return View();
+            }
         // --- Gestion de l'équipe par le créateur ---
 
         // Affiche la page de gestion pour le créateur
