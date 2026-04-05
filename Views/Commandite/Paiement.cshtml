@@ -23,40 +23,47 @@
         <div class="payment-form-section mt-4">
             <h3 class="section-title">Détails de paiement</h3>
             
-            <form asp-action="SimulerPaiement" method="post">
+            <form asp-action="SimulerPaiement" method="post" id="paymentForm">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="commanditeId" value="@Model.CommanditeId" />
                 
                 <div class="form-group">
-                    <label>Nom de l'entreprise / Titulaire</label>
-                    <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" readonly />
+                    <label>Titulaire de la carte</label>
+                    <input type="text" value="@(string.IsNullOrEmpty(Model.Utilisateur.NomEntreprise) ? $"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}" : Model.Utilisateur.NomEntreprise)" required />
                 </div>
                 
                 <div class="form-group">
                     <label>Numéro de carte de crédit</label>
                     <div class="card-input-wrapper">
-                        <input type="text" value="4540 1234 5678 9012" readonly />
+                        <input type="text" placeholder="4540 1234 5678 9012" maxlength="19" required />
                         <span class="card-type-icon">VISA / MC</span>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group col-half">
-                        <label>Expiration</label>
-                        <input type="text" value="12/28" readonly />
+                        <label>Date d'expiration</label>
+                        <input type="text" placeholder="MM/AA" maxlength="5" required />
                     </div>
                     <div class="form-group col-half">
-                        <label>CVV</label>
-                        <input type="text" value="***" readonly />
+                        <label>CVV (Code de sécurité)</label>
+                        <input type="password" placeholder="***" maxlength="3" required />
                     </div>
                 </div>
 
                 <p class="text-muted small mb-3 text-start">
-                    <i class="fas fa-lock text-success"></i> Transaction sécurisée pour les partenaires du Tournoi G06.
+                    <i class="fas fa-lock text-success"></i> Transaction sécurisée et cryptée. Les données ne sont pas conservées.
                 </p>
                 
-                <button type="submit" class="btn btn-payment-simulate">
-                    <span class="btn-text">Payer @Model.Montant.ToString("C")</span>
+                <div id="paymentLoader" style="display: none;">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Traitement...</span>
+                    </div>
+                    <p class="mt-2 text-success fw-bold">Traitement de la transaction en cours...</p>
+                </div>
+
+                <button type="submit" class="btn btn-payment-simulate" id="btnPayer">
+                    <span class="btn-text">Confirmer le paiement de @Model.Montant.ToString("C")</span>
                     <span class="btn-icon">💳</span>
                 </button>
             </form>
@@ -228,3 +235,22 @@
         box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
     }
 </style>
+
+@section Scripts {
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            // Empêcher la soumission multiple
+            document.getElementById('btnPayer').style.display = 'none';
+            document.getElementById('paymentLoader').style.display = 'block';
+            
+            // Simuler un temps de réponse de la banque
+            const form = this;
+            setTimeout(() => {
+                form.submit();
+            }, 1500);
+            
+            e.preventDefault();
+        });
+    </script>
+}
+

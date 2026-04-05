@@ -4,99 +4,613 @@
 @{
     ViewData["Title"] = "Accueil";
     bool estConnecte = HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true";
-    string role = HttpContextAccessor.HttpContext?.Session.GetString("UserRole") ?? "";
     string prenom = HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom") ?? "";
 }
 
-<!-- Page d'accueil style affiche complète -->
-<div class="full-poster-page">
-    <div class="hero-poster">
-        <div class="poster-overlay">
-            <div class="poster-content">
-                <div class="poster-badge animate__animated animate__fadeInDown">
-                    <span class="poster-golf-text">CONCOURS ANNUEL</span>
-                    <h1 class="poster-golf-title">GOLF</h1>
-                    <p class="poster-subtitle">L'ÉVÉNEMENT PRESTIGE DE L'ANNÉE</p>
-                </div>
-                
-                <div class="poster-college animate__animated animate__fadeIn">
-                    <div class="college-logo-wrapper">
-                        <span class="college-text-small">COLLÈGE</span>
-                        <h2 class="college-name">LA CITÉ</h2>
-                        <span class="college-location">Ottawa</span>
-                    </div>
-                </div>
-
-                <div class="poster-cta-group animate__animated animate__fadeInUp">
-                    @if (estConnecte)
-                    {
-                        <p class="poster-welcome">Heureux de vous revoir, <strong>@prenom</strong></p>
-                        <div class="poster-btns">
-                            <a class="btn-poster-primary luxury-btn" href="/Tournoi/Index">Découvrir les tournois</a>
-                            @if (role == "ADMIN")
-                            {
-                                <a class="btn-poster-outline luxury-outline" href="/Admin/Index">Tableau de Bord</a>
-                            }
-                            else
-                            {
-                                <a class="btn-poster-outline luxury-outline" href="/Auth/MesInscriptions">Mon Profil</a>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="poster-btns">
-                            <a class="btn-poster-primary luxury-btn" href="/Auth/Register">Rejoindre l'aventure</a>
-                            <a class="btn-poster-outline luxury-outline" href="/Auth/Login">Accès Membre</a>
-                        </div>
-                    }
-                </div>
-
-                <div class="poster-footer animate__animated animate__fadeInUp">
-                    <div class="footer-info-line">
-                        <span class="line"></span>
-                        <span class="info-text">Information & Réservation</span>
-                        <span class="line"></span>
-                    </div>
-                    <div class="poster-phone">
-                        <span class="phone-icon">📞</span> (613) 742-2483
-                    </div>
+<!-- ========== HERO SECTION ========== -->
+<div class="hero-banner">
+    <div class="hero-content">
+        <div class="hero-text">
+            <span class="hero-badge">
+                <i class="fas fa-golf-ball"></i> Édition 2026
+            </span>
+            <h1 class="hero-title">
+                Vivez l'expérience<br>
+                <span class="gold-text">Golf La Cité</span>
+            </h1>
+            <p class="hero-desc">
+                Rejoignez le tournoi annuel le plus prestigieux d'Ottawa. 
+                Compétition, réseautage et moments inoubliables sur les plus beaux parcours de la région.
+            </p>
+            <div class="hero-actions">
+                @if (estConnecte)
+                {
+                    <a href="/Tournoi/Index" class="btn-hero-primary">
+                        <i class="fas fa-trophy me-2"></i> Explorer les tournois
+                    </a>
+                    <a href="/Equipe/Index" class="btn-hero-outline">
+                        <i class="fas fa-users me-2"></i> Mes équipes
+                    </a>
+                }
+                else
+                {
+                    <a href="/Auth/Register" class="btn-hero-primary">
+                        <i class="fas fa-rocket me-2"></i> S'inscrire maintenant
+                    </a>
+                    <a href="/Auth/Login" class="btn-hero-outline">
+                        Déjà membre ? Connexion
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-img-wrapper">
+                <img src="/images/golf-hero.png" alt="Golf La Cité" class="hero-img" />
+                <div class="hero-img-badge">
+                    <div class="badge-number">15<sup>e</sup></div>
+                    <div class="badge-label">Édition</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ========== STATISTIQUES ========== -->
+<div class="stats-row">
+    <div class="stat-item">
+        <div class="stat-number" data-target="250">250+</div>
+        <div class="stat-label">Participants</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Tournois organisés</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+        <div class="stat-number">45K$</div>
+        <div class="stat-label">En commandites</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+        <div class="stat-number">98%</div>
+        <div class="stat-label">Satisfaction</div>
+    </div>
+</div>
+
+<!-- ========== SERVICES ========== -->
+<div class="section-header">
+    <h2 class="section-title">Tout ce dont vous avez besoin</h2>
+    <p class="section-subtitle">Une plateforme complète pour gérer votre expérience de golf</p>
+</div>
+
+<div class="services-grid">
+    <div class="service-card card-tournoi">
+        <div class="service-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <h3>Compétitions</h3>
+        <p>Inscrivez-vous aux tournois, suivez les classements et vivez des compétitions passionnantes.</p>
+        <a href="/Tournoi/Index" class="service-link">
+            Voir les tournois <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="service-card card-equipe">
+        <div class="service-icon equipe-icon">
+            <i class="fas fa-user-friends"></i>
+        </div>
+        <h3>Équipes</h3>
+        <p>Formez votre dream team, invitez vos amis avec un code secret et dominez le parcours.</p>
+        <a href="/Equipe/Index" class="service-link">
+            Gérer mes équipes <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="service-card card-commandite">
+        <div class="service-icon commandite-icon">
+            <i class="fas fa-handshake"></i>
+        </div>
+        <h3>Commandites</h3>
+        <p>Devenez partenaire officiel. Choisissez votre palier Bronze, Argent ou Or et gagnez en visibilité.</p>
+        <a href="/Sponsor/Index" class="service-link">
+            Découvrir les paliers <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+
+<!-- ========== POURQUOI NOUS ========== -->
+<div class="why-section">
+    <div class="why-content">
+        <div class="why-text">
+            <span class="why-badge">Pourquoi nous choisir ?</span>
+            <h2>L'excellence du golf, <br><span class="gold-text">simplifiée.</span></h2>
+            <div class="why-features">
+                <div class="why-feature">
+                    <div class="why-check"><i class="fas fa-check"></i></div>
+                    <div>
+                        <strong>Inscription en 2 minutes</strong>
+                        <p>Processus simplifié, paiement sécurisé et confirmation instantanée.</p>
+                    </div>
+                </div>
+                <div class="why-feature">
+                    <div class="why-check"><i class="fas fa-check"></i></div>
+                    <div>
+                        <strong>Gestion d'équipe intuitive</strong>
+                        <p>Créez votre équipe, partagez le code secret et suivez vos coéquipiers.</p>
+                    </div>
+                </div>
+                <div class="why-feature">
+                    <div class="why-check"><i class="fas fa-check"></i></div>
+                    <div>
+                        <strong>Support dédié</strong>
+                        <p>Notre équipe est disponible pour vous accompagner à chaque étape.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="why-visual">
+            <div class="why-card-stack">
+                <div class="mini-card mc-1">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Paiement sécurisé</span>
+                </div>
+                <div class="mini-card mc-2">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>100% Responsive</span>
+                </div>
+                <div class="mini-card mc-3">
+                    <i class="fas fa-bolt"></i>
+                    <span>Temps réel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== CTA FINAL ========== -->
+<div class="cta-banner">
+    <div class="cta-content">
+        <h2>Prêt à rejoindre l'aventure ?</h2>
+        <p>Inscrivez-vous dès maintenant et réservez votre place pour le prochain tournoi.</p>
+        <div class="cta-actions">
+            @if (!estConnecte)
+            {
+                <a href="/Auth/Register" class="btn-cta-primary">
+                    Créer mon compte gratuitement
+                </a>
+            }
+            else
+            {
+                <a href="/Tournoi/Index" class="btn-cta-primary">
+                    Découvrir les tournois disponibles
+                </a>
+            }
+            <a href="/Home/Contact" class="btn-cta-secondary">
+                <i class="fas fa-headset me-2"></i> Nous contacter
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ========== STYLES ========== -->
 <style>
-    /* On surcharge le conteneur principal pour cette page spécifique */
-    .container {
-        background: transparent !important;
-        backdrop-filter: none !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-        max-width: 100% !important;
-        width: 100% !important;
+    /* Hero */
+    .hero-banner {
+        background: linear-gradient(135deg, #1a3c2a 0%, #0d2818 50%, #1a3c2a 100%);
+        border-radius: 24px;
+        padding: 50px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
     }
-
-    .full-poster-page {
-        margin: 0;
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    .hero-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+        position: relative;
+        z-index: 2;
+    }
+    .hero-text { flex: 1; }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(212,175,55,0.15);
+        color: #D4AF37;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+    .hero-title {
+        color: #fff;
+        font-size: 2.8rem;
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0 0 20px;
+    }
+    .gold-text {
+        background: linear-gradient(135deg, #D4AF37, #F5D76E);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+        color: rgba(255,255,255,0.65);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 30px;
+        max-width: 480px;
+    }
+    .hero-actions { display: flex; gap: 15px; flex-wrap: wrap; }
+    .btn-hero-primary {
+        background: linear-gradient(135deg, #D4AF37, #c9a030);
+        color: #1a3c2a;
+        padding: 14px 30px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 20px rgba(212,175,55,0.3);
+    }
+    .btn-hero-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(212,175,55,0.4);
+        color: #1a3c2a;
+    }
+    .btn-hero-outline {
+        border: 2px solid rgba(255,255,255,0.2);
+        color: #fff;
+        padding: 14px 30px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    .btn-hero-outline:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.4);
+        color: #fff;
+    }
+    .hero-visual { flex-shrink: 0; }
+    .hero-img-wrapper {
+        position: relative;
+        width: 320px;
+        height: 320px;
+    }
+    .hero-img {
         width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .hero-img-badge {
+        position: absolute;
+        bottom: -15px;
+        left: -15px;
+        background: linear-gradient(135deg, #D4AF37, #c9a030);
+        color: #1a3c2a;
+        padding: 12px 18px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(212,175,55,0.4);
+    }
+    .badge-number { font-size: 1.6rem; font-weight: 900; line-height: 1; }
+    .badge-number sup { font-size: 0.7rem; }
+    .badge-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Stats */
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px 50px;
+        margin-bottom: 50px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .stat-item { text-align: center; }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a3c2a;
+    }
+    .stat-label {
+        font-size: 0.82rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+    .stat-divider {
+        width: 1px;
+        height: 50px;
+        background: #e2e8f0;
     }
 
-    .hero-poster {
-        border-radius: 0;
-        min-height: calc(100vh - 66px); /* 66px = hauteur navbar */
-        margin-bottom: 0;
-        background-position: center center;
-        background-size: cover;
+    /* Section Headers */
+    .section-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1a3c2a;
+        margin-bottom: 8px;
+    }
+    .section-subtitle {
+        color: #64748b;
+        font-size: 1rem;
     }
 
-    @@media (min-width: 1200px) {
-        .poster-content {
-            transform: scale(1.1);
-        }
+    /* Services */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 50px;
+    }
+    .service-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 35px 28px;
+        text-align: center;
+        transition: all 0.35s cubic-bezier(.4,0,.2,1);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+    .service-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1a3c2a, #D4AF37);
+        transform: scaleX(0);
+        transition: transform 0.35s;
+    }
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(26,60,42,0.1);
+        border-color: transparent;
+    }
+    .service-card:hover::after { transform: scaleX(1); }
+    .service-icon {
+        width: 65px;
+        height: 65px;
+        background: rgba(26,60,42,0.08);
+        color: #1a3c2a;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 20px;
+        transition: all 0.3s;
+    }
+    .service-card:hover .service-icon {
+        background: #1a3c2a;
+        color: #D4AF37;
+        transform: scale(1.1);
+    }
+    .equipe-icon { background: rgba(59,130,246,0.08); color: #3b82f6; }
+    .service-card:hover .equipe-icon { background: #3b82f6; color: #fff; }
+    .commandite-icon { background: rgba(212,175,55,0.1); color: #D4AF37; }
+    .service-card:hover .commandite-icon { background: #D4AF37; color: #1a3c2a; }
+    .service-card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #1e293b;
+    }
+    .service-card p {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 18px;
+    }
+    .service-link {
+        color: #1a3c2a;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.88rem;
+        transition: all 0.2s;
+    }
+    .service-link:hover { color: #D4AF37; }
+
+    /* Why Section */
+    .why-section {
+        background: #fff;
+        border-radius: 24px;
+        padding: 50px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+    .why-content {
+        display: flex;
+        gap: 60px;
+        align-items: center;
+    }
+    .why-text { flex: 1; }
+    .why-badge {
+        display: inline-block;
+        background: rgba(26,60,42,0.07);
+        color: #1a3c2a;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+    }
+    .why-text h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1a3c2a;
+        margin-bottom: 30px;
+        line-height: 1.3;
+    }
+    .why-features { display: flex; flex-direction: column; gap: 20px; }
+    .why-feature {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    .why-check {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        background: rgba(26,60,42,0.08);
+        color: #1a3c2a;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        margin-top: 2px;
+    }
+    .why-feature strong {
+        display: block;
+        font-size: 0.95rem;
+        color: #1e293b;
+        margin-bottom: 3px;
+    }
+    .why-feature p {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+    .why-visual { flex-shrink: 0; width: 280px; }
+    .why-card-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .mini-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 22px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        transition: transform 0.3s;
+    }
+    .mini-card:hover { transform: translateX(8px); }
+    .mini-card i { font-size: 1.2rem; }
+    .mc-1 {
+        background: linear-gradient(135deg, #1a3c2a, #2d6a2e);
+        color: #D4AF37;
+    }
+    .mc-2 {
+        background: #fff;
+        color: #1a3c2a;
+        border: 1px solid #e2e8f0;
+    }
+    .mc-3 {
+        background: linear-gradient(135deg, #D4AF37, #e8c84a);
+        color: #1a3c2a;
+    }
+
+    /* CTA */
+    .cta-banner {
+        background: linear-gradient(135deg, #1a3c2a 0%, #0d2818 100%);
+        border-radius: 24px;
+        padding: 50px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .cta-banner::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 60%);
+        border-radius: 50%;
+    }
+    .cta-content { position: relative; z-index: 2; }
+    .cta-content h2 {
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .cta-content p {
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+    .cta-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    .btn-cta-primary {
+        background: linear-gradient(135deg, #D4AF37, #c9a030);
+        color: #1a3c2a;
+        padding: 16px 35px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 20px rgba(212,175,55,0.3);
+        transition: all 0.3s;
+    }
+    .btn-cta-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(212,175,55,0.5);
+        color: #1a3c2a;
+    }
+    .btn-cta-secondary {
+        border: 2px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.8);
+        padding: 16px 35px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-cta-secondary:hover {
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-content { flex-direction: column; text-align: center; }
+        .hero-title { font-size: 2rem; }
+        .hero-desc { max-width: 100%; }
+        .hero-actions { justify-content: center; }
+        .hero-visual { display: none; }
+        .stats-row { flex-wrap: wrap; gap: 20px; padding: 25px; }
+        .stat-divider { display: none; }
+        .services-grid { grid-template-columns: 1fr; }
+        .why-content { flex-direction: column; }
+        .why-visual { width: 100%; }
+        .why-card-stack { flex-direction: row; flex-wrap: wrap; }
+        .mini-card { flex: 1; min-width: 150px; }
+        .hero-banner, .why-section, .cta-banner { padding: 30px; }
     }
 </style>

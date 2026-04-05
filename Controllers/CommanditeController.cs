@@ -121,6 +121,12 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Index");
             }
 
+            // Si déjà payé, aller directement à la confirmation
+            if (commandite.Statut == "PAYEE")
+            {
+                return RedirectToAction("Confirmation", new { id = commandite.CommanditeId });
+            }
+
             return View(commandite);
         }
 

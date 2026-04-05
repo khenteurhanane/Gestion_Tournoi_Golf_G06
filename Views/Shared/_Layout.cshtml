@@ -4,104 +4,334 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tournoi de Golf G06</title>
-    <meta name="description" content="Plateforme de gestion de tournoi de golf - La Cité" />
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="/css/site.css?v=20260331" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-dark mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">
-                    Tournoi Golf G06
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @using Microsoft.AspNetCore.Http
-                    @inject IHttpContextAccessor HttpContextAccessor
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">Accueil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Tournoi/Index">Tournois</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-warning fw-bold" href="/Sponsor/Index"><i class="bi bi-star"></i> Commanditer</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Home/Contact">Contact</a>
-                        </li>
-                        @if (HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true")
-                        {
-                            if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/Admin/Index">Dashboard</a>
-                                </li>
-                            }
-                            else if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "COMMANDITAIRE")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/Commandite/Index">Mes commandites</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-success" style="font-weight:600;" href="/Equipe/Index">Gérer mes équipes</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/Auth/MesInscriptions">Mes inscriptions</a>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Auth/Profil">Mon profil</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-warning" href="/Auth/Logout">Déconnexion</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link nav-btn-login" href="/Auth/Login">Connexion</a>
-                            </li>
-                        }
-                    </ul>
-                    @if (HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true")
-                    {
-                        <span class="navbar-text" style="color:var(--gold); font-size:0.85rem;">
-                            @HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom")
-                            @HttpContextAccessor.HttpContext?.Session.GetString("UserNom")
-                        </span>
-                    }
+<body class="dashboard-body">
+    @using Microsoft.AspNetCore.Http
+    @inject IHttpContextAccessor HttpContextAccessor
+    @{
+        bool estConnecte = HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true";
+        string role = HttpContextAccessor.HttpContext?.Session.GetString("UserRole") ?? "";
+        string prenom = HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom") ?? "";
+        string nom = HttpContextAccessor.HttpContext?.Session.GetString("UserNom") ?? "";
+    }
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-golf-ball"></i>
+                    <span>Golf G06</span>
                 </div>
             </div>
-        </nav>
-    </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
+            <nav class="sidebar-nav">
+                <a href="/" class="@(ViewData["Title"]?.ToString() == "Accueil" ? "active" : "")">
+                    <i class="fas fa-home"></i> <span>Accueil</span>
+                </a>
+                <a href="/Tournoi/Index" class="@(ViewData["Title"]?.ToString() == "Liste des Tournois" ? "active" : "")">
+                    <i class="fas fa-calendar-alt"></i> <span>Tournois</span>
+                </a>
+                <a href="/Sponsor/Index" class="@(ViewData["Title"]?.ToString() == "Paliers de Commandite" ? "active" : "")">
+                    <i class="fas fa-star text-warning"></i> <span>Commanditer</span>
+                </a>
+                
+                @if (estConnecte)
+                {
+                    <div class="nav-divider">Menu Utilisateur</div>
+                    
+                    @if (role == "ADMIN")
+                    {
+                        <a href="/Admin/Index" class="@(ViewData["Title"]?.ToString() == "Espace Administrateur" ? "index" == "active" ? "active" : "" : "")">
+                            <i class="fas fa-chart-pie"></i> <span>Dashboard Admin</span>
+                        </a>
+                        <a href="/Admin/Utilisateurs">
+                            <i class="fas fa-users-cog"></i> <span>Utilisateurs</span>
+                        </a>
+                    }
+                    else if (role == "COMMANDITAIRE")
+                    {
+                        <a href="/Commandite/Index">
+                            <i class="fas fa-handshake"></i> <span>Mes commandites</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/Equipe/Index">
+                            <i class="fas fa-user-friends"></i> <span>Mes équipes</span>
+                        </a>
+                        <a href="/Auth/MesInscriptions">
+                            <i class="fas fa-check-circle"></i> <span>Mes inscriptions</span>
+                        </a>
+                    }
+
+                    <a href="/Auth/Profil">
+                        <i class="fas fa-user-circle"></i> <span>Mon profil</span>
+                    </a>
+                }
+                
+                <div class="nav-bottom">
+                    <a href="/Home/Contact">
+                        <i class="fas fa-envelope"></i> <span>Contact</span>
+                    </a>
+                    @if (estConnecte)
+                    {
+                        <a href="/Auth/Logout" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/Auth/Login" class="login-link">
+                            <i class="fas fa-sign-in-alt"></i> <span>Connexion</span>
+                        </a>
+                    }
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Topbar -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <h2 class="page-title">@ViewData["Title"]</h2>
+                </div>
+                <div class="topbar-right">
+                    @if (estConnecte)
+                    {
+                        <div class="user-profile">
+                            <div class="user-info">
+                                <span class="user-name">@prenom @nom</span>
+                                <span class="user-role">@role</span>
+                            </div>
+                            <div class="user-avatar">
+                                @prenom[0]
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/Auth/Login" class="btn btn-sm btn-success">Se connecter</a>
+                    }
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                @RenderBody()
+            </div>
         </main>
     </div>
 
-    <footer class="site-footer">
-        <div class="footer-links">
-            <a href="/Home/Contact">Contact</a> |
-            <a href="/Home/Privacy">Confidentialité</a>
-        </div>
-        &copy; 2026 - Tournoi de Golf G06 - La Cité
-    </footer>
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --topbar-height: 70px;
+            --primary-green: #2d6a2e;
+            --dark-green: #1a3c2a;
+            --accent-gold: #D4AF37;
+            --bg-light: #f0f2f5;
+            --sidebar-bg: #1a3c2a;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body.dashboard-body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            color: var(--text-main);
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .app-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1a3c2a 0%, #143322 100%);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+        }
+
+        .logo i { color: var(--accent-gold); }
+
+        .sidebar-nav {
+            padding: 20px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-nav a {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.92rem;
+        }
+
+        .sidebar-nav a i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+
+        .sidebar-nav a.active {
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--accent-gold);
+            border-left-color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .nav-divider {
+            padding: 20px 25px 10px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3);
+            font-weight: 700;
+        }
+
+        .nav-bottom {
+            margin-top: auto;
+            padding-bottom: 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 10px;
+        }
+
+        .logout-link:hover {
+            color: #ff6b6b !important;
+            background: rgba(255, 107, 107, 0.1) !important;
+        }
+
+        .login-link:hover {
+            color: var(--accent-gold) !important;
+        }
+
+        /* Main Content */
+        .app-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-topbar {
+            height: var(--topbar-height);
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            display: block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .user-role {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            color: var(--accent-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(26,60,42,0.3);
+        }
+
+        .content-wrapper {
+            padding: 30px;
+            flex: 1;
+        }
+
+        /* Responsive */
+        @@media (max-width: 991px) {
+            .app-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .app-main {
+                margin-left: 0;
+            }
+        }
+    </style>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/site.js"></script>
-    <script src="/js/validation.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

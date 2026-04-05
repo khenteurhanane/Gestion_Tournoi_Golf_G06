@@ -1419,3 +1419,47 @@ footer.site-footer .footer-links {
         background: white;
     }
 }
+
+/* ===================== DASHBOARD LAYOUT OVERRIDES ===================== */
+body.dashboard-body {
+    background: #f0f2f5 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+body.dashboard-body .navbar {
+    display: none !important;
+}
+
+body.dashboard-body footer.site-footer {
+    display: none !important;
+}
+
+body.dashboard-body > .container {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+}
+
+body.dashboard-body .app-sidebar {
+    background: linear-gradient(180deg, #1a3c2a 0%, #143322 100%) !important;
+    border-right: none !important;
+}
+
+body.dashboard-body .app-topbar {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+}
+
+body.dashboard-body .content-wrapper {
+    background: #f0f2f5 !important;
+}
+
+body.dashboard-body .app-main {
+    background: #f0f2f5 !important;
+}
