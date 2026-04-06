@@ -193,8 +193,14 @@ namespace croupe_06_TournoiGolf.Controllers
             HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
             HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
 
-            // Rediriger vers la page d'accueil ou tableau de bord admin selon la logique
-            return RedirectToAction("Index", "Tournoi");
+            // Rediriger vers la page de confirmation d'inscription commanditaire (US-11-T05)
+            return RedirectToAction("ConfirmationInscriptionCommanditaire", "Auth");
+        }
+
+        // Action pour afficher la confirmation d'inscription commanditaire (US-11-T05)
+        public IActionResult ConfirmationInscriptionCommanditaire()
+        {
+            return View();
         }
 
         // --- Mot de passe oublié ---

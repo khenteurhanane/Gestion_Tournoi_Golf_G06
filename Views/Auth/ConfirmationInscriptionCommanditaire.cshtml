@@ -1,0 +1,71 @@
+@{
+    ViewData["Title"] = "Inscription Confirmée";
+}
+
+<div class="confirmation-container">
+    <div class="dashboard-card status-summary-card mb-4 text-center py-5">
+        <div class="card-body">
+            <div class="confirmation-icon mb-4">
+                <div class="icon-circle bg-success-subtle text-success mx-auto d-flex align-items-center justify-content-center shadow-lg" style="width: 100px; height: 100px; border-radius: 50%;">
+                    <i class="fas fa-check fa-4x"></i>
+                </div>
+            </div>
+            
+            <h1 class="display-5 fw-bold text-dark mb-3">Félicitations !</h1>
+            <p class="lead text-muted mb-4">Votre compte commanditaire a été créé avec succès.</p>
+            
+            <div class="alert alert-info border-0 shadow-sm rounded-4 text-start d-inline-block mx-auto mb-5" style="max-width: 600px;">
+                <div class="d-flex align-items-start p-2">
+                    <i class="fas fa-info-circle fa-2x me-3 mt-1 text-primary-green"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Prochaine étape : Devenir commanditaire d'un tournoi</h6>
+                        <p class="small mb-0">Vous pouvez maintenant parcourir la liste des tournois ouverts et choisir d'en commanditer un pour augmenter la visibilité de votre entreprise.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="/Tournoi/Index" class="btn btn-success btn-lg px-5 rounded-pill shadow-sm py-3 fw-bold">
+                    <i class="fas fa-search me-2"></i> Parcourir les tournois
+                </a>
+                <a href="/Commandite/Index" class="btn btn-outline-success btn-lg px-5 rounded-pill py-3 fw-bold">
+                    <i class="fas fa-handshake me-2"></i> Mes commandites
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .confirmation-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        padding-top: 50px;
+    }
+    
+    .status-summary-card {
+        background: white;
+        border-radius: 24px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        max-width: 850px;
+        width: 100%;
+        border: 1px solid var(--border-color);
+    }
+    
+    .bg-success-subtle { background-color: rgba(45, 106, 46, 0.1); }
+    .text-success { color: var(--primary-green) !important; }
+    .text-primary-green { color: var(--primary-green); }
+    
+    .icon-circle {
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: scalePop 0.6s ease-out;
+    }
+    
+    @@keyframes scalePop {
+        0% { transform: scale(0); opacity: 0; }
+        70% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
