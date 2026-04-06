@@ -2,115 +2,243 @@
 @{
     var commandite = (croupe_06_TournoiGolf.Models.Commandite)ViewBag.Commandite;
     ViewData["Title"] = "Gestion des joueurs sponsorisés";
+    int limite = croupe_06_TournoiGolf.Models.TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
+    int inscrits = Model.Count();
+    double pourcentage = (double)inscrits / limite * 100;
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg border-0 rounded-lg">
-        <div class="card-header bg-success text-white">
-            <h3 class="mb-0"><i class="fas fa-users"></i> Gestion des joueurs - @commandite.Tournoi.Nom</h3>
-        </div>
-        <div class="card-body">
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h5>Informations de la commandite</h5>
-                    <p><strong>Type :</strong> @commandite.TypeCommandite</p>
-                    <p><strong>Montant :</strong> @commandite.Montant.ToString("C")</p>
-                    <p><strong>Statut :</strong> 
-                        @if (commandite.Statut == "PAYEE") { <span class="badge bg-success">Payée</span> }
-                        else { <span class="badge bg-warning text-dark">En attente</span> }
-                    </p>
-                    <p><strong>Places incluses :</strong> @croupe_06_TournoiGolf.Models.TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite) joueur(s)</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Retour à mes commandites</a>
-                </div>
-            </div>
-
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">@TempData["Success"]</div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger">@TempData["Error"]</div>
-            }
-
-            <div class="row">
-                <!-- Formulaire d'ajout -->
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <h6><i class="fas fa-plus-circle"></i> Ajouter un joueur</h6>
-                            <form asp-action="AjouterJoueur" method="post">
-                                <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
-                                <div class="mb-3">
-                                    <label class="form-label">Prénom</label>
-                                    <input type="text" name="prenom" class="form-control" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Nom</label>
-                                    <input type="text" name="nom" class="form-control" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" required />
-                                </div>
-                                <button type="submit" class="btn btn-success w-100" @(commandite.Statut != "PAYEE" ? "disabled" : "")>
-                                    Ajouter le joueur
-                                </button>
-                                @if (commandite.Statut != "PAYEE")
-                                {
-                                    <small class="text-danger d-block mt-2">Le paiement est requis pour ajouter des joueurs.</small>
-                                }
-                            </form>
+<div class="players-management-section">
+    <!-- Header Summary Card -->
+    <div class="dashboard-card status-summary-card mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="mb-1 text-primary-green fw-bold">Configuration des joueurs : @commandite.Tournoi.Nom</h4>
+                    <p class="text-muted mb-3">Gérez les participants inclus dans votre forfait de commandite <strong>@commandite.TypeCommandite</strong>.</p>
+                    
+                    <div class="slots-progress-wrapper mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-600">Occupation des places</span>
+                            <span class="fw-bold @(inscrits >= limite ? "text-danger" : "text-success")">@inscrits / @limite</span>
+                        </div>
+                        <div class="progress rounded-pill shadow-sm" style="height: 12px; background: #e9ecef;">
+                            <div class="progress-bar rounded-pill @(inscrits >= limite ? "bg-danger" : "bg-success")" 
+                                 role="progressbar" 
+                                 style="width: @pourcentage%" 
+                                 aria-valuenow="@inscrits" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="@limite">
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="sponsor-badge p-3 rounded-4 d-inline-block text-center shadow-sm" style="background: rgba(212, 175, 55, 0.1); border: 2px solid var(--accent-gold);">
+                        <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                        <div class="small text-uppercase fw-bold text-dark">Forfait @commandite.TypeCommandite</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Liste des joueurs -->
-                <div class="col-md-8">
-                    @{
-                        int limite = croupe_06_TournoiGolf.Models.TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
-                    }
-                    <h6>Joueurs inscrits (@Model.Count() / @limite) @(Model.Count() >= limite ? Html.Raw("<span class='badge bg-danger'>Complet</span>") : (object)"")</h6>
-                    @if (!Model.Any())
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm mb-4 rounded-4 py-3 scale-up">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm mb-4 rounded-4 py-3 shake">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
+        </div>
+    }
+
+    <div class="row">
+        <!-- Formulaire Panel -->
+        <div class="col-lg-4 mb-4">
+            <div class="dashboard-card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white p-4 border-0">
+                    <h5 class="mb-0"><i class="fas fa-user-plus me-2 text-warning"></i> Nouvel invité</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (commandite.Statut != "PAYEE")
                     {
-                        <div class="text-center py-4 bg-white border rounded">
-                            <p class="text-muted mb-0">Aucun joueur ajouté pour le moment.</p>
+                        <div class="text-center py-5">
+                            <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                            <h6 class="fw-bold">Action restreinte</h6>
+                            <p class="small text-muted">Veuillez finaliser le paiement de votre commandite pour pouvoir inscrire des joueurs.</p>
+                            <a asp-action="Paiement" asp-route-id="@commandite.CommanditeId" class="btn btn-success rounded-pill px-4">
+                                <i class="fas fa-credit-card me-2"></i> Aller au paiement
+                            </a>
+                        </div>
+                    }
+                    else if (inscrits >= limite)
+                    {
+                        <div class="alert alert-warning border-0 rounded-4 p-4 text-center">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <h6 class="fw-bold">Capacité atteinte</h6>
+                            <p class="small mb-0">Vous avez déjà utilisé vos @limite places de joueur incluses pour ce forfait.</p>
                         </div>
                     }
                     else
                     {
-                        <table class="table table-striped align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Nom Complet</th>
-                                    <th>Email</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var p in Model)
-                                {
+                        <form asp-action="AjouterJoueur" method="post" class="needs-validation" novalidate id="addPlayerForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Prénom</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                    <input type="text" name="prenom" class="form-control border-start-0" placeholder="Ex: Jean" required />
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Nom</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-user-tag text-muted"></i></span>
+                                    <input type="text" name="nom" class="form-control border-start-0" placeholder="Ex: Tremblay" required />
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Adresse courriel</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                                    <input type="email" name="email" class="form-control border-start-0" placeholder="jean.tremblay@exemple.com" required />
+                                </div>
+                                <div class="form-text mt-1 text-muted small">Le joueur recevra son code d'accès par courriel.</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm mt-2">
+                                <i class="fas fa-plus-circle me-2"></i> Inscrire le joueur
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste Panel -->
+        <div class="col-lg-8">
+            <div class="dashboard-card shadow-sm border-0 rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-list-ul me-2 text-success"></i> Joueurs Inscrits</h5>
+                    <span class="badge rounded-pill bg-light text-dark border p-2 px-3 fw-bold">Total: @inscrits / @limite</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-6">
+                            <div class="empty-list-icon mb-4">
+                                <i class="fas fa-users-slash fa-4x text-light" style="opacity: 0.5;"></i>
+                            </div>
+                            <h6 class="text-muted fw-bold">Aucun joueur pour le moment</h6>
+                            <p class="text-muted small">Commencez par ajouter un invité à l'aide du formulaire à gauche.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 custom-table">
+                                <thead class="bg-light">
                                     <tr>
-                                        <td>@p.Prenom @p.Nom</td>
-                                        <td>@p.Email</td>
-                                        <td>
-                                            <form asp-action="SupprimerJoueur" method="post" onsubmit="return confirm('Retirer ce joueur ?');">
-                                                <input type="hidden" name="participantId" value="@p.ParticipantId" />
-                                                <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-trash"></i> Retirer
-                                                </button>
-                                            </form>
-                                        </td>
+                                        <th class="ps-4 border-0 py-3">Joueur</th>
+                                        <th class="border-0 py-3">Coordonnées</th>
+                                        <th class="border-0 py-3">Statut</th>
+                                        <th class="text-end pe-4 border-0 py-3">Actions</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var p in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 py-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm rounded-circle bg-success-subtle text-success me-3 d-flex align-items-center justify-content-center fw-bold">
+                                                        @p.Prenom[0]@p.Nom[0]
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">@p.Prenom @p.Nom</div>
+                                                        <div class="small text-muted">ID: #J-@p.ParticipantId.ToString("D4")</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-3">
+                                                <div class="small"><i class="fas fa-envelope text-muted me-2"></i>@p.Email</div>
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Confirmé</span>
+                                            </td>
+                                            <td class="text-end pe-4 py-3">
+                                                <form asp-action="SupprimerJoueur" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous certain de vouloir retirer ce joueur de votre commandite ?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="participantId" value="@p.ParticipantId" />
+                                                    <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
+                                                    <button type="submit" class="btn btn-action-circle btn-outline-danger" title="Retirer">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fw-600 { font-weight: 600; }
+    
+    .dashboard-card {
+        background: #ffffff;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid var(--border-color);
+    }
+    
+    .text-primary-green { color: var(--primary-green); }
+    
+    .bg-success-subtle { background-color: rgba(45, 106, 46, 0.1); }
+    .text-success { color: var(--primary-green) !important; }
+    
+    .avatar-sm {
+        width: 38px;
+        height: 38px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-action-circle {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+    
+    .py-6 { padding-top: 5rem; padding-bottom: 5rem; }
+    
+    .custom-table tr:last-child td { border-bottom: none; }
+    
+    .scale-up { animation: scaleUp 0.3s ease-out; }
+    @@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @@keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+</style>
+
