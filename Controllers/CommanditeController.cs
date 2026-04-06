@@ -108,7 +108,7 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(model);
         }
 
-        // Affiche la page de paiement pour une commandite
+        // Affiche la page de paiement pour une commandite (US-11-T04)
         public IActionResult Paiement(int id)
         {
             var commandite = _context.Commandites
@@ -130,7 +130,8 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(commandite);
         }
 
-        // Simule le paiement de la commandite
+        // Simule le traitement d'un paiement de commandite (US-11-T04)
+        // Redirige vers la confirmation une fois le statut mis à jour en base
         [HttpPost]
         public IActionResult SimulerPaiement(int commanditeId)
         {

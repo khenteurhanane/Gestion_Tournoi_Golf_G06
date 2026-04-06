@@ -23,6 +23,7 @@
         <div class="payment-form-section mt-4">
             <h3 class="section-title">Détails de paiement</h3>
             
+            <!-- Formulaire de simulation de paiement - US-11-T04 -->
             <form asp-action="SimulerPaiement" method="post" id="paymentForm">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="commanditeId" value="@Model.CommanditeId" />
@@ -55,6 +56,7 @@
                     <i class="fas fa-lock text-success"></i> Transaction sécurisée et cryptée. Les données ne sont pas conservées.
                 </p>
                 
+                <!-- Zone d'attente (spinner) affichée pendant le traitement simulé -->
                 <div id="paymentLoader" style="display: none;">
                     <div class="spinner-border text-success" role="status">
                         <span class="visually-hidden">Traitement...</span>
@@ -238,18 +240,19 @@
 
 @section Scripts {
     <script>
+        // Gestion de la soumission du formulaire avec délai de simulation
         document.getElementById('paymentForm').addEventListener('submit', function(e) {
-            // Empêcher la soumission multiple
+            // Empêcher la soumission multiple et basculer l'affichage (bouton -> spinner)
             document.getElementById('btnPayer').style.display = 'none';
             document.getElementById('paymentLoader').style.display = 'block';
             
-            // Simuler un temps de réponse de la banque
+            // Simulation d'un délai de communication réseau de 1.5 seconde
             const form = this;
             setTimeout(() => {
                 form.submit();
             }, 1500);
             
-            e.preventDefault();
+            e.preventDefault(); // Suspendre la soumission immédiate
         });
     </script>
 }
