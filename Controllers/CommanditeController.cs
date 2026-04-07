@@ -27,6 +27,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             var commandites = _context.Commandites
                 .Include(c => c.Tournoi)
+                .Include(c => c.Participants)
                 .Where(c => c.UtilisateurId == userId)
                 .ToList();
 

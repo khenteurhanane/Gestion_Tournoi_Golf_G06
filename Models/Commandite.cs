@@ -32,6 +32,9 @@ namespace croupe_06_TournoiGolf.Models
         public string Statut { get; set; } = "EN_ATTENTE_PAIEMENT";
 
         public DateTime DateCreation { get; set; } = DateTime.Now;
+
+        // Navigation vers les joueurs inscrits (US-12-T03)
+        public virtual ICollection<Participant> Participants { get; set; } = new List<Participant>();
     }
 
     public static class TypesCommandite
