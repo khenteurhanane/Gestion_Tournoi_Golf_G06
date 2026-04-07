@@ -184,6 +184,37 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(joueurs);
         }
 
+        // Affiche le formulaire dédié pour ajouter un joueur (US-12-T01)
+        [HttpGet]
+        public IActionResult AjouterJoueur(int commanditeId)
+        {
+            var commandite = _context.Commandites
+                .Include(c => c.Tournoi)
+                .FirstOrDefault(c => c.CommanditeId == commanditeId);
+
+            if (commandite == null) return RedirectToAction("Index");
+
+            // Vérifier si la commandite est payée
+            if (commandite.Statut != "PAYEE")
+            {
+                TempData["Error"] = "Vous devez payer votre commandite avant d'ajouter des joueurs.";
+                return RedirectToAction("Paiement", new { id = commanditeId });
+            }
+
+            // Vérifier la limite
+            int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
+            int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
+
+            if (nbJoueurs >= limiteJoueurs)
+            {
+                TempData["Error"] = $"Maximum de {limiteJoueurs} joueur(s) atteint pour cette commandite.";
+                return RedirectToAction("Joueurs", new { id = commanditeId });
+            }
+
+            ViewBag.Commandite = commandite;
+            return View();
+        }
+
         // Ajoute un joueur à une commandite
         [HttpPost]
         public IActionResult AjouterJoueur(int commanditeId, string prenom, string nom, string email)
