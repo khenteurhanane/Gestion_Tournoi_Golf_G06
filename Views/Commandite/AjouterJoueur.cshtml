@@ -19,54 +19,65 @@
             </div>
             
             <div class="card-body p-5">
-                <div class="text-center mb-5">
-                    <div class="icon-circle bg-success-subtle text-success mx-auto mb-3">
-                        <i class="fas fa-id-card fa-2x"></i>
+                @if (commandite.Tournoi.PlacesParticipantsMax <= (int)ViewBag.TotalInscrits)
+                {
+                    <div class="alert alert-danger border-0 rounded-4 p-4 text-center mb-4">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h6 class="fw-bold">Le tournoi est complet</h6>
+                        <p class="small mb-0">La capacité maximale a été atteinte.</p>
                     </div>
-                    <h5 class="fw-bold">Détails du participant</h5>
-                    <p class="text-muted small">Inscrivez les informations pour le tournoi : <strong>@commandite.Tournoi.Nom</strong></p>
-                </div>
-
-                <form asp-action="AjouterJoueur" method="post" class="needs-validation" novalidate id="addForm">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
-
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <label class="form-label fw-bold small text-uppercase">Prénom</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
-                                <input type="text" name="prenom" class="form-control border-start-0" placeholder="Jean" required />
-                                <div class="invalid-feedback">Veuillez entrer un prénom.</div>
-                            </div>
+                }
+                else
+                {
+                    <div class="text-center mb-5">
+                        <div class="icon-circle bg-success-subtle text-success mx-auto mb-3">
+                            <i class="fas fa-id-card fa-2x"></i>
                         </div>
-                        <div class="col-sm-6">
-                            <label class="form-label fw-bold small text-uppercase">Nom de famille</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-tag text-muted"></i></span>
-                                <input type="text" name="nom" class="form-control border-start-0" placeholder="Tremblay" required />
-                                <div class="invalid-feedback">Veuillez entrer un nom.</div>
-                            </div>
-                        </div>
-                        <div class="col-12 mt-4">
-                            <label class="form-label fw-bold small text-uppercase">Adresse Courriel</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
-                                <input type="email" name="email" class="form-control border-start-0" placeholder="jean.tremblay@exemple.com" required />
-                                <div class="invalid-feedback">Veuillez entrer un courriel valide.</div>
-                            </div>
-                            <div class="form-text mt-2">
-                                <i class="fas fa-info-circle me-1"></i> Cet invité sera automatiquement ajouté à votre liste de joueurs pour ce forfait.
-                            </div>
-                        </div>
+                        <h5 class="fw-bold">Détails du participant</h5>
+                        <p class="text-muted small">Inscrivez les informations pour le tournoi : <strong>@commandite.Tournoi.Nom</strong></p>
                     </div>
 
-                    <div class="buttons-container mt-5 pt-3">
-                        <button type="submit" class="btn btn-success w-100 rounded-pill py-3 fw-bold shadow">
-                            <i class="fas fa-save me-2"></i> Enregistrer le joueur
-                        </button>
-                    </div>
-                </form>
+                    <form asp-action="AjouterJoueur" method="post" class="needs-validation" novalidate id="addForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-bold small text-uppercase">Prénom</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                    <input type="text" name="prenom" class="form-control border-start-0" placeholder="Jean" required />
+                                    <div class="invalid-feedback">Veuillez entrer un prénom.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-bold small text-uppercase">Nom de famille</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-tag text-muted"></i></span>
+                                    <input type="text" name="nom" class="form-control border-start-0" placeholder="Tremblay" required />
+                                    <div class="invalid-feedback">Veuillez entrer un nom.</div>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <label class="form-label fw-bold small text-uppercase">Adresse Courriel</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                                    <input type="email" name="email" class="form-control border-start-0" placeholder="jean.tremblay@exemple.com" required />
+                                    <div class="invalid-feedback">Veuillez entrer un courriel valide.</div>
+                                </div>
+                                <div class="form-text mt-2">
+                                    <i class="fas fa-info-circle me-1"></i> Cet invité sera automatiquement ajouté à votre liste de joueurs pour ce forfait.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="buttons-container mt-5 pt-3">
+                            <button type="submit" class="btn btn-success w-100 rounded-pill py-3 fw-bold shadow">
+                                <i class="fas fa-save me-2"></i> Enregistrer le joueur
+                            </button>
+                        </div>
+                    </form>
+                }
             </div>
             <div class="card-footer bg-light p-3 border-0 text-center">
                 <span class="badge bg-light text-dark border p-2 px-3 fw-normal">

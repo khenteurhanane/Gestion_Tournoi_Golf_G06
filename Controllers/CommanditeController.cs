@@ -181,6 +181,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 .ToList();
 
             ViewBag.Commandite = commandite;
+            ViewBag.TotalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
             return View(joueurs);
         }
 
@@ -201,7 +202,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Paiement", new { id = commanditeId });
             }
 
-            // Vérifier la limite
+            // Vérifier la limite du forfait de commandite
             int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
             int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
 
@@ -211,7 +212,16 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 
+            // Vérifier la capacité globale du tournoi (US-12-T02)
+            int totalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
+            if (totalInscrits >= commandite.Tournoi.PlacesParticipantsMax)
+            {
+                TempData["Error"] = "Le tournoi a atteint sa capacité maximale d'inscriptions. Vous ne pouvez plus ajouter de joueurs.";
+                return RedirectToAction("Joueurs", new { id = commanditeId });
+            }
+
             ViewBag.Commandite = commandite;
+            ViewBag.TotalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
             return View();
         }
 
@@ -219,7 +229,10 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult AjouterJoueur(int commanditeId, string prenom, string nom, string email)
         {
-            var commandite = _context.Commandites.Find(commanditeId);
+            var commandite = _context.Commandites
+                .Include(c => c.Tournoi)
+                .FirstOrDefault(c => c.CommanditeId == commanditeId);
+
             if (commandite == null) return RedirectToAction("Index");
 
             // Vérifier si la commandite est payée
@@ -236,6 +249,14 @@ namespace croupe_06_TournoiGolf.Controllers
             if (nbJoueurs >= limiteJoueurs)
             {
                 TempData["Error"] = $"Vous avez atteint le maximum de {limiteJoueurs} joueur(s) pour une commandite de type {commandite.TypeCommandite}.";
+                return RedirectToAction("Joueurs", new { id = commanditeId });
+            }
+
+            // Vérifier la capacité globale du tournoi (US-12-T02)
+            int totalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
+            if (totalInscrits >= commandite.Tournoi.PlacesParticipantsMax)
+            {
+                TempData["Error"] = "Désolé, le tournoi est complet. Aucune inscription supplémentaire n'est possible.";
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 
