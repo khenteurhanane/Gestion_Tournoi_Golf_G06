@@ -91,6 +91,22 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(utilisateurs);
         }
 
+        // Liste de tous les participants (US-12-T04)
+        public IActionResult Participants()
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            var participants = _context.Participants
+                .Include(p => p.Tournoi)
+                .Include(p => p.Utilisateur)
+                .Include(p => p.Commandite)
+                    .ThenInclude(c => c.Utilisateur)
+                .OrderByDescending(p => p.CreeLe)
+                .ToList();
+
+            return View(participants);
+        }
+
         // Supprimer un utilisateur (admin)
         [HttpPost]
         public IActionResult SupprimerUtilisateur(int id)
