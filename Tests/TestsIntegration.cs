@@ -256,7 +256,7 @@ namespace GolfTournoi.Tests
             Assert.Equal(50.00m, participant.MontantPaye); // retraite = 50$
 
             // Étape 2 : simuler le paiement via le contrôleur
-            inscriptionController.SimulerPaiement(participant.ParticipantId);
+            inscriptionController.SimulerPaiement(participant.ParticipantId, "Carte de Crédit/Débit").Wait();
 
             // Vérifier : le statut est maintenant CONFIRMEE
             var participantApres = context.Participants.Find(participant.ParticipantId);

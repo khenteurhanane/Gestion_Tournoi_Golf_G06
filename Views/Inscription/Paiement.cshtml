@@ -21,36 +21,66 @@
         </div>
 
         <div class="payment-form-section mt-4">
-            <h3 class="section-title">Détails de paiement</h3>
+            <h3 class="section-title">Mode de paiement</h3>
             
+            <div class="payment-methods-tabs mb-4">
+                <button type="button" class="method-tab active" onclick="switchPaymentMethod('card')">
+                    <i class="fas fa-credit-card"></i> Carte Débit/Crédit
+                </button>
+                <button type="button" class="method-tab" onclick="switchPaymentMethod('interac')">
+                    <i class="fas fa-exchange-alt"></i> Virement Interac
+                </button>
+            </div>
+
             <form asp-action="SimulerPaiement" method="post" id="paymentForm">
                 <input type="hidden" name="participantId" value="@Model.ParticipantId" />
+                <input type="hidden" name="methodePaiement" id="methodePaiement" value="Carte de Crédit/Débit" />
                 
-                <div class="form-group">
-                    <label>Nom sur la carte</label>
-                    <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" required />
-                </div>
-                
-                <div class="form-group">
-                    <label>Numéro de carte</label>
-                    <div class="card-input-wrapper">
-                        <input type="text" value="4540 1234 5678 9012" required />
-                        <span class="card-type-icon">VISA</span>
+                <!-- Section Carte -->
+                <div id="cardSection">
+                    <div class="form-group">
+                        <label>Nom sur la carte</label>
+                        <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" required />
                     </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group col-half">
-                        <label>Expiration</label>
-                        <input type="text" value="12/28" required />
+                    
+                    <div class="form-group">
+                        <label>Numéro de carte</label>
+                        <div class="card-input-wrapper">
+                            <input type="text" value="4540 1234 5678 9012" required />
+                            <span class="card-type-icon">VISA</span>
+                        </div>
                     </div>
-                    <div class="form-group col-half">
-                        <label>CVV</label>
-                        <input type="text" value="***" required />
+                    
+                    <div class="form-row">
+                        <div class="form-group col-half">
+                            <label>Expiration</label>
+                            <input type="text" value="12/28" required />
+                        </div>
+                        <div class="form-group col-half">
+                            <label>CVV</label>
+                            <input type="text" value="***" required />
+                        </div>
                     </div>
                 </div>
 
-                <p class="text-muted small mb-3 text-start">
+                <!-- Section Interac (Cachée par défaut) -->
+                <div id="interacSection" style="display:none;">
+                    <div class="interac-instructions">
+                        <p class="mb-3">Pour finaliser votre inscription, veuillez effectuer un virement Interac aux coordonnées suivantes :</p>
+                        <div class="interac-detail">
+                            <strong>Courriel :</strong> <span>paiement@golfg06.com</span>
+                        </div>
+                        <div class="interac-detail">
+                            <strong>Question :</strong> <span>Numéro de Tournoi</span>
+                        </div>
+                        <div class="interac-detail">
+                            <strong>Réponse :</strong> <span>Golf2024</span>
+                        </div>
+                        <p class="mt-3 small text-muted">Note : Votre inscription sera confirmée une fois le virement reçu.</p>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-3 text-start mt-3">
                     <i class="fas fa-lock"></i> Ceci est une simulation sécurisée pour le projet G06.
                 </p>
                 
@@ -64,12 +94,40 @@
             </form>
 
             <script>
+                function switchPaymentMethod(method) {
+                    const cardSection = document.getElementById('cardSection');
+                    const interacSection = document.getElementById('interacSection');
+                    const methodInput = document.getElementById('methodePaiement');
+                    const tabs = document.querySelectorAll('.method-tab');
+                    const btnIcon = document.querySelector('.btn-icon');
+                    
+                    tabs.forEach(tab => tab.classList.remove('active'));
+                    
+                    if (method === 'card') {
+                        cardSection.style.display = 'block';
+                        interacSection.style.display = 'none';
+                        methodInput.value = "Carte de Crédit/Débit";
+                        tabs[0].classList.add('active');
+                        btnIcon.innerText = "💳";
+                        // Re-ajouter les attributs 'required'
+                        cardSection.querySelectorAll('input').forEach(i => i.required = true);
+                    } else {
+                        cardSection.style.display = 'none';
+                        interacSection.style.display = 'block';
+                        methodInput.value = "Virement Interac";
+                        tabs[1].classList.add('active');
+                        btnIcon.innerText = "📲";
+                        // Enlever les attributs 'required' pour ne pas bloquer le formulaire
+                        cardSection.querySelectorAll('input').forEach(i => i.required = false);
+                    }
+                }
+
                 document.getElementById('paymentForm').addEventListener('submit', function(e) {
                     const btn = document.getElementById('submitBtn');
                     const text = document.getElementById('btnText');
                     const spinner = document.getElementById('spinner');
                     
-                    e.preventDefault(); // On bloque l'envoi direct pour montrer l'animation
+                    e.preventDefault(); 
                     
                     btn.disabled = true;
                     text.innerText = "Traitement en cours...";
@@ -77,7 +135,7 @@
                     btn.style.filter = "grayscale(0.5)";
                     
                     setTimeout(() => {
-                        this.submit(); // On envoie le formulaire après 1.5s
+                        this.submit(); 
                     }, 1500);
                 });
             </script>
@@ -244,5 +302,54 @@
 
     .btn-payment-simulate:active {
         transform: translateY(-1px);
+    }
+
+    /* New styles for payment methods */
+    .payment-methods-tabs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .method-tab {
+        flex: 1;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: #aaa;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .method-tab.active {
+        background: rgba(212, 175, 55, 0.2);
+        border-color: var(--primary-gold);
+        color: white;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+
+    .method-tab i {
+        margin-right: 5px;
+    }
+
+    .interac-instructions {
+        background: rgba(0,0,0,0.3);
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: left;
+        border: 1px dashed var(--primary-gold);
+    }
+
+    .interac-detail {
+        margin-bottom: 0.5rem;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .interac-detail strong {
+        color: var(--primary-gold);
+        width: 100px;
+        display: inline-block;
     }
 </style>

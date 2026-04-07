@@ -34,10 +34,19 @@
                             <span>Montant payé :</span>
                             <span class="fw-bold text-success h4 mb-0">@Model.Montant.ToString("C")</span>
                         </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Méthode de paiement :</span>
+                            <span class="fw-bold">@(ViewBag.MethodePaiement ?? "Non spécifiée")</span>
+                        </div>
                         <div class="d-flex justify-content-between py-2">
                             <span>Date :</span>
                             <span>@DateTime.Now.ToString("g")</span>
                         </div>
+                    </div>
+
+                    <div class="alert alert-success border-0 shadow-sm mb-4">
+                        <i class="fas fa-envelope me-2"></i> 
+                        Un message de confirmation a été envoyé à votre adresse courriel.
                     </div>
 
                     <div class="alert alert-info border-0 shadow-sm">

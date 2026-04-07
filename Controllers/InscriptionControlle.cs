@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using croupe_06_TournoiGolf.Models;
@@ -212,7 +212,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Simule le paiement (GOLF-37)
         [HttpPost]
-        public async Task<IActionResult> SimulerPaiement(int participantId)
+        public async Task<IActionResult> SimulerPaiement(int participantId, string methodePaiement)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             
@@ -228,6 +228,9 @@ namespace croupe_06_TournoiGolf.Controllers
             // Mettre à jour le statut
             participant.StatutInscription = "CONFIRMEE";
             await _context.SaveChangesAsync();
+
+            // Passer la méthode de paiement à la vue
+            ViewBag.MethodePaiement = methodePaiement;
 
             // Préparer les infos pour la confirmation
             ViewBag.NomTournoi = participant.Tournoi?.Nom;

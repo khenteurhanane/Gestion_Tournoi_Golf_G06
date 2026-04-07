@@ -1,4 +1,4 @@
-﻿<div class="confirmation-container">
+<div class="confirmation-container">
     <div class="confirmation-card">
         <div class="success-icon-wrapper">
             <div class="success-icon">✓</div>
@@ -17,8 +17,17 @@
             }
             
             <div class="detail-item">
-                <span class="label">Statut:</span>
+                <span class="label">Statut :</span>
                 <span class="value status-confirmed">Confirmé</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">Méthode :</span>
+                <span class="value">@(ViewBag.MethodePaiement ?? "Non spécifiée")</span>
+            </div>
+
+            <div class="alert alert-success mt-4 mb-0" style="font-size: 0.9rem; border: none; background: #f0fdf4; color: #166534;">
+                <i class="fas fa-envelope me-2"></i> Un message de confirmation a été envoyé à votre adresse courriel.
             </div>
 
             @if (ViewBag.NomEquipe != null)

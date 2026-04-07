@@ -134,7 +134,7 @@ namespace croupe_06_TournoiGolf.Controllers
         // Simule le traitement d'un paiement de commandite (US-11-T04)
         // Redirige vers la confirmation une fois le statut mis à jour en base
         [HttpPost]
-        public IActionResult SimulerPaiement(int commanditeId)
+        public IActionResult SimulerPaiement(int commanditeId, string methodePaiement)
         {
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
@@ -149,11 +149,11 @@ namespace croupe_06_TournoiGolf.Controllers
             commandite.Statut = "PAYEE";
             _context.SaveChanges();
 
-            return RedirectToAction("Confirmation", new { id = commandite.CommanditeId });
+            return RedirectToAction("Confirmation", new { id = commandite.CommanditeId, methodePaiement = methodePaiement });
         }
 
         // Affiche la confirmation de paiement
-        public IActionResult Confirmation(int id)
+        public IActionResult Confirmation(int id, string methodePaiement)
         {
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
@@ -164,6 +164,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Index");
             }
 
+            ViewBag.MethodePaiement = methodePaiement;
             return View(commandite);
         }
         // --- US-12 : Gestion des joueurs commanditaires ---
