@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"ai-refine-in-chat\":\"Refine in chat\"}"
-    ),
-    'en'
-);

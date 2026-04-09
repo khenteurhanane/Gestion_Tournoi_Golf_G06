@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"code-to-diagram-mermaid-diagram-block-name\":\"Mermaid diagram\",\"code-to-diagram-mermaid-diagram-title-unknown\":\"Diagram\"}"
-    ),
-    'en'
-);

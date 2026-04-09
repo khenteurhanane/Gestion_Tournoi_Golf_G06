@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"button-print\":\"Print\",\"button-share\":\"Share\",\"chart-conditional-formatting-v2\":\"Conditional formatting\",\"cloud-view-panel-views\":\"Views\",\"comment-title\":\"Comments\",\"menu-item-export\":\"Export\",\"menu-item-help\":\"Help\",\"menu-item-help-center\":\"Help Center\",\"storm-context-panel\":\"Context Panel\",\"storm-feature-find-account-and-preferences\":\"Account settings and preferences\",\"storm-feature-find-document-data-sync\":\"Document data sync\",\"storm-feature-find-duplicate-view\":\"Duplicate view\",\"storm-feature-find-duplicate-view-manual-layout\":\"Duplicate view with manual layout\",\"storm-feature-find-export-to-json-data\":\"Export to JSON data\",\"storm-feature-find-export-to-lucidchart\":\"Export to Lucidchart\",\"storm-feature-find-menu\":\"Menu\",\"storm-feature-find-minimap\":\"Mini map and navigation\",\"storm-feature-find-plus-menu\":\"Create new view\",\"storm-feature-find-zoom-controls-options\":\"Zoom options\",\"storm-resource-panel\":\"Resource Panel\",\"storm-rules-filter-trigger\":\"Filters\",\"storm-structure-panel-title-v2\":\"Structure\",\"undoredo-redo\":\"Redo\",\"undoredo-undo\":\"Undo\"}"
-    ),
-    'en'
-);

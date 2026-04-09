@@ -1,3 +1,0 @@
-'use strict';function Uchrn(a,b,c){a.sxo.set(b,c)}function UcAL(a){let b;return{className:a.className,c5d:UcP.key,fe:(c,d)=>(c=d.D3d(c))?{[Uc9n.at("semantic").key]:c.serialize()}:{},d2f:Ucquf("__Name__"),Mmi:{fillColor:(b=a.Cd)!=null?b:void 0,mc:c=>{let d;return a.mc(c,(d=a.Cd)!=null?d:UcFg,(e,f,g,h,k)=>UcXy(e,h,k,f,g))}}}}
-function UcBL(a){let b,c;return{className:a.className,c5d:UcP.key,fe:(d,e)=>(d=e.D3d(d))?{[Uc9n.at("semantic").key]:d.serialize()}:{},d2f:Ucquf("__Name__"),Mmi:{fillColor:(b=a.backgroundColor)!=null?b:void 0,borderColor:(c=a.borderColor)!=null?c:void 0}}};
-

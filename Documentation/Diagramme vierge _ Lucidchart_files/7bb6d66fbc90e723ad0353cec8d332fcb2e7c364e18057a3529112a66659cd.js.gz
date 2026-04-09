@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"person-shape-empty-name\":\"Blank\",\"profile-shape-bank-dropzone-text\":\"Drag and drop profile shapes here\",\"profile-shape-bank-name\":\"Profile shapes\",\"profile-shape-bank-placeholder-name\":\"Lucid User\",\"profile-shape-bank-plus-button-text\":\"Add profile\",\"profile-shape-bank-tool-name\":\"Profile shape bank\",\"toolbar-item-keywords-profile-shape-bank\":\"person people users user coworkers coworker faces face\"}"
-    ),
-    'en'
-);

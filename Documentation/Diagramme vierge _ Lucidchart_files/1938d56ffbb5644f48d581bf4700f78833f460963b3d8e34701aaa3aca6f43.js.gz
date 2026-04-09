@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"cloud-insights-aws-curated-data-tags-zero-state\":\"No tags present\",\"data-hub-premodel-filtering-filters-callout-include-untagged\":\"Include untagged resources\",\"data-hub-premodel-filtering-filters-callout-tags-table-header-v2\":\"Select all tags\",\"data-hub-premodel-filtering-filters-callout-title\":\"Tags\",\"datahub-document-filtering-summary-untagged\":\"untagged\",\"datahub-model-filtering-apply-to-all-accounts\":\"Apply to all accounts\",\"datahub-model-filtering-no-tags\":\"There are no tags listed in this account.\",\"datahub-model-filtering-not-seeing-resources-with-link\":\"Try <w0>updating the account</w0> from data hub.\",\"datahub-model-filtering-selection-applied-to-all-accounts\":\"Selection applied to all accounts\",\"datahub-model-filtering-summary-tags.one\":\"{count} tag\",\"datahub-model-filtering-summary-tags.other\":\"{count} tags\",\"storm-data-management-discard-filter-selections-text-aws\":\"You've made some changes to the account filters. Are you sure you want to discard without syncing your document?\",\"storm-data-management-tags-included.one\":\"{count} tag included\",\"storm-data-management-tags-included.other\":\"{count} tags included\",\"storm-rules-tags\":\"Tags\"}"
-    ),
-    'en'
-);

@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"storm-resource-panel-categories-analytics\":\"Analytics\",\"storm-resource-panel-categories-application-integration\":\"Application Integration\",\"storm-resource-panel-categories-compute\":\"Compute\",\"storm-resource-panel-categories-database\":\"Database\",\"storm-resource-panel-categories-integration\":\"Integration\",\"storm-resource-panel-categories-internet-of-things\":\"Internet of Things\",\"storm-resource-panel-categories-management\":\"Management\",\"storm-resource-panel-categories-management-group\":\"Management Group\",\"storm-resource-panel-categories-networking\":\"Networking\",\"storm-resource-panel-categories-networking-and-content-delivery\":\"Networking & Content Delivery\",\"storm-resource-panel-categories-organization\":\"Organization\",\"storm-resource-panel-categories-relationships\":\"Relationships\",\"storm-resource-panel-categories-security-and-management\":\"Security & Management\",\"storm-resource-panel-categories-storage\":\"Storage\",\"storm-resource-panel-categories-web-and-mobile\":\"Web & Mobile\"}"
-    ),
-    'en'
-);

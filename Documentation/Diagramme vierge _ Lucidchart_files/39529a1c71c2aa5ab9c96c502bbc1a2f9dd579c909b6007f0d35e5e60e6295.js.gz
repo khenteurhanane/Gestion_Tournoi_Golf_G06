@@ -1,2 +1,0 @@
-'use strict';Uc0C.set("action",class extends UccI{constructor(){const a=Ucy(Ucsxg);super("action.js");this.Eo="^ActionBlock$";UcCC.register(this.id,this.deps.ma,a);const b=UcBc(UcfC).map(c=>{if(a.Qfa[c].UV)return{className:UcCC.className,variant:c}}).filter(Ucg);this.xf.Pt(this.id,{ActionBlocks:{displayName:i18n.get("action-shape-library-name"),items:b}});this.xf.l$a(this.id,"actionShape",b)}});
-

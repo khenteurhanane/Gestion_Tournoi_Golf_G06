@@ -19,36 +19,22 @@
     <div class="col-md-5">
         <div class="card mb-4">
             <h3>Paramètres de l'équipe</h3>
-            @if (ViewBag.CurrentUserId == Model.CreeParUtilisateurId)
-            {
-                <form action="/Equipe/ModifierNom" method="post">
-                    <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
-                    <div class="form-group mb-3">
-                        <label>Nom de l'équipe</label>
-                        <input type="text" name="NomEquipe" value="@Model.NomEquipe" class="form-control" required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <label>Code Secret (Partagez ce code avec vos coéquipiers)</label>
-                        <input type="text" value="@Model.CodeSecret" class="form-control text-center font-weight-bold" readonly style="letter-spacing:3px; background:#f8f9fa;" />
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mb-2">Enregistrer les modifications</button>
-                </form>
-                <form action="/Equipe/SupprimerEquipe" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe ?');">
-                    <input type="hidden" name="id" value="@Model.EquipeId" />
-                    <button type="submit" class="btn btn-outline-danger w-100">Supprimer l'équipe</button>
-                </form>
-            }
-            else
-            {
+            <form action="/Equipe/ModifierNom" method="post">
+                <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
                 <div class="form-group mb-3">
                     <label>Nom de l'équipe</label>
-                    <input type="text" value="@Model.NomEquipe" class="form-control" readonly disabled />
+                    <input type="text" name="NomEquipe" value="@Model.NomEquipe" class="form-control" required />
                 </div>
                 <div class="form-group mb-3">
                     <label>Code Secret (Partagez ce code avec vos coéquipiers)</label>
                     <input type="text" value="@Model.CodeSecret" class="form-control text-center font-weight-bold" readonly style="letter-spacing:3px; background:#f8f9fa;" />
                 </div>
-            }
+                <button type="submit" class="btn btn-primary w-100 mb-2">Enregistrer les modifications</button>
+            </form>
+            <form action="/Equipe/SupprimerEquipe" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe ?');">
+                <input type="hidden" name="id" value="@Model.EquipeId" />
+                <button type="submit" class="btn btn-outline-danger w-100">Supprimer l'équipe</button>
+            </form>
         </div>
     </div>
 
@@ -75,25 +61,17 @@
                             <tr>
                                 <td>@m.Utilisateur?.Prenom @m.Utilisateur?.Nom</td>
                                 <td>
-                                    @if (m.UtilisateurId == Model.CreeParUtilisateurId)
+                                    @if (m.UtilisateurId != Model.CreeParUtilisateurId)
                                     {
-                                        <span class="badge badge-ouvert">Créateur</span>
-                                    }
-                                    else if (ViewBag.CurrentUserId == Model.CreeParUtilisateurId)
-                                    {
-                                        <div class="d-flex gap-2">
-                                            <form action="/Equipe/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce membre ?');">
-                                                <input type="hidden" name="participantId" value="@m.ParticipantId" />
-                                                <input type="hidden" name="equipeId" value="@Model.EquipeId" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
-                                            </form>
-                                            <a href="/Equipe/DeplacerMembre?participantId=@m.ParticipantId&equipeId=@Model.EquipeId"
-                                               class="btn btn-sm btn-outline-secondary">Déplacer</a>
-                                        </div>
+                                        <form action="/Equipe/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce membre ?');">
+                                            <input type="hidden" name="participantId" value="@m.ParticipantId" />
+                                            <input type="hidden" name="equipeId" value="@Model.EquipeId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
+                                        </form>
                                     }
                                     else
                                     {
-                                        <span class="badge badge-secondary">Membre</span>
+                                        <span class="badge badge-ouvert">Créateur</span>
                                     }
                                 </td>
                             </tr>

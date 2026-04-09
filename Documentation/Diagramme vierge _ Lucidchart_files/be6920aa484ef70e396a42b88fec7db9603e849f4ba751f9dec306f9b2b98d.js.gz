@@ -1,2 +1,0 @@
-'use strict';var UcSK={Oi:"AmazonEC2",a7:"AmazonECS",jma:"AmazonElastiCache",f8a:"AmazonEFS",jNa:"AmazonFSx",FHa:"AWSLambda",UD:"AmazonRDS",x0:"AmazonRedshift",g7:"AmazonRoute53",S3:"AmazonS3",asc:"AmazonSageMaker",gma:"AmazonCloudFront",H3b:"comprehend",wOc:"AmazonTextract",jPb:"AmazonCognito",F0a:"AWSQueueService",ENa:"AmazonSNS",$Cb:"AmazonStates",aOc:"AWSSecretsManager",sPb:"AWSGlue",mKe:"AWSTransfer",Jqc:"AmazonApiGateway",MOd:"AmazonAppStream",JFe:"AmazonES",qP:"AmazonDynamoDB"};
-

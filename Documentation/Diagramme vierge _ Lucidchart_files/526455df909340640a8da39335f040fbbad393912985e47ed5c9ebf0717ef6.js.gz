@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"people-shape-library-name\":\"People Shapes\"}"
-    ),
-    'en'
-);

@@ -112,11 +112,10 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la page de paiement pour une commandite (US-11-T04)
         public IActionResult Paiement(int id)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
                 .Include(c => c.Utilisateur)
-                .FirstOrDefault(c => c.CommanditeId == id && c.UtilisateurId == userId);
+                .FirstOrDefault(c => c.CommanditeId == id);
 
             if (commandite == null)
             {
@@ -137,10 +136,9 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult SimulerPaiement(int commanditeId, string methodePaiement)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
-                .FirstOrDefault(c => c.CommanditeId == commanditeId && c.UtilisateurId == userId);
+                .FirstOrDefault(c => c.CommanditeId == commanditeId);
 
             if (commandite == null)
             {
@@ -157,10 +155,9 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la confirmation de paiement
         public IActionResult Confirmation(int id, string methodePaiement)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
-                .FirstOrDefault(c => c.CommanditeId == id && c.UtilisateurId == userId);
+                .FirstOrDefault(c => c.CommanditeId == id);
 
             if (commandite == null)
             {
@@ -175,10 +172,9 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la liste des joueurs pour une commandite spécifique
         public IActionResult Joueurs(int id)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
-                .FirstOrDefault(c => c.CommanditeId == id && c.UtilisateurId == userId);
+                .FirstOrDefault(c => c.CommanditeId == id);
 
             if (commandite == null) return RedirectToAction("Index");
 
@@ -195,10 +191,9 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpGet]
         public IActionResult AjouterJoueur(int commanditeId)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
-                .FirstOrDefault(c => c.CommanditeId == commanditeId && c.UtilisateurId == userId);
+                .FirstOrDefault(c => c.CommanditeId == commanditeId);
 
             if (commandite == null) return RedirectToAction("Index");
 
@@ -236,10 +231,9 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult AjouterJoueur(int commanditeId, string prenom, string nom, string email)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
-                .FirstOrDefault(c => c.CommanditeId == commanditeId && c.UtilisateurId == userId);
+                .FirstOrDefault(c => c.CommanditeId == commanditeId);
 
             if (commandite == null) return RedirectToAction("Index");
 
@@ -292,11 +286,6 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult SupprimerJoueur(int participantId, int commanditeId)
         {
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
-            // Verify ownership of the commandite
-            bool hasAccess = _context.Commandites.Any(c => c.CommanditeId == commanditeId && c.UtilisateurId == userId);
-            if (!hasAccess) return RedirectToAction("Index");
-
             var participant = _context.Participants.Find(participantId);
             if (participant != null && participant.CommanditeId == commanditeId)
             {

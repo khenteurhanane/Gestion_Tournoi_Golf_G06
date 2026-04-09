@@ -1,2 +1,0 @@
-'use strict';Uc0C.set("people",class extends UccI{constructor(){const a=Ucy(UcbI),b=Ucy(Uc6Yi),c=Ucy(UcYYg),d=Ucy(Uc_i);super("people.js");this.Eo="(^PersonShape$)|(^ProfileShapeBankBlock$)";UcfM.register(this.id,a.ma);UcgM.register(this.id,a.ma,b,c,d);this.xf.Pt(this.id,{PeopleShapes:{displayName:i18n.get("people-shape-library-name"),items:[UcfM.className]}})}});
-

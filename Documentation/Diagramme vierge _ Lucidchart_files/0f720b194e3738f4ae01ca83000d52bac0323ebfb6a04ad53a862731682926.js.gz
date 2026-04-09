@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"avatar-image-alt-text\":\"User avatar image\",\"dynamic-matrix-assignee\":\"Assignee\",\"dynamic-matrix-estimate\":\"Estimate\",\"dynamic-matrix-issue-type\":\"Issue Type\",\"dynamic-matrix-parent\":\"Parent\",\"dynamic-matrix-priority\":\"Priority\",\"dynamic-matrix-project\":\"Project\",\"dynamic-matrix-reporter\":\"Reporter\",\"dynamic-matrix-sprint\":\"Sprint\",\"dynamic-matrix-status\":\"Status\",\"dynamic-matrix-team\":\"Team\",\"error-forbidden-no-permissions\":\"You do not have permission to view this page\",\"error-not-found\":\"The resource you were trying to access was not found.\",\"error-too-many-requests-v2\":\"You've made multiple requests and have hit your rate limit. Try again later.\",\"error-unauthorized-requires-login\":\"You need to <w0>login</w0> to view this page\",\"error-unknown-details\":\"Error\",\"shape-styles-style-default\":\"Style {style}\"}"
-    ),
-    'en'
-);

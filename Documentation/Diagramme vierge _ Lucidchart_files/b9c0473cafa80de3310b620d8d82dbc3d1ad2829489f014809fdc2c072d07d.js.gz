@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"action-shape-library-name\":\"Action Shapes\"}"
-    ),
-    'en'
-);

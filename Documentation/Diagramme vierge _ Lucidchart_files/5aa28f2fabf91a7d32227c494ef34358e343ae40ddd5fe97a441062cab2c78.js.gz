@@ -1,2 +1,0 @@
-'use strict';var UccL=Object.fromEntries([...Object.values(Ucp),...Object.values(UcMf)].map(a=>[a,a]));
-

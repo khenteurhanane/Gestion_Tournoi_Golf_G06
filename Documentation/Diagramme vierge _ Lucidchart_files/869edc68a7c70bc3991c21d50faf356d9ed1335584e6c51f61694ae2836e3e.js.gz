@@ -1,2 +1,0 @@
-'use strict';Uc0C.set("estimation",class extends UccI{constructor(){const a=Ucy(UcbI),b=Ucy(Uc6Yi),c=Ucy(UcYYg),d=Ucy(Uc_i),e=Ucy(UcfD);super("estimation.js");this.Eo="(^EstimationShape$)|(^(TshirtSizeShape|(StoryPoint|TshirtSize)ShapeBank)Block$)";UcBAo.register(this.id,a.ma);UcAAo.register(this.id,a.ma);UcNAo.register(this.id,a.ma,b,c,d);UcKAo.register(this.id,a.ma,b,c,d);e.q7(UcT$k)}});
-

@@ -1,2 +1,0 @@
-'use strict';function UcTK(a){a.S0a=void 0;a.Nfa=[]}function Ucd0m(a){let b;return{className:a.className,$d:a.$d,Uc:(b=a.Uc)!=null?b:{w:120,h:120},Cd:UcMg,mc:(c,d,e)=>{c=e(c,a.SGd,1,0,0);c=(new Uc5Ad(a.icon)).size(c).moveBy(c);a.gNd&&c.fill(d instanceof Ucq?d:UcMg);return c.gE()}}};
-

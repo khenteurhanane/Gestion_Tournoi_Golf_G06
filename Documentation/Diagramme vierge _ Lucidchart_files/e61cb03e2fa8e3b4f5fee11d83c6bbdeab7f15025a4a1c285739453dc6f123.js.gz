@@ -1,6 +1,0 @@
-i18n.setData(
-    JSON.parse(
-        "{\"ai-idea-generator-generating-label-v2\":\"Generating ideas...\",\"ai-idea-generator-generating-longer-loading-v2\":\"Almost done! Brainstorming ideas... It's taking a bit longer, but will finish up soon.\",\"ai-loading-sorting-ideas-longer-loading-v2\":\"Almost done! Grouping ideas... This could take {estimatedSeconds} seconds.\",\"ai-loading-sorting-ideas-v2\":\"Sorting ideas...\",\"ai-summary-summarizing-longer-loading-v2\":\"Almost done! Writing a summary... It's taking a bit longer, but will finish up soon.\",\"ai-summary-summarizing-v2\":\"Summarizing content...\",\"button-cancel\":\"Cancel\"}"
-    ),
-    'en'
-);
