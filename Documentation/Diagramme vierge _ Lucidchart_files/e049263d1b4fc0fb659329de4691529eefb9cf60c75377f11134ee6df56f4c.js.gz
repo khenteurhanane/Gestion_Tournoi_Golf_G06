@@ -1,0 +1,6 @@
+i18n.setData(
+    JSON.parse(
+        "{\"cloud-view-tab-layout-show-where\":\"Show in {location} where {relationship}\",\"cloud-view-tab-layout-show-where-on-boundary\":\"Show on boundary of {location} where {relationship}\",\"cloudinsights-relationship-adjective-attached\":\"attached\",\"cloudinsights-relationship-adjective-connected\":\"connected\",\"cloudinsights-relationship-adjective-defined\":\"defined\",\"cloudinsights-relationship-adjective-running\":\"running\"}"
+    ),
+    'en'
+);

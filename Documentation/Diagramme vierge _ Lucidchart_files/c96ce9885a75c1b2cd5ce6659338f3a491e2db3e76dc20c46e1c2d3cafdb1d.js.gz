@@ -1,0 +1,2 @@
+'use strict';var UcJ6m=class{constructor(){this.registry=Ucy(Ucapk)}initialize(){this.registry.Wyd(this.provider)||this.registry.register(this.provider,this.V3j())}};
+

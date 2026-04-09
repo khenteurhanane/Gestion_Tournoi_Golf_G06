@@ -1,0 +1,3 @@
+'use strict';var Uc1Gn=class{constructor(){this.ae=UcJ(Ucor);this.ba={kUb:i18n.get("ai-disclaimer-v2"),rq:i18n.get("ai-learn-more-link-v2")};this.links={fsg:this.ae.uj(UcyZi)}}};Uc1Gn.za=[{type:Uc3,args:[{selector:"lucid-ai-disclaimer",templateUrl:"./aidisclaimer.component.html",Ma:"./aidisclaimer.component.css",changeDetection:UcS.OnPush,imports:[Uc7,Ucdpn]}]}];Uc1Gn.wa=function(a){return new (a||Uc1Gn)};
+Uc1Gn.Ka=UcU({type:Uc1Gn,Ga:[["lucid-ai-disclaimer"]],Ja:1,Ia:3,La:[[3,"disclaimerText","linkText","linkUrl"]],template:function(a,b){a&1&&Uc_(0,"lucid-disclaimer",0);a&2&&UcX("disclaimerText",b.ba.kUb)("linkText",b.ba.rq)("linkUrl",b.links.fsg)},dependencies:[Uc7,Ucdpn],Hd:2,changeDetection:0});
+

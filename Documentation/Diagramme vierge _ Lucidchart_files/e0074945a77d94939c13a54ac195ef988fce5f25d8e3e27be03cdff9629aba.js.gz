@@ -1,0 +1,2 @@
+'use strict';Uc0C.set("mermaiddiagramviz",class extends UccI{constructor(){const a=Ucy(UcbI);super("mermaiddiagramviz.js");this.Eo="^MermaidDiagram";UcVco.register(this.id,a.ma);UcUco.register(this.id,a.ma);Uc4co.register(this.id,a.G3)}});
+

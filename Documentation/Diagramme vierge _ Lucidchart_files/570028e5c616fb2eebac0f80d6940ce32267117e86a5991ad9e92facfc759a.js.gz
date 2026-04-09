@@ -1,0 +1,6 @@
+i18n.setData(
+    JSON.parse(
+        "{\"button-cancel\":\"Cancel\",\"button-close\":\"Close\",\"button-save\":\"Save\",\"contextual-data-panel-advanced-options\":\"Advanced options\",\"drag-aria-label\":\"Drag\",\"estimation-shape-bank-onboarding-description\":\"Drag estimation stickers onto a card to apply an estimate.\\n\\nDrag estimation stickers below a card to reach consensus as a team on estimates.\",\"estimation-shape-bank-onboarding-header\":\"Team estimation\",\"shape-bank-story-point-add-item\":\"Add item\",\"shape-bank-story-point-edit-story-points\":\"Edit story points\",\"shape-bank-story-point-estimation-name\":\"Story points\",\"spark-control-tag-color-label\":\"Tag color\",\"spark-control-trash\":\"Delete\",\"team-estimation-tooltip-description\":\"Drag estimation stickers below a card to reach consensus as a team on estimates.\\n\",\"team-estimation-tooltip-title\":\"Team estimation\"}"
+    ),
+    'en'
+);
