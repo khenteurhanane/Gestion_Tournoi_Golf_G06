@@ -112,12 +112,13 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la page de paiement pour une commandite (US-11-T04)
         public IActionResult Paiement(int id)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
                 .Include(c => c.Utilisateur)
                 .FirstOrDefault(c => c.CommanditeId == id);
 
-            if (commandite == null)
+            if (commandite == null || commandite.UtilisateurId != userId)
             {
                 return RedirectToAction("Index");
             }
@@ -132,20 +133,19 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         // Simule le traitement d'un paiement de commandite (US-11-T04)
-        // Redirige vers la confirmation une fois le statut mis à jour en base
         [HttpPost]
         public IActionResult SimulerPaiement(int commanditeId, string methodePaiement)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
                 .FirstOrDefault(c => c.CommanditeId == commanditeId);
 
-            if (commandite == null)
+            if (commandite == null || commandite.UtilisateurId != userId)
             {
                 return RedirectToAction("Index");
             }
 
-            // Mettre à jour le statut
             commandite.Statut = "PAYEE";
             _context.SaveChanges();
 
@@ -172,11 +172,12 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la liste des joueurs pour une commandite spécifique
         public IActionResult Joueurs(int id)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
                 .FirstOrDefault(c => c.CommanditeId == id);
 
-            if (commandite == null) return RedirectToAction("Index");
+            if (commandite == null || commandite.UtilisateurId != userId) return RedirectToAction("Index");
 
             var joueurs = _context.Participants
                 .Where(p => p.CommanditeId == id)
@@ -191,11 +192,12 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpGet]
         public IActionResult AjouterJoueur(int commanditeId)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
                 .FirstOrDefault(c => c.CommanditeId == commanditeId);
 
-            if (commandite == null) return RedirectToAction("Index");
+            if (commandite == null || commandite.UtilisateurId != userId) return RedirectToAction("Index");
 
             // Vérifier si la commandite est payée
             if (commandite.Statut != "PAYEE")
@@ -204,7 +206,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Paiement", new { id = commanditeId });
             }
 
-            // Vérifier la limite du forfait de commandite
             int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
             int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
 
@@ -214,7 +215,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 
-            // Vérifier la capacité globale du tournoi (US-12-T02)
             int totalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
             if (totalInscrits >= commandite.Tournoi.PlacesParticipantsMax)
             {
@@ -231,20 +231,19 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult AjouterJoueur(int commanditeId, string prenom, string nom, string email)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var commandite = _context.Commandites
                 .Include(c => c.Tournoi)
                 .FirstOrDefault(c => c.CommanditeId == commanditeId);
 
-            if (commandite == null) return RedirectToAction("Index");
+            if (commandite == null || commandite.UtilisateurId != userId) return RedirectToAction("Index");
 
-            // Vérifier si la commandite est payée
             if (commandite.Statut != "PAYEE")
             {
                 TempData["Error"] = "Vous devez payer votre commandite avant d'ajouter des joueurs.";
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 
-            // Vérifier le nombre de joueurs selon le type de commandite
             int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
             int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
 
@@ -254,7 +253,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }
 
-            // Vérifier la capacité globale du tournoi (US-12-T02)
             int totalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
             if (totalInscrits >= commandite.Tournoi.PlacesParticipantsMax)
             {
@@ -271,7 +269,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 Email = email,
                 TypeParticipant = "commandite",
                 StatutInscription = "CONFIRMEE",
-                MontantPaye = 0, // Inclus dans la commandite
+                MontantPaye = 0,
                 CreeLe = DateTime.Now
             };
 

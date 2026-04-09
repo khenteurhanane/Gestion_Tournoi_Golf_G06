@@ -197,12 +197,13 @@ namespace croupe_06_TournoiGolf.Controllers
         // Affiche la page de paiement
         public IActionResult Paiement(int participantId)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var participant = _context.Participants
                 .Include(p => p.Tournoi)
                 .Include(p => p.Utilisateur)
                 .FirstOrDefault(p => p.ParticipantId == participantId);
 
-            if (participant == null)
+            if (participant == null || participant.UtilisateurId != userId)
             {
                 return RedirectToAction("Index", "Tournoi");
             }
