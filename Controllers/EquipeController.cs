@@ -197,7 +197,7 @@ namespace croupe_06_TournoiGolf.Controllers
         }
         // --- Gestion de l'équipe par le créateur ---
 
-        // Affiche la page de gestion pour le créateur
+        // Affiche la page de gestion d'équipe
         public IActionResult Gestion(int id)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -210,9 +210,10 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (equipe == null) return RedirectToAction("Index");
 
-            // Vérifier que l'utilisateur est bien le créateur ou un admin
+            // Vérifier que l'utilisateur fait partie de l'équipe ou est admin
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (equipe.CreeParUtilisateurId != userId && role != "ADMIN")
+            bool estMembre = _context.Participants.Any(p => p.EquipeId == id && p.UtilisateurId == userId);
+            if (!estMembre && equipe.CreeParUtilisateurId != userId && role != "ADMIN")
             {
                 return RedirectToAction("Index");
             }
@@ -223,6 +224,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 .ToList();
 
             ViewBag.Membres = membres;
+            ViewBag.CurrentUserId = userId;
             return View(equipe);
         }
 
