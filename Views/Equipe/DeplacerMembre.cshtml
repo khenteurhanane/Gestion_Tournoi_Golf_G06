@@ -1,0 +1,45 @@
+@model croupe_06_TournoiGolf.Models.Participant
+@{
+    ViewData["Title"] = "Déplacer un membre";
+    var autresEquipes = (List<croupe_06_TournoiGolf.Models.Equipe>)ViewBag.AutresEquipes;
+    var equipeActuelle = (croupe_06_TournoiGolf.Models.Equipe)ViewBag.EquipeActuelle;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-exchange-alt"></i> Déplacer un membre</h1>
+    <a href="/Equipe/Gestion/@equipeActuelle.EquipeId" class="btn btn-secondary">Retour à la gestion</a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card">
+    <h3>Déplacer : @Model.Utilisateur?.Prenom @Model.Utilisateur?.Nom</h3>
+    <p>Équipe actuelle : <strong>@equipeActuelle.NomEquipe</strong></p>
+
+    @if (autresEquipes.Count == 0)
+    {
+        <div class="alert alert-warning">Aucune autre équipe disponible avec de la place dans ce tournoi.</div>
+    }
+    else
+    {
+        <form action="/Equipe/DeplacerMembre" method="post">
+            <input type="hidden" name="participantId" value="@Model.ParticipantId" />
+            <input type="hidden" name="equipeSourceId" value="@equipeActuelle.EquipeId" />
+            <div class="form-group mb-3">
+                <label>Choisir l'équipe de destination</label>
+                <select name="equipeCibleId" class="form-control" required>
+                    <option value="">-- Sélectionner une équipe --</option>
+                    @foreach (var e in autresEquipes)
+                    {
+                        var nbMembres = ViewBag.AutresEquipes != null ? 0 : 0;
+                        <option value="@e.EquipeId">@e.NomEquipe</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Confirmer le déplacement</button>
+        </form>
+    }
+</div>

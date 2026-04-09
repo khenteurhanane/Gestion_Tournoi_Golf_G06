@@ -285,5 +285,64 @@ namespace croupe_06_TournoiGolf.Controllers
 
             return RedirectToAction("Gestion", new { id = equipeId });
         }
+
+        // Affiche le formulaire pour deplacer un membre vers une autre equipe
+        [HttpGet]
+        public IActionResult DeplacerMembre(int participantId, int equipeId)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var equipe = _context.Equipes.Include(e => e.Tournoi).FirstOrDefault(e => e.EquipeId == equipeId);
+
+            if (equipe == null || equipe.CreeParUtilisateurId != userId)
+                return RedirectToAction("Index");
+
+            var participant = _context.Participants
+                .Include(p => p.Utilisateur)
+                .FirstOrDefault(p => p.ParticipantId == participantId && p.EquipeId == equipeId);
+
+            if (participant == null) return RedirectToAction("Gestion", new { id = equipeId });
+
+            // Lister les autres equipes du meme tournoi qui ont encore de la place
+            var autresEquipes = _context.Equipes
+                .Where(e => e.TournoiId == equipe.TournoiId && e.EquipeId != equipeId)
+                .ToList()
+                .Where(e => _context.Participants.Count(p => p.EquipeId == e.EquipeId) < e.NbJoueursMax)
+                .ToList();
+
+            ViewBag.AutresEquipes = autresEquipes;
+            ViewBag.EquipeActuelle = equipe;
+            return View(participant);
+        }
+
+        // Traite le deplacement d'un membre vers une autre equipe
+        [HttpPost]
+        public IActionResult DeplacerMembre(int participantId, int equipeSourceId, int equipeCibleId)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var equipe = _context.Equipes.Find(equipeSourceId);
+
+            if (equipe == null || equipe.CreeParUtilisateurId != userId)
+                return RedirectToAction("Index");
+
+            var participant = _context.Participants.Find(participantId);
+            if (participant == null || participant.EquipeId != equipeSourceId)
+                return RedirectToAction("Gestion", new { id = equipeSourceId });
+
+            // Verifier que l'equipe cible a encore de la place
+            var equipeCible = _context.Equipes.Find(equipeCibleId);
+            if (equipeCible == null) return RedirectToAction("Gestion", new { id = equipeSourceId });
+
+            int nbMembres = _context.Participants.Count(p => p.EquipeId == equipeCibleId);
+            if (nbMembres >= equipeCible.NbJoueursMax)
+            {
+                TempData["Error"] = "L'equipe selectionnee est deja complete.";
+                return RedirectToAction("DeplacerMembre", new { participantId, equipeId = equipeSourceId });
+            }
+
+            participant.EquipeId = equipeCibleId;
+            _context.SaveChanges();
+            TempData["Success"] = $"Le membre a ete deplace vers l'equipe '{equipeCible.NomEquipe}'.";
+            return RedirectToAction("Gestion", new { id = equipeSourceId });
+        }
     }
 }
