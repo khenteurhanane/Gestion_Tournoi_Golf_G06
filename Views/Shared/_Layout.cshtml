@@ -11,12 +11,15 @@
 </head>
 <body class="dashboard-body">
     @using Microsoft.AspNetCore.Http
+    @using Microsoft.AspNetCore.Mvc.Localization
+    @inject IViewLocalizer Localizer
     @inject IHttpContextAccessor HttpContextAccessor
     @{
         bool estConnecte = HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true";
         string role = HttpContextAccessor.HttpContext?.Session.GetString("UserRole") ?? "";
         string prenom = HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom") ?? "";
         string nom = HttpContextAccessor.HttpContext?.Session.GetString("UserNom") ?? "";
+        string currentLang = HttpContextAccessor.HttpContext?.Session.GetString("Lang") ?? "FR";
     }
 
     <div class="app-container">
@@ -31,13 +34,13 @@
 
             <nav class="sidebar-nav">
                 <a href="/" class="@(ViewData["Title"]?.ToString() == "Accueil" ? "active" : "")">
-                    <i class="fas fa-home"></i> <span>Accueil</span>
+                    <i class="fas fa-home"></i> <span>@(currentLang == "EN" ? "Home" : "Accueil")</span>
                 </a>
                 <a href="/Tournoi/Index" class="@(ViewData["Title"]?.ToString() == "Liste des Tournois" ? "active" : "")">
-                    <i class="fas fa-calendar-alt"></i> <span>Tournois</span>
+                    <i class="fas fa-calendar-alt"></i> <span>@(currentLang == "EN" ? "Tournaments" : "Tournois")</span>
                 </a>
                 <a href="/Sponsor/Index" class="@(ViewData["Title"]?.ToString() == "Paliers de Commandite" ? "active" : "")">
-                    <i class="fas fa-star text-warning"></i> <span>Commanditer</span>
+                    <i class="fas fa-star text-warning"></i> <span>@(currentLang == "EN" ? "Become a Sponsor" : "Commanditer")</span>
                 </a>
                 
                 @if (estConnecte)
@@ -105,6 +108,15 @@
                     <h2 class="page-title">@ViewData["Title"]</h2>
                 </div>
                 <div class="topbar-right">
+                    <div class="lang-switcher me-4">
+                        @{
+                            string targetLang = currentLang == "FR" ? "EN" : "FR";
+                        }
+                        <a href="/Home/SetLanguage?lang=@targetLang" class="lang-btn">
+                            <img src="https://flagcdn.com/w20/ca.png" srcset="https://flagcdn.com/w40/ca.png 2x" width="20" alt="Canada">
+                            <span class="ms-2">@currentLang</span>
+                        </a>
+                    </div>
                     @if (estConnecte)
                     {
                         <div class="user-profile">
@@ -313,6 +325,24 @@
             font-weight: 800;
             font-size: 1.1rem;
             box-shadow: 0 2px 8px rgba(26,60,42,0.3);
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            border-bottom: 2px solid #2d6a2e; /* Like in the screenshot underline */
+        }
+        
+        .lang-btn:hover {
+            background: rgba(45, 106, 46, 0.05);
+            color: var(--primary-green);
         }
 
         .content-wrapper {

@@ -46,27 +46,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 }
             }
 
-            // Fallback: vérification admin de test (pour développement)
-            if (email == "admin@test.com" && motDePasse == "1234")
-            {
-                // On cherche l'admin dans la DB s'il existe, sinon on simule
-                var admin = _context.Utilisateurs.FirstOrDefault(u => u.Email == "admin@test.com");
-                if (admin == null)
-                {
-                    // Simulation temporaire si non présent en DB
-                    HttpContext.Session.SetInt32("UserId", 999);
-                    HttpContext.Session.SetString("IsLoggedIn", "true");
-                    HttpContext.Session.SetString("UserRole", "ADMIN");
-                    HttpContext.Session.SetString("UserPrenom", "Admin");
-                    HttpContext.Session.SetString("UserNom", "Test");
-                }
-                else
-                {
-                    SetUserSession(admin);
-                }
-                
-                return RedirectToAction("Index", "Admin");
-            }
 
             ViewBag.Error = "Email ou mot de passe incorrect.";
             return View();
@@ -229,14 +208,17 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
-            // Simulation d'envoi d'email : on redirige directement vers la page de réinitialisation
-            // En production, on enverrait un email avec un lien contenant un token unique.
-            return RedirectToAction("ResetPassword", new { email = model.Email });
+            // Simulation d'envoi d'email : on redirige vers une page de confirmation
+            // Pour le projet G06, on va mettre l'email en session temporairement pour simuler le lien reçu par email
+            HttpContext.Session.SetString("ResetEmail", model.Email);
+            TempData["Success"] = "Un lien de réinitialisation a été simulé. Vous pouvez maintenant réinitialiser votre mot de passe.";
+            return RedirectToAction("ResetPassword");
         }
 
         [HttpGet]
-        public IActionResult ResetPassword(string email)
+        public IActionResult ResetPassword()
         {
+            var email = HttpContext.Session.GetString("ResetEmail");
             if (string.IsNullOrEmpty(email))
             {
                 return RedirectToAction("ForgotPassword");
@@ -254,20 +236,27 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
-            // Retrouver l'utilisateur
+            // Vérifier que c'est bien l'email en cours de réinitialisation
+            var resetEmail = HttpContext.Session.GetString("ResetEmail");
+            if (resetEmail != model.Email)
+            {
+                return RedirectToAction("Login");
+            }
+
             var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateur == null)
             {
-                ModelState.AddModelError("Email", "Utilisateur introuvable.");
-                return View(model);
+                return RedirectToAction("Login");
             }
 
-            // Mettre à jour le mot de passe
             utilisateur.MotDePasseHash = _passwordHasher.HashPassword(model.NewPassword);
             _context.SaveChanges();
 
-            ViewBag.Message = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
-            return View("Login");
+            // Nettoyer la session
+            HttpContext.Session.Remove("ResetEmail");
+
+            TempData["Success"] = "Votre mot de passe a été réinitialisé avec succès.";
+            return RedirectToAction("Login");
         }
 
         // --- Mon Profil ---

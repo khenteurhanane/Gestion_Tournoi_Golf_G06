@@ -184,11 +184,7 @@ EXEC sp_AjouterTournoi
     @NbEquipesMax = 20,
     @PlacesParticipantsMax = 80;
 
--- Ajouter un compte administrateur de test
--- Email: admin@test.com / Mot de passe: 1234
-DELETE FROM Utilisateurs WHERE Email = 'admin@test.com';
-INSERT INTO Utilisateurs (Email, MotDePasseHash, Role, Prenom, Nom, Telephone)
-VALUES ('admin@test.com', 'A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=', 'ADMIN', 'Admin', 'Test', '000-000-0000');
+
 
 -- Supprimer utilisateur test s'il existe
 DELETE FROM Utilisateurs WHERE Email = 'participant@lacite.ca';

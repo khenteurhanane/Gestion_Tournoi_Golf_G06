@@ -43,6 +43,26 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
+        public IActionResult SetLanguage(string lang)
+        {
+            string culture = lang.ToLower() == "en" ? "en" : "fr";
+            
+            // Définir le cookie de culture standard (reconnu par le middleware)
+            Response.Cookies.Append(
+                Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.DefaultCookieName,
+                Microsoft.AspNetCore.Localization.RequestCulture.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
+                new Microsoft.AspNetCore.Http.CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+            );
+
+            // Optionnel : Garder la session pour la compatibilité avec vos anciennes vues
+            HttpContext.Session.SetString("Lang", culture.ToUpper());
+            
+            // Retourner à la page précédente
+            string? returnUrl = Request.Headers["Referer"].ToString();
+            if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index");
+            return Redirect(returnUrl);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
