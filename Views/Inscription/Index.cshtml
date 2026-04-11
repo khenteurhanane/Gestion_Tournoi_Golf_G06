@@ -1,4 +1,4 @@
-﻿@model croupe_06_TournoiGolf.Models.ViewModels.InscriptionViewModel
+@model croupe_06_TournoiGolf.Models.ViewModels.InscriptionViewModel
 
 @{
     ViewData["Title"] = "Inscription au tournoi";
@@ -13,6 +13,8 @@
             <p class="sub">Date : @ViewBag.DateTournoi | Lieu : @ViewBag.LieuTournoi</p>
 
             <form action="/Inscription/Index" method="post">
+                @Html.AntiForgeryToken()
+
                 
                 <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
 

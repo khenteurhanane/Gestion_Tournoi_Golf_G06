@@ -65,7 +65,9 @@
                     @if (user.Role != "ADMIN")
                     {
                         <form action="/Admin/SupprimerUtilisateur" method="post" style="display:inline;"
-                              onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
+                            @Html.AntiForgeryToken()
+
                             <input type="hidden" name="id" value="@user.UtilisateurId" />
                             <button type="submit" class="btn btn-secondary" style="background: var(--danger); color: white; border-color: var(--danger);">
                                 Supprimer

@@ -25,7 +25,11 @@ builder.Services.AddHttpContextAccessor();
 
 // Support multilingue (US-Localization)
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-builder.Services.AddControllersWithViews()
+builder.Services.AddControllersWithViews(options =>
+{
+    // Protection Anti-CSRF globale sur tous les POST (GOLF-132)
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+})
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 

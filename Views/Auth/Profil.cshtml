@@ -17,6 +17,8 @@
             }
 
             <form action="/Auth/Profil" method="post">
+                @Html.AntiForgeryToken()
+
 
                 <div class="form-group">
                     <label>Adresse courriel</label>

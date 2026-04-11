@@ -12,6 +12,8 @@
             <p class="sub">Inscris-toi pour participer aux tournois de golf.</p>
 
             <form action="/Auth/Register" method="post">
+                @Html.AntiForgeryToken()
+
 
                 @if (ViewBag.Error != null)
                 {
