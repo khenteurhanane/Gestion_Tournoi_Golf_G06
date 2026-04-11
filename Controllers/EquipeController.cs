@@ -82,18 +82,38 @@ namespace croupe_06_TournoiGolf.Controllers
             model.CreeLe = DateTime.Now;
             model.NbJoueursMax = 4; // GOLF-44 : max 4 joueurs
 
-            _context.Equipes.Add(model);
-            _context.SaveChanges();
-
-            // Ajouter automatiquement le créateur à l'équipe en tant que participant (si possible)
-            var participant = _context.Participants.FirstOrDefault(p => p.UtilisateurId == userId && p.TournoiId == model.TournoiId);
-            if (participant != null)
+            // Gestion de la Race Condition (GOLF-133)
+            using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+            try
             {
-                participant.EquipeId = model.EquipeId;
-                _context.SaveChanges();
-            }
+                // Vérifier s'il reste des places d'équipes
+                int nbEquipes = _context.Equipes.Count(e => e.TournoiId == model.TournoiId);
+                if (nbEquipes >= tournoi.NbEquipesMax)
+                {
+                    ViewBag.Error = "Navré, la limite d'équipes pour ce tournoi est atteinte.";
+                    return View(model);
+                }
 
-            return RedirectToAction("Confirmation", new { equipeId = model.EquipeId });
+                _context.Equipes.Add(model);
+                _context.SaveChanges();
+
+                // Ajouter automatiquement le créateur à l'équipe en tant que participant (si possible)
+                var participant = _context.Participants.FirstOrDefault(p => p.UtilisateurId == userId && p.TournoiId == model.TournoiId);
+                if (participant != null)
+                {
+                    participant.EquipeId = model.EquipeId;
+                    _context.SaveChanges();
+                }
+
+                transaction.Commit();
+                return RedirectToAction("Confirmation", new { equipeId = model.EquipeId });
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                ViewBag.Error = "Erreur lors de la création de l'équipe. Veuillez réessayer.";
+                return View(model);
+            }
         }
 
         // Page de confirmation après création
@@ -179,21 +199,34 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View();
             }
 
-            // Vérifier si l'équipe est pleine (GOLF-48)
-            int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
-            if (nbMembres >= equipe.NbJoueursMax)
+            // Gestion de la Race Condition (GOLF-133)
+            using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+            try
             {
-                ViewBag.Error = "Cette équipe est déjà complète (max 4 joueurs).";
+                // Vérifier si l'équipe est pleine (à l'intérieur de la transaction)
+                int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
+                if (nbMembres >= equipe.NbJoueursMax)
+                {
+                    ViewBag.Error = "Navré, cette équipe vient d'être complétée.";
+                    ViewBag.ParticipantId = participantId;
+                    return View();
+                }
+
+                // Rejoindre l'équipe (GOLF-49)
+                participant.EquipeId = equipe.EquipeId;
+                _context.SaveChanges();
+                transaction.Commit();
+
+                TempData["Success"] = $"Vous avez rejoint l'équipe '{equipe.NomEquipe}' avec succès !";
+                return RedirectToAction("MesInscriptions", "Auth");
+            }
+            catch
+            {
+                transaction.Rollback();
+                ViewBag.Error = "Erreur lors de l'adhésion à l'équipe. Veuillez réessayer.";
                 ViewBag.ParticipantId = participantId;
                 return View();
             }
-
-            // Rejoindre l'équipe (GOLF-49)
-            participant.EquipeId = equipe.EquipeId;
-            _context.SaveChanges();
-
-            TempData["Success"] = $"Vous avez rejoint l'équipe '{equipe.NomEquipe}' avec succès !";
-            return RedirectToAction("MesInscriptions", "Auth");
         }
         // --- Gestion de l'équipe par le créateur ---
 

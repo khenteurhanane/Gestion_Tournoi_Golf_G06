@@ -105,27 +105,34 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View("InscriptionsFermees");
             }
 
-            // Vérifier s'il reste des places
-            int nbInscrits = _context.Participants.Count(p => p.TournoiId == model.TournoiId.Value);
-            if (nbInscrits >= tournoi.PlacesParticipantsMax)
+            // Gestion de la Race Condition (GOLF-133) : On utilise une transaction
+            using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+            try
             {
-                ViewBag.Message = "Ce tournoi est complet.";
-                return View("InscriptionsFermees");
-            }
-
-            // Vérifier la double inscription
-            var dejaInscrit = _context.Participants
-                .FirstOrDefault(p => p.TournoiId == model.TournoiId.Value && p.UtilisateurId == userId);
-
-            if (dejaInscrit != null)
-            {
-                if (dejaInscrit.StatutInscription == "EN_ATTENTE_PAIEMENT")
+                // Re-vérifier s'il reste des places (à l'intérieur de la transaction)
+                int nbInscrits = _context.Participants.Count(p => p.TournoiId == model.TournoiId.Value);
+                if (nbInscrits >= tournoi.PlacesParticipantsMax)
                 {
-                    return RedirectToAction("Paiement", new { participantId = dejaInscrit.ParticipantId });
+                    ViewBag.Message = "Navré, le tournoi vient de se remplir.";
+                    return View("InscriptionsFermees");
                 }
-                ViewBag.Error = "Vous êtes déjà inscrit à ce tournoi.";
-                return View("DejaInscrit");
-            }
+
+                // Vérifier la double inscription
+                var dejaInscrit = _context.Participants
+                    .FirstOrDefault(p => p.TournoiId == model.TournoiId.Value && p.UtilisateurId == userId);
+
+                if (dejaInscrit != null)
+                {
+                    if (dejaInscrit.StatutInscription == "EN_ATTENTE_PAIEMENT")
+                    {
+                        return RedirectToAction("Paiement", new { participantId = dejaInscrit.ParticipantId });
+                    }
+                    ViewBag.Error = "Vous êtes déjà inscrit à ce tournoi.";
+                    return View("DejaInscrit");
+                }
+
+                // ... reste du code ...
+
 
             // Calculer le montant selon le type de participant
             decimal montant = (model.TypeParticipant == "retraite") ? 50.00m : 60.00m;
@@ -188,10 +195,18 @@ namespace croupe_06_TournoiGolf.Controllers
                 participant.EquipeId = equipe.EquipeId;
             }
 
-            _context.Participants.Add(participant);
-            _context.SaveChanges();
+                _context.Participants.Add(participant);
+                _context.SaveChanges();
 
-            return RedirectToAction("Paiement", new { participantId = participant.ParticipantId });
+                transaction.Commit();
+                return RedirectToAction("Paiement", new { participantId = participant.ParticipantId });
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                ViewBag.Error = "Une erreur est survenue lors de l'inscription. Veuillez réessayer.";
+                return RedirectToAction("Index", new { tournoiId = model.TournoiId });
+            }
         }
 
         // Affiche la page de paiement

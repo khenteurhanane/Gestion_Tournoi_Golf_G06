@@ -30,6 +30,11 @@ namespace croupe_06_TournoiGolf.Models
         [Column("PlacesParticipantsMax")]
         public int PlacesParticipantsMax { get; set; } = 100;
 
+        // Nombre maximum d'équipes (GOLF-133)
+        [Range(1, 40, ErrorMessage = "Entre 1 et 40 équipes")]
+        [Column("NbEquipesMax")]
+        public int NbEquipesMax { get; set; } = 20;
+
         // Date limite d'inscription (optionnelle)
         [DataType(DataType.Date)]
         public DateTime? DateLimiteInscription { get; set; }
