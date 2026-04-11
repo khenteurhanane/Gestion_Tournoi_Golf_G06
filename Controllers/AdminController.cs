@@ -80,12 +80,12 @@ namespace croupe_06_TournoiGolf.Controllers
 
             var utilisateurs = _context.Utilisateurs.OrderBy(u => u.Nom).ToList();
 
-            // Compter le nombre d'inscriptions par utilisateur
+            // Compter le nombre d'inscriptions par utilisateur (Optimisé GOLF-134)
             var nbInscriptions = _context.Participants
                 .Where(p => p.UtilisateurId != null)
-                .AsEnumerable()
-                .GroupBy(p => p.UtilisateurId!.Value)
-                .ToDictionary(g => g.Key, g => g.Count());
+                .GroupBy(p => p.UtilisateurId)
+                .Select(g => new { UserId = g.Key, Count = g.Count() })
+                .ToDictionary(g => g.UserId!.Value, g => g.Count);
             ViewBag.NbInscriptions = nbInscriptions;
 
             return View(utilisateurs);
