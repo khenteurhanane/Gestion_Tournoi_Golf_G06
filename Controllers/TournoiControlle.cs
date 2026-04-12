@@ -107,6 +107,40 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Index");
         }
 
+        // Démarre le tournoi — active la saisie des scores (admin seulement)
+        [HttpPost]
+        public IActionResult DemarrerTournoi(int id)
+        {
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+                return View("AccesRefuse");
+
+            var tournoi = _context.Tournois.Find(id);
+            if (tournoi != null)
+            {
+                tournoi.EstEnCours = true;
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Details", new { id });
+        }
+
+        // Termine le tournoi — désactive la saisie des scores (admin seulement)
+        [HttpPost]
+        public IActionResult TerminerTournoi(int id)
+        {
+            string role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "ADMIN")
+                return View("AccesRefuse");
+
+            var tournoi = _context.Tournois.Find(id);
+            if (tournoi != null)
+            {
+                tournoi.EstEnCours = false;
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Details", new { id });
+        }
+
         // Ferme les inscriptions (admin seulement)
         [HttpPost]
         public IActionResult FermerInscriptions(int id)

@@ -1,5 +1,6 @@
 using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
+using croupe_06_TournoiGolf.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,9 @@ builder.Services.AddDbContext<GolfDbContext>(options =>
 
 // Service de hashage
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+// SignalR pour le tableau de scores en temps réel (GOLF-143)
+builder.Services.AddSignalR();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -64,5 +68,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Route du hub SignalR
+app.MapHub<ScoreHub>("/scorehub");
 
 app.Run();

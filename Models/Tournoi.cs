@@ -46,5 +46,8 @@ namespace croupe_06_TournoiGolf.Models
         // Date de création automatique
         [Column("CreeLe")]
         public DateTime CreeLe { get; set; } = DateTime.Now;
+
+        // Indique si le tournoi est en cours (saisie des scores activée)
+        public bool EstEnCours { get; set; } = false;
     }
 }

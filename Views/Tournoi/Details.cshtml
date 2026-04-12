@@ -47,6 +47,28 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><strong>État du tournoi</strong></td>
+                    <td>
+                        @if (tournoi.EstEnCours)
+                        {
+                            <span class="badge badge-en-cours">En cours</span>
+                            <form action="/Tournoi/TerminerTournoi" method="post" style="display:inline; margin-left: 10px;">
+                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                                <button type="submit" class="btn btn-sm btn-danger">Terminer le tournoi</button>
+                            </form>
+                            <a href="/Score/Saisie/@tournoi.TournoiId" class="btn btn-sm btn-primary" style="margin-left: 5px;">Saisir les scores</a>
+                        }
+                        else
+                        {
+                            <span class="badge badge-ferme">Pas encore démarré</span>
+                            <form action="/Tournoi/DemarrerTournoi" method="post" style="display:inline; margin-left: 10px;">
+                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                                <button type="submit" class="btn btn-sm btn-success">Démarrer le tournoi</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+                <tr>
                     <td><strong>Inscrits</strong></td>
                     <td>@nbInscrits / @tournoi.PlacesParticipantsMax</td>
                 </tr>
@@ -178,4 +200,12 @@
 
 <div class="card-footer">
     <a href="/Tournoi/Index" class="btn">Retour à la liste des tournois</a>
+    @if (tournoi.EstEnCours)
+    {
+        <a href="/Score/Tableau/@tournoi.TournoiId" class="btn btn-info" style="margin-left: 10px;">Voir le classement live</a>
+    }
 </div>
+
+<style>
+    .badge-en-cours { background: rgba(52, 152, 219, 0.15); color: #2980b9; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+</style>

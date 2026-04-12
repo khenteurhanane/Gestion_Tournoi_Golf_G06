@@ -15,6 +15,7 @@ namespace croupe_06_TournoiGolf.Data
         public DbSet<Utilisateur> Utilisateurs { get; set; }
         public DbSet<Equipe> Equipes { get; set; }
         public DbSet<Commandite> Commandites { get; set; }
+        public DbSet<ScoreTrou> ScoresTrous { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

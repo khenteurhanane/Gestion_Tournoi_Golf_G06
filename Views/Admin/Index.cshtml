@@ -118,7 +118,11 @@
                                     <td>@t.DateTournoi.ToShortDateString()</td>
                                     <td>@t.Lieu</td>
                                     <td>
-                                        @if (t.InscriptionsOuvertes)
+                                        @if (t.EstEnCours)
+                                        {
+                                            <span class="badge badge-en-cours">En cours</span>
+                                        }
+                                        else if (t.InscriptionsOuvertes)
                                         {
                                             <span class="badge badge-ouvert">Ouvert</span>
                                         }
@@ -165,6 +169,9 @@
                     </a>
                     <a href="/Commandite/Index" class="qa-item">
                         <i class="fas fa-handshake"></i> Commandites
+                    </a>
+                    <a href="/Score/Tableau" class="qa-item">
+                        <i class="fas fa-golf-ball"></i> Tableau des scores
                     </a>
                 </div>
             </div>
@@ -241,5 +248,6 @@
     td { padding: 15px 12px; border-bottom: 1px solid #f8f9fa; }
     .badge-ouvert { background: rgba(46, 204, 113, 0.15); color: #27ae60; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
     .badge-ferme { background: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+    .badge-en-cours { background: rgba(52, 152, 219, 0.15); color: #2980b9; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
 </style>
 

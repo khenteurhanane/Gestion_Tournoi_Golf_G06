@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Classement en direct";
+    var tournoi = (croupe_06_TournoiGolf.Models.Tournoi)ViewBag.Tournoi;
+    int tournoiId = (int)ViewBag.TournoiId;
+}
+
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">
+            <i class="fas fa-golf-ball text-success me-2"></i>
+            Classement en direct
+        </h1>
+        <p class="text-muted">@tournoi.Nom — @tournoi.Lieu</p>
+        <span class="badge bg-success" id="statut-connexion">
+            <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i> Connecté en direct
+        </span>
+    </div>
+
+    <!-- Tableau de classement -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0" id="tableau-classement">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 80px;" class="text-center">Position</th>
+                        <th>Équipe</th>
+                        <th class="text-center">Trous joués</th>
+                        <th class="text-center">Total coups</th>
+                    </tr>
+                </thead>
+                <tbody id="corps-classement">
+                    <!-- Rempli par scoreboard.js au chargement puis mis à jour par SignalR -->
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">Chargement du classement...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted text-center mt-3" style="font-size: 0.85rem;">
+        <i class="fas fa-sync-alt me-1"></i>
+        Le classement se met à jour automatiquement dès qu'un score est saisi.
+    </p>
+</div>
+
+<!-- Passer l'id du tournoi au JS -->
+<input type="hidden" id="tournoi-id" value="@tournoiId" />
+
+@section Scripts {
+    <!-- Client SignalR (inclus dans ASP.NET Core) -->
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/js/scoreboard.js"></script>
+}
+
+<style>
+    #corps-classement tr {
+        transition: background-color 0.4s ease;
+    }
+    .ligne-mise-a-jour {
+        background-color: rgba(46, 204, 113, 0.15) !important;
+    }
+    .position-badge {
+        display: inline-block;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 32px;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+    .pos-1 { background: #f1c40f; color: #fff; }
+    .pos-2 { background: #95a5a6; color: #fff; }
+    .pos-3 { background: #cd7f32; color: #fff; }
+    .pos-autre { background: #ecf0f1; color: #555; }
+</style>
