@@ -6,22 +6,15 @@
 
 /* Variables de couleurs */
 :root {
-    --bg1: #e8f0de;
-    --bg2: #d4e6c3;
+    --bg-main: #f8fafc;
     --card: #ffffff;
-    --card2: #f5f9f0;
-    --text: #1a2e12;
-    --muted: #5a7a4a;
-    --accent: #2d6a2e;
-    --accent2: #3d8b3e;
-    --gold: #c8a84e;
-    --gold2: #a88a30;
-    --danger: #c62828;
-    --warning: #ef6c00;
-    --shadow: 0 4px 20px rgba(30, 60, 20, .10);
-    --shadow-hover: 0 8px 30px rgba(30, 60, 20, .18);
-    --radius: 14px;
-    --transition: 0.25s ease;
+    --text: #1e293b;
+    --muted: #64748b;
+    --accent: #1a3c2a;
+    --accent-light: #2d6a2e;
+    --gold: #D4AF37;
+    --shadow: 0 4px 15px rgba(0, 0, 0, .05);
+    --radius: 12px;
 }
 
 * {
@@ -30,31 +23,14 @@
     padding: 0;
 }
 
-html {
-    font-size: 14px;
-    position: relative;
-    min-height: 100%;
-    scroll-behavior: smooth;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
 body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: var(--text);
-    background:
-        radial-gradient(ellipse 900px 600px at 20% 5%, rgba(200, 220, 170, .50), transparent 60%),
-        radial-gradient(ellipse 800px 500px at 85% 90%, rgba(160, 200, 130, .35), transparent 55%),
-        linear-gradient(175deg, #eef5e4 0%, #d9ebc8 35%, #c5deb2 70%, #a8cc8e 100%);
-    background-attachment: fixed;
+    background-color: var(--bg-main);
     line-height: 1.6;
 }
 

@@ -17,7 +17,7 @@ namespace croupe_06_TournoiGolf.Services
                 // Vérifier si le mot de passe correspond au hash (gère les sels)
                 return BCrypt.Net.BCrypt.EnhancedVerify(password, hashedPassword);
             }
-            catch (BCrypt.Net.BCryptInternalException)
+            catch (Exception)
             {
                 // En cas de hash invalide ou ancien format
                 return false;

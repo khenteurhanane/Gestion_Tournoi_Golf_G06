@@ -8,14 +8,10 @@ namespace croupe_06_TournoiGolf.Controllers
 {
     // Extensions d'image acceptées
     // Dossier de destination : wwwroot/images/tournois/
-    public class TournoiController : BaseController
+    public class TournoiController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
     {
-        private readonly GolfDbContext _context;
-
-        public TournoiController(GolfDbContext context)
-        {
-            _context = context;
-        }
+        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
+        private readonly string _lang = "FR";
 
         // On permet l'accès à la liste sans être connecté
         public override void OnActionExecuting(ActionExecutingContext context)

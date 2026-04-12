@@ -5,14 +5,9 @@ using croupe_06_TournoiGolf.Models;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class CommanditeController : Controller
+    public class CommanditeController(croupe_06_TournoiGolf.Data.GolfDbContext context) : Controller
     {
-        private readonly GolfDbContext _context;
-
-        public CommanditeController(GolfDbContext context)
-        {
-            _context = context;
-        }
+        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
 
         // Affiche la liste des commandites de l'utilisateur connecté
         public IActionResult Index()
@@ -238,50 +233,57 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (commandite == null || commandite.UtilisateurId != userId) return RedirectToAction("Index");
 
-            if (commandite.Statut != "PAYEE")
-            // Gestion de la Race Condition (GOLF-133)
-            using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
             try
             {
-                int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
-                int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
-
-                if (nbJoueurs >= limiteJoueurs)
+                using (var tx = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable))
                 {
-                    TempData["Error"] = $"Maximum de {limiteJoueurs} joueur(s) atteint.";
-                    return RedirectToAction("Joueurs", new { id = commanditeId });
+                    try
+                    {
+                        int nbJoueurs = _context.Participants.Count(p => p.CommanditeId == commanditeId);
+                        int limiteJoueurs = TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
+
+                        if (nbJoueurs >= limiteJoueurs)
+                        {
+                            TempData["Error"] = $"Maximum de {limiteJoueurs} joueur(s) atteint.";
+                            return RedirectToAction("Joueurs", new { id = commanditeId });
+                        }
+
+                        int totalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
+                        if (totalInscrits >= commandite.Tournoi.PlacesParticipantsMax)
+                        {
+                            TempData["Error"] = "Le tournoi est complet.";
+                            return RedirectToAction("Joueurs", new { id = commanditeId });
+                        }
+
+                        var participant = new Participant
+                        {
+                            TournoiId = commandite.TournoiId,
+                            CommanditeId = commanditeId,
+                            Prenom = prenom,
+                            Nom = nom,
+                            Email = email,
+                            TypeParticipant = "commandite",
+                            StatutInscription = "CONFIRMEE",
+                            MontantPaye = 0,
+                            CreeLe = DateTime.Now
+                        };
+
+                        _context.Participants.Add(participant);
+                        _context.SaveChanges();
+                        tx.Commit();
+
+                        TempData["Success"] = "Joueur ajouté avec succès.";
+                        return RedirectToAction("Joueurs", new { id = commanditeId });
+                    }
+                    catch (Exception)
+                    {
+                        tx.Rollback();
+                        throw;
+                    }
                 }
-
-                int totalInscrits = _context.Participants.Count(p => p.TournoiId == commandite.TournoiId);
-                if (totalInscrits >= commandite.Tournoi.PlacesParticipantsMax)
-                {
-                    TempData["Error"] = "Le tournoi est complet.";
-                    return RedirectToAction("Joueurs", new { id = commanditeId });
-                }
-
-                var participant = new Participant
-                {
-                    TournoiId = commandite.TournoiId,
-                    CommanditeId = commanditeId,
-                    Prenom = prenom,
-                    Nom = nom,
-                    Email = email,
-                    TypeParticipant = "commandite",
-                    StatutInscription = "CONFIRMEE",
-                    MontantPaye = 0,
-                    CreeLe = DateTime.Now
-                };
-
-                _context.Participants.Add(participant);
-                _context.SaveChanges();
-                transaction.Commit();
-
-                TempData["Success"] = "Joueur ajouté avec succès.";
-                return RedirectToAction("Joueurs", new { id = commanditeId });
             }
-            catch
+            catch (Exception)
             {
-                transaction.Rollback();
                 TempData["Error"] = "Erreur lors de l'inscription.";
                 return RedirectToAction("Joueurs", new { id = commanditeId });
             }

@@ -1,6 +1,7 @@
 using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,12 @@ using (var scope = app.Services.CreateScope())
 
         // Ajout de ImageUrl pour les tournois
         context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'ImageUrl') ALTER TABLE Tournois ADD ImageUrl NVARCHAR(300) NULL;");
+
+        // Ajout de NbEquipesMax pour les tournois (valeur par défaut : 10)
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'NbEquipesMax') ALTER TABLE Tournois ADD NbEquipesMax INT NOT NULL DEFAULT 10;");
+
+        // Ajout de DateLimiteInscription pour les tournois
+        context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'DateLimiteInscription') ALTER TABLE Tournois ADD DateLimiteInscription DATETIME2 NULL;");
     }
     catch (Exception ex)
     {

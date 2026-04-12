@@ -2,19 +2,15 @@ using System.Diagnostics;
 using croupe_06_TournoiGolf.Models;
 using croupe_06_TournoiGolf.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(Microsoft.Extensions.Logging.ILogger<HomeController> logger, croupe_06_TournoiGolf.Data.GolfDbContext context) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly GolfDbContext _context;
-
-        public HomeController(ILogger<HomeController> logger, GolfDbContext context)
-        {
-            _logger = logger;
-            _context = context;
-        }
+        private readonly Microsoft.Extensions.Logging.ILogger<HomeController> _logger = logger;
+        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
 
         public IActionResult Index()
         {
@@ -50,7 +46,7 @@ namespace croupe_06_TournoiGolf.Controllers
             // Définir le cookie de culture standard (reconnu par le middleware)
             Response.Cookies.Append(
                 Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.DefaultCookieName,
-                Microsoft.AspNetCore.Localization.RequestCulture.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
+                Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
                 new Microsoft.AspNetCore.Http.CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
             );
 

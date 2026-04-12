@@ -10,10 +10,10 @@ namespace croupe_06_TournoiGolf.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IPasswordHasher _passwordHasher;
-        private readonly GolfDbContext _context;
+        private readonly croupe_06_TournoiGolf.Services.IPasswordHasher _passwordHasher;
+        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context;
 
-        public AuthController(IPasswordHasher passwordHasher, GolfDbContext context)
+        public AuthController(croupe_06_TournoiGolf.Services.IPasswordHasher passwordHasher, croupe_06_TournoiGolf.Data.GolfDbContext context)
         {
             _passwordHasher = passwordHasher;
             _context = context;

@@ -7,14 +7,9 @@ using croupe_06_TournoiGolf.Models;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class AdminController : BaseController
+    public class AdminController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
     {
-        private readonly GolfDbContext _context;
-
-        public AdminController(GolfDbContext context)
-        {
-            _context = context;
-        }
+        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
 
         // Vérifie que l'utilisateur est admin
         private bool EstAdmin()
