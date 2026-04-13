@@ -51,12 +51,11 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<GolfDbContext>();
     
-    // Créer la DB si elle n'existe pas
-    context.Database.EnsureCreated();
-
-    // Correction pour la table Participants (US-12)
+    // Créer la DB si elle n'existe pas et appliquer les corrections
     try
     {
+        context.Database.EnsureCreated();
+
         // Ajout de CommanditeId
         context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Participants') AND name = 'CommanditeId') ALTER TABLE Participants ADD CommanditeId INT NULL;");
         
@@ -76,10 +75,14 @@ using (var scope = app.Services.CreateScope())
 
         // Ajout de DateLimiteInscription pour les tournois
         context.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'DateLimiteInscription') ALTER TABLE Tournois ADD DateLimiteInscription DATETIME2 NULL;");
+        
+        Console.WriteLine("Base de données initialisée avec succès.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Erreur lors de la mise à jour des colonnes : " + ex.Message);
+        Console.WriteLine("CRITICAL ERROR: Erreur lors de l'initialisation de la base de données !");
+        Console.WriteLine(ex.Message);
+        if (ex.InnerException != null) Console.WriteLine("Inner: " + ex.InnerException.Message);
     }
 }
 

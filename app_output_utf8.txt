@@ -1,0 +1,35 @@
+﻿Utilisation des param├¿tres de lancement ├á partir de Properties\launchSettings.json...
+G├®n├®ration...
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Auth\ForgotPassword.cshtml(20,52): warning CS8602: D├®r├®f├®rencement d'une ├®ventuelle r├®f├®rence null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Models\Commandite.cs(13,28): warning CS8618: Le propri├®t├® ┬½┬áUtilisateur┬á┬╗ non-nullable doit contenir une valeur autre que Null lors de la fermeture du constructeur. Envisagez dÔÇÖajouter le modificateur ┬½┬árequired┬á┬╗ ou de d├®clarer le propri├®t├® comme pouvant accepter la valeur Null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Models\Commandite.cs(17,24): warning CS8618: Le propri├®t├® ┬½┬áTournoi┬á┬╗ non-nullable doit contenir une valeur autre que Null lors de la fermeture du constructeur. Envisagez dÔÇÖajouter le modificateur ┬½┬árequired┬á┬╗ ou de d├®clarer le propri├®t├® comme pouvant accepter la valeur Null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Auth\Register.cshtml(36,52): warning CS8602: D├®r├®f├®rencement d'une ├®ventuelle r├®f├®rence null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Auth\Register.cshtml(50,52): warning CS8602: D├®r├®f├®rencement d'une ├®ventuelle r├®f├®rence null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Auth\ResetPassword.cshtml(22,52): warning CS8602: D├®r├®f├®rencement d'une ├®ventuelle r├®f├®rence null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Auth\ResetPassword.cshtml(31,52): warning CS8602: D├®r├®f├®rencement d'une ├®ventuelle r├®f├®rence null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Auth\ResetPassword.cshtml(38,48): warning CS8602: D├®r├®f├®rencement d'une ├®ventuelle r├®f├®rence null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Models\Participant.cs(13,24): warning CS8618: Le propri├®t├® ┬½┬áTournoi┬á┬╗ non-nullable doit contenir une valeur autre que Null lors de la fermeture du constructeur. Envisagez dÔÇÖajouter le modificateur ┬½┬árequired┬á┬╗ ou de d├®clarer le propri├®t├® comme pouvant accepter la valeur Null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Models\Participant.cs(17,28): warning CS8618: Le propri├®t├® ┬½┬áUtilisateur┬á┬╗ non-nullable doit contenir une valeur autre que Null lors de la fermeture du constructeur. Envisagez dÔÇÖajouter le modificateur ┬½┬árequired┬á┬╗ ou de d├®clarer le propri├®t├® comme pouvant accepter la valeur Null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Models\Equipe.cs(13,24): warning CS8618: Le propri├®t├® ┬½┬áTournoi┬á┬╗ non-nullable doit contenir une valeur autre que Null lors de la fermeture du constructeur. Envisagez dÔÇÖajouter le modificateur ┬½┬árequired┬á┬╗ ou de d├®clarer le propri├®t├® comme pouvant accepter la valeur Null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Models\Equipe.cs(28,28): warning CS8618: Le propri├®t├® ┬½┬áCreateur┬á┬╗ non-nullable doit contenir une valeur autre que Null lors de la fermeture du constructeur. Envisagez dÔÇÖajouter le modificateur ┬½┬árequired┬á┬╗ ou de d├®clarer le propri├®t├® comme pouvant accepter la valeur Null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Controllers\AuthController.cs(315,85): warning CS8629: Le type valeur Nullable peut avoir une valeur null. [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Commandite\Paiement.cshtml(32,88): error CS1061: 'Utilisateur' ne contient pas de d├®finition pour 'NomEntreprise' et aucune m├®thode d'extension accessible 'NomEntreprise' acceptant un premier argument de type 'Utilisateur' n'a ├®t├® trouv├®e (une directive using ou une r├®f├®rence d'assembly est-elle manquante┬á?) [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\Views\Commandite\Paiement.cshtml(32,179): error CS1061: 'Utilisateur' ne contient pas de d├®finition pour 'NomEntreprise' et aucune m├®thode d'extension accessible 'NomEntreprise' acceptant un premier argument de type 'Utilisateur' n'a ├®t├® trouv├®e (une directive using ou une r├®f├®rence d'assembly est-elle manquante┬á?) [C:\Users\khent\Downloads\Gestion_Tournoi_Golf_G06 1 (2)\Gestion_Tournoi_Golf_G06\croupe 06 TournoiGolf.csproj]
+dotnet : 
+Au caractère Ligne:1 : 1
++ dotnet run --project 
+"croupe 06 
+TournoiGolf.csproj" > 
+app_output.txt  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+La build a ├®chou├®. 
+Corrigez les erreurs de la 
+build et r├®ex├®cutez-la.

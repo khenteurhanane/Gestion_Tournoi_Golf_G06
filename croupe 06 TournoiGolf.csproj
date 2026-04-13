@@ -4,14 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>croupe_06_TournoiGolf</RootNamespace>
+     <RootNamespace>croupe_06_TournoiGolf</RootNamespace>
+    <UseAppHost>false</UseAppHost>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Tests\**" />
-    <Content Remove="Tests\**" />
-    <EmbeddedResource Remove="Tests\**" />
-    <None Remove="Tests\**" />
+    <Compile Remove="**/Tests/**" />
+    <Content Remove="**/Tests/**" />
+    <EmbeddedResource Remove="**/Tests/**" />
+    <None Remove="**/Tests/**" />
     <Compile Remove="NewFolder1\**" />
     <Compile Remove="NewFolder\**" />
     <Compile Remove="Views\NewFolder1\**" />

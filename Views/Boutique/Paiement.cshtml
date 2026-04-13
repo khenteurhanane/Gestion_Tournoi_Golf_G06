@@ -1,0 +1,89 @@
+@model croupe_06_TournoiGolf.Models.ViewModels.PaiementBoutiqueViewModel
+@{
+    ViewData["Title"] = "Paiement - Boutique";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <i class="fas fa-credit-card fa-3x mb-2"></i>
+                <h3 class="mb-0">Paiement Sécurisé</h3>
+                <p class="mb-0 text-white-50">Boutique & Restauration Golf G06</p>
+            </div>
+            
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <h5 class="text-muted">Total à payer</h5>
+                    <h1 class="display-4 fw-bold text-primary">@Model.Panier.TotalFinal.ToString("C")</h1>
+                </div>
+
+                <form action="/Boutique/ConfirmerPaiement" method="post">
+                    @Html.AntiForgeryToken()
+                    <h5 class="mb-3 border-bottom pb-2">Sélectionnez votre mode de paiement</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <input type="radio" class="btn-check" name="ModePaiement" id="carte" value="carte" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary w-100 p-4 h-100 d-flex flex-column align-items-center justify-content-center" for="carte">
+                                <i class="fas fa-cc-visa fa-3x mb-2"></i>
+                                <span>Carte de crédit / débit</span>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="radio" class="btn-check" name="ModePaiement" id="interac" value="interac" autocomplete="off">
+                            <label class="btn btn-outline-primary w-100 p-4 h-100 d-flex flex-column align-items-center justify-content-center" for="interac">
+                                <i class="fas fa-exchange-alt fa-3x mb-2"></i>
+                                <span>Virement Interac</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Champs simulés de carte -->
+                    <div id="formCarte">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nom sur la carte</label>
+                            <input type="text" class="form-control" placeholder="Ex: Jean Tremblay" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Numéro de carte</label>
+                            <input type="text" class="form-control" placeholder="XXXX XXXX XXXX XXXX" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted">Expiration</label>
+                                <input type="text" class="form-control" placeholder="MM/AA" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted">CVC</label>
+                                <input type="text" class="form-control" placeholder="123" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-5">
+                        <a href="/Boutique/Panier" class="btn btn-light"><i class="fas fa-arrow-left"></i> Retour au panier</a>
+                        <button type="submit" class="btn btn-success px-5 fw-bold">
+                            Payer @Model.Panier.TotalFinal.ToString("C") <i class="fas fa-lock ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('input[name="ModePaiement"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            var formCarte = document.getElementById('formCarte');
+            if (this.value === 'interac') {
+                formCarte.style.display = 'none';
+                formCarte.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
+            } else {
+                formCarte.style.display = 'block';
+                formCarte.querySelectorAll('input').forEach(i => i.setAttribute('required', 'required'));
+            }
+        });
+    });
+</script>

@@ -1,0 +1,235 @@
+@using croupe_06_TournoiGolf.Models.ViewModels
+@{
+    ViewData["Title"] = "Boutique Pro-Shop";
+    var catalogue = ViewBag.Catalogue as List<ArticleBoutique>;
+    var nbElements = ViewBag.NbElementsPanier ?? 0;
+}
+
+<style>
+    .pro-shop-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('https://www.transparenttextures.com/patterns/cubes.png');
+        padding: 60px 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .pro-shop-header::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; bottom: 0; left: 0;
+        background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
+        background-size: 200% 200%;
+        animation: shine 5s infinite linear;
+        pointer-events: none;
+    }
+
+    @@keyframes shine {
+        0% { background-position: -100% 100%; }
+        100% { background-position: 200% -100%; }
+    }
+
+    .pro-shop-header h1 {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 3rem;
+        letter-spacing: -1px;
+        margin-bottom: 5px;
+        background: linear-gradient(90deg, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .boutique-nav-pills {
+        background: white;
+        padding: 5px;
+        border-radius: 50px;
+        display: inline-flex;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .boutique-nav-pills .nav-link {
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+    }
+    
+    .boutique-nav-pills .nav-link.active {
+        background: var(--primary-navy);
+        color: white;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+    }
+
+    .premium-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .premium-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+        border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .premium-card-icon {
+        background: linear-gradient(135deg, var(--light-silver) 0%, #fff 100%);
+        width: 90px;
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .btn-premium {
+        background: var(--primary-navy);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 0;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-premium:hover {
+        background: var(--dark-navy);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2);
+        color: #fff;
+    }
+    
+    .btn-cart-floating {
+        background: white;
+        color: var(--primary-navy);
+        border: none;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-weight: 700;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+    }
+    
+    .btn-cart-floating:hover {
+        transform: scale(1.05);
+        background: var(--light-silver);
+        color: var(--primary-navy);
+    }
+</style>
+
+<div class="pro-shop-header d-flex justify-content-between align-items-center">
+    <div>
+        <p class="text-uppercase mb-2 text-white-50 fw-bold" style="letter-spacing: 2px;"><i class="fas fa-crown text-warning"></i> Expérience Premium</p>
+        <h1>Pro-Shop & Restauration</h1>
+        <p class="lead mb-0 text-light" style="opacity: 0.9;">Réservez votre équipement et commandez votre repas pour la partie.</p>
+    </div>
+    
+    <a href="/Boutique/Panier" class="btn btn-cart-floating text-decoration-none d-none d-md-block">
+        <i class="fas fa-shopping-bag me-2"></i> Mon Panier 
+        @if (nbElements > 0)
+        {
+            <span class="badge bg-danger rounded-pill ms-2">@nbElements</span>
+        }
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" style="border-radius: 15px;" role="alert">
+        <i class="fas fa-check-circle me-2"></i> <strong>@TempData["SuccessMessage"]</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="text-center mb-5">
+    <ul class="nav nav-pills boutique-nav-pills" id="boutique-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="materiel-tab" data-bs-toggle="pill" data-bs-target="#materiel" type="button" role="tab"><i class="fas fa-golf-club me-2"></i> Location Équipement</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="resto-tab" data-bs-toggle="pill" data-bs-target="#resto" type="button" role="tab"><i class="fas fa-utensils me-2"></i> Restauration Gourmet</button>
+        </li>
+    </ul>
+</div>
+
+<div class="tab-content" id="boutique-tabContent">
+    <!-- ONGLET MATÉRIEL -->
+    <div class="tab-pane fade show active" id="materiel" role="tabpanel">
+        <div class="row g-4 justify-content-center">
+            @foreach (var article in catalogue.Where(a => a.Categorie == "Materiel"))
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="card premium-card h-100 pb-3">
+                        <div class="card-body text-center d-flex flex-column pt-4 px-4">
+                            <div class="premium-card-icon">
+                                <i class="fas @article.ImageIcon" style="font-size: 2.5rem; color: var(--primary-navy);"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">@article.Nom</h5>
+                            <p class="text-muted small mb-4 flex-grow-1">@article.Description</p>
+                            <h3 class="fw-bolder mb-4" style="color: var(--primary-navy);">@article.Prix.ToString("C")</h3>
+                            
+                            <form action="/Boutique/AjouterAuPanier" method="post" class="mt-auto">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@article.Id" />
+                                <div class="d-flex align-items-center justify-content-between mb-3 bg-light rounded-3 p-2">
+                                    <span class="text-muted fw-bold small text-uppercase ms-2">Quantité</span>
+                                    <input type="number" name="quantite" class="form-control form-control-sm w-50 border-0 bg-transparent fw-bold text-end" value="1" min="1" max="10" />
+                                </div>
+                                <button type="submit" class="btn btn-premium w-100">
+                                    <i class="fas fa-plus me-2"></i> Réserver
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ONGLET RESTAURATION -->
+    <div class="tab-pane fade" id="resto" role="tabpanel">
+        <div class="row g-4 justify-content-center">
+            @foreach (var article in catalogue.Where(a => a.Categorie == "Restauration"))
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="card premium-card h-100 pb-3">
+                        <div class="card-body text-center d-flex flex-column pt-4 px-4">
+                            <div class="premium-card-icon">
+                                <i class="fas @article.ImageIcon" style="font-size: 2.5rem; color: #f59e0b;"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">@article.Nom</h5>
+                            <p class="text-muted small mb-4 flex-grow-1">@article.Description</p>
+                            <h3 class="fw-bolder mb-4" style="color: var(--primary-navy);">@article.Prix.ToString("C")</h3>
+                            
+                            <form action="/Boutique/AjouterAuPanier" method="post" class="mt-auto">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@article.Id" />
+                                <div class="d-flex align-items-center justify-content-between mb-3 bg-light rounded-3 p-2">
+                                    <span class="text-muted fw-bold small text-uppercase ms-2">Menu/Qté</span>
+                                    <input type="number" name="quantite" class="form-control form-control-sm w-50 border-0 bg-transparent fw-bold text-end" value="1" min="1" max="10" />
+                                </div>
+                                <button type="submit" class="btn btn-premium w-100" style="background: #f59e0b;">
+                                    <i class="fas fa-utensils me-2"></i> Commander
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

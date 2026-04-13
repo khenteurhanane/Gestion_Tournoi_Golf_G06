@@ -42,6 +42,9 @@
                 <a href="/Sponsor/Index" class="@(ViewData["Title"]?.ToString() == "Paliers de Commandite" ? "active" : "")">
                     <i class="fas fa-star text-warning"></i> <span>@(currentLang == "EN" ? "Become a Sponsor" : "Commanditer")</span>
                 </a>
+                <a href="/Boutique/Index" class="@(ViewData["Title"]?.ToString() == "Boutique" ? "active" : "")">
+                    <i class="fas fa-store text-success"></i> <span>@(currentLang == "EN" ? "Shop" : "Magasiner")</span>
+                </a>
                 
                 @if (estConnecte)
                 {
