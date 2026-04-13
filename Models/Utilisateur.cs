@@ -19,13 +19,13 @@ namespace croupe_06_TournoiGolf.Models
         public string Role { get; set; } = "PARTICIPANT"; // ADMIN / PARTICIPANT / COMMANDITAIRE
 
         [StringLength(60)]
-        public string Prenom { get; set; } = string.Empty;
+        public string? Prenom { get; set; }
 
         [StringLength(60)]
-        public string Nom { get; set; } = string.Empty;
+        public string? Nom { get; set; }
 
         [StringLength(30)]
-        public string Telephone { get; set; } = string.Empty;
+        public string? Telephone { get; set; }
 
         [StringLength(100)]
         public string? NomEntreprise { get; set; }
