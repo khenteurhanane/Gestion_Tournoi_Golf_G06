@@ -35,6 +35,16 @@ namespace croupe_06_TournoiGolf.Controllers
             ViewBag.NbEquipes = _context.Equipes.Count();
             ViewBag.RevenuTotal = _context.Participants.Sum(p => (decimal?)p.MontantPaye) ?? 0;
 
+            // Détecter les équipes incomplètes (GOLF-146)
+            var equipes = _context.Equipes.ToList();
+            var nbMembres = _context.Participants
+                .Where(p => p.EquipeId != null)
+                .GroupBy(p => p.EquipeId)
+                .ToDictionary(g => g.Key ?? 0, g => g.Count());
+
+            int nbIncompletes = equipes.Count(e => !nbMembres.ContainsKey(e.EquipeId) || nbMembres[e.EquipeId] < e.NbJoueursMax);
+            ViewBag.NbEquipesIncompletes = nbIncompletes;
+
             // Inscriptions récentes
             ViewBag.InscriptionsRecentes = _context.Participants
                 .Include(p => p.Tournoi)

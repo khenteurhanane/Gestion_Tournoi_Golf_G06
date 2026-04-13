@@ -42,6 +42,12 @@
                             <span class="badge @(count >= eq.NbJoueursMax ? "badge-ferme" : "badge-ouvert")">
                                 @count / @eq.NbJoueursMax
                             </span>
+                            @if (count < eq.NbJoueursMax)
+                            {
+                                <small class="text-warning ms-1" title="Incomplète">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </small>
+                            }
                         </td>
                         <td><code>@eq.CodeSecret</code></td>
                         <td>

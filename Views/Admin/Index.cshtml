@@ -10,12 +10,24 @@
         <h1 class="fw-bold">Tableau de bord <span class="text-success">Admin</span></h1>
         <p class="text-muted">Vue d'ensemble de l'activité des tournois</p>
     </div>
-    <div class="header-actions">
-        <a class="btn btn-success rounded-pill px-4 shadow-sm" href="/Tournoi/Create">
-            <i class="fas fa-plus me-2"></i> Nouveau Tournoi
-        </a>
     </div>
 </div>
+
+@if (ViewBag.NbEquipesIncompletes > 0)
+{
+    <div class="alert alert-warning border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center p-3 animate__animated animate__fadeInDown" style="background: rgba(243, 156, 18, 0.1); border-left: 5px solid #f39c12 !important;">
+        <div class="alert-icon me-3 bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h5 class="mb-0 fw-bold text-dark">Équipes incomplètes détectées</h5>
+            <p class="mb-0 text-muted small">Il y a actuellement <strong>@ViewBag.NbEquipesIncompletes</strong> équipes qui n'ont pas encore atteint leur nombre maximal de joueurs.</p>
+        </div>
+        <div>
+            <a href="/Admin/Equipes" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold">Gérer</a>
+        </div>
+    </div>
+}
 
     <!-- Statistiques -->
     <div class="stats-grid">
