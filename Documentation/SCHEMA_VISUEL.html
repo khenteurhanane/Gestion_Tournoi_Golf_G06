@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Schéma Base de Données - Golf G06</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding: 40px; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 1200px; margin: 0 auto; }
+        h1 { color: #1a3c2a; border-bottom: 2px solid #D4AF37; padding-bottom: 10px; }
+        .mermaid { display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Schéma Conceptuel de la Base de Données (ERD)</h1>
+        <p>Ce diagramme montre les relations entre les différentes tables du projet.</p>
+        
+        <div class="mermaid">
+erDiagram
+    UTILISATEUR ||--o{ PARTICIPANT : "est"
+    UTILISATEUR ||--o{ EQUIPE : "crée"
+    UTILISATEUR ||--o{ COMMANDITE : "finance"
+    TOURNOI ||--o{ PARTICIPANT : "contient"
+    TOURNOI ||--o{ EQUIPE : "héberge"
+    TOURNOI ||--o{ COMMANDITE : "possède"
+    EQUIPE ||--o{ PARTICIPANT : "regroupe"
+    EQUIPE ||--o{ SCORETROU : "enregistre"
+    TOURNOI ||--o{ SCORETROU : "comprend"
+
+    UTILISATEUR {
+        int UtilisateurId PK
+        string Email
+        string MotDePasseHash
+        string Role
+        string Prenom
+        string Nom
+    }
+
+    TOURNOI {
+        int TournoiId PK
+        string Nom
+        datetime DateTournoi
+        string Lieu
+        bool InscriptionsOuvertes
+    }
+
+    EQUIPE {
+        int EquipeId PK
+        int TournoiId FK
+        string NomEquipe
+        string CodeSecret
+    }
+
+    PARTICIPANT {
+        int ParticipantId PK
+        int TournoiId FK
+        int UtilisateurId FK
+        string TypeParticipant
+    }
+
+    COMMANDITE {
+        int CommanditeId PK
+        int TournoiId FK
+        int UtilisateurId FK
+        string TypeCommandite
+        decimal Montant
+    }
+
+    SCORETROU {
+        int ScoreTrouId PK
+        int EquipeId FK
+        int NumeroTrou
+        int NbCoups
+    }
+        </div>
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'forest' });
+    </script>
+</body>
+</html>
