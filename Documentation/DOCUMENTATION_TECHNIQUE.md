@@ -20,13 +20,16 @@ Le projet est développé en utilisant l'architecture **ASP.NET Core MVC**.
 
 ## 3. Schéma de la Base de Données
 
-Le système s'appuie sur cinq entités principales :
+Le système s'appuie sur six entités principales. Pour une vue détaillée du diagramme et des relations, consultez :
+**[👉 Schéma de la Base de Données détaillé (ERD)](SCHEMA_BDD.md)**
 
+Les entités sont :
 - **`Utilisateur`** : Gère les comptes (Admin, Employé, Commanditaire). Stocke le Hash des mots de passe.
 - **`Tournoi`** : Stocke les informations des événements (Lieu, Date, Places Max, Statut).
 - **`Equipe`** : Regroupe les participants avec un système de code secret pour rejoindre.
 - **`Participant`** : Lien entre les tournois et les inscrits. Supporte à la fois les utilisateurs du système et les invités (joueurs commanditaires).
 - **`Commandite`** : Gère les forfaits de sponsoring (Or, Argent, Bronze).
+- **`ScoreTrou`** : Suivi des points par trou pour chaque équipe.
 
 ## 4. Authentification et Rôles
 
