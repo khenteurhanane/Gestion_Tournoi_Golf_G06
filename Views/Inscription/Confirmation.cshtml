@@ -1,3 +1,11 @@
+@{
+var participantIdBillet = ViewBag.ParticipantId?.ToString();
+if (string.IsNullOrWhiteSpace(participantIdBillet))
+{
+participantIdBillet = Context.Request.Query["participantId"].ToString();
+}
+}
+
 <div class="confirmation-container">
     <div class="confirmation-card">
         <div class="success-icon-wrapper">
@@ -64,6 +72,36 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+const participantId = '@participantIdBillet';
+if (!participantId) {
+return;
+}
+
+const lien = document.createElement('a');
+lien.href = '/Inscription/TelechargerBillet?participantId=' + encodeURIComponent(participantId);
+lien.className = 'btn btn-warning';
+lien.textContent = 'Télécharger mon billet';
+
+const zoneActions = document.querySelector('.confirmation-actions');
+if (zoneActions) {
+zoneActions.prepend(lien);
+return;
+}
+
+const carte = document.querySelector('.confirmation-card');
+if (!carte) {
+return;
+}
+
+const conteneur = document.createElement('div');
+conteneur.className = 'mt-4 d-flex justify-content-center';
+conteneur.appendChild(lien);
+carte.appendChild(conteneur);
+});
+</script>
 
 <style>
     .confirmation-container {

@@ -235,12 +235,13 @@ namespace croupe_06_TournoiGolf.Controllers
             await _context.SaveChangesAsync();
 
             // Passer la méthode de paiement à la vue
-            ViewBag.MethodePaiement = methodePaiement;
+ViewBag.MethodePaiement = methodePaiement;
 
-            // Préparer les infos pour la confirmation
-            ViewBag.NomTournoi = participant.Tournoi?.Nom;
+// Préparer les infos pour la confirmation
+ViewBag.NomTournoi = participant.Tournoi?.Nom;
+ViewBag.ParticipantId = participant.ParticipantId;
 
-            if (participant.EquipeId != null)
+if (participant.EquipeId != null)
             {
                 var eq = await _context.Equipes.FindAsync(participant.EquipeId);
                 if (eq != null)
@@ -254,7 +255,43 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         // Page de confirmation
-        public IActionResult Confirmation()
+[HttpGet]
+public IActionResult TelechargerBillet(int participantId)
+{
+int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+if (userId == 0)
+{
+return Unauthorized();
+}
+
+var participant = _context.Participants
+.Include(p => p.Tournoi)
+.Include(p => p.Utilisateur)
+.FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
+
+if (participant == null)
+{
+return NotFound();
+}
+
+if (!string.Equals(participant.StatutInscription, "CONFIRMEE", StringComparison.OrdinalIgnoreCase))
+{
+return RedirectToAction("Paiement", new { participantId });
+}
+
+var ticketService = new croupe_06_TournoiGolf.Services.TicketService();
+var pdfBytes = ticketService.GenererBilletPdf(participant);
+var nomParticipant = $"{participant.Utilisateur?.Prenom ?? participant.Prenom} {participant.Utilisateur?.Nom ?? participant.Nom}".Trim();
+if (string.IsNullOrWhiteSpace(nomParticipant))
+{
+nomParticipant = $"participant-{participant.ParticipantId}";
+}
+
+var nomFichier = $"billet-{nomParticipant.Replace(' ', '-').ToLowerInvariant()}-{participant.ParticipantId}.pdf";
+return File(pdfBytes, "application/pdf", nomFichier);
+}
+
+public IActionResult Confirmation()
         {
             return View();
         }

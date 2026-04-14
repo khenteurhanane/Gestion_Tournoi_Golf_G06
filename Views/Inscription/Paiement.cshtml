@@ -32,7 +32,7 @@
                 </button>
             </div>
 
-            <form asp-action="SimulerPaiement" method="post" id="paymentForm">
+<form asp-action="SimulerPaiement" asp-route-participantId="@Model.ParticipantId" method="post" id="paymentForm">
                 <input type="hidden" name="participantId" value="@Model.ParticipantId" />
                 <input type="hidden" name="methodePaiement" id="methodePaiement" value="Carte de Crédit/Débit" />
                 
