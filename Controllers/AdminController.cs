@@ -7,6 +7,11 @@ using croupe_06_TournoiGolf.Models;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
+    /// <summary>
+    /// CONTRÔLEUR ADMINISTRATION (BACK-END SÉCURISÉ)
+    /// Réservé aux utilisateurs avec le rôle "ADMIN".
+    /// Permet de gérer les tournois, les utilisateurs, les équipes et de voir les revenus.
+    /// </summary>
     public class AdminController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
@@ -18,7 +23,7 @@ namespace croupe_06_TournoiGolf.Controllers
             return role == "ADMIN";
         }
 
-        // Tableau de bord admin
+        // TABLEAU DE BORD PRINCIPAL : Affiche les chiffres clés de l'application
         public IActionResult Index()
         {
             if (!EstAdmin())
@@ -74,7 +79,7 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Liste de tous les utilisateurs
+        // GESTION DES UTILISATEURS : Liste tous les comptes enregistrés
         public IActionResult Utilisateurs()
         {
             if (!EstAdmin())
@@ -96,7 +101,7 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(utilisateurs);
         }
 
-        // Liste de tous les participants (US-12-T04)
+        // GESTION DES PARTICIPANTS : Liste tous les inscrits aux différents tournois
         public IActionResult Participants()
         {
             if (!EstAdmin()) return View("AccesRefuse");

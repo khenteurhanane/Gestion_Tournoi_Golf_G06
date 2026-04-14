@@ -8,6 +8,11 @@ namespace croupe_06_TournoiGolf.Controllers
 {
     // Extensions d'image acceptées
     // Dossier de destination : wwwroot/images/tournois/
+    /// <summary>
+    /// CONTRÔLEUR DES TOURNOIS
+    /// Permet de lister les tournois (Public) et de les gérer (Admin).
+    /// Gère aussi l'inscription, l'ouverture/fermeture et le démarrage des événements.
+    /// </summary>
     public class TournoiController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
@@ -25,7 +30,7 @@ namespace croupe_06_TournoiGolf.Controllers
             base.OnActionExecuting(context);
         }
 
-        // Affiche la liste des tournois
+        // PAGE PUBLIQUE : Liste tous les tournois disponibles
         public IActionResult Index()
         {
             var listeTournois = _context.Tournois.ToList();
@@ -59,7 +64,7 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Enregistre un nouveau tournoi (admin seulement)
+        // CRÉATION D'UN TOURNOI (ADMIN) : Enregistre le nom, le lieu, la date et l'image
         [HttpPost]
         public async Task<IActionResult> Create(Tournoi tournoi, IFormFile? imageFile)
         {

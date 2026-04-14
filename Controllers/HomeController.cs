@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
+    /// <summary>
+    /// CONTRÔLEUR D'ACCUEIL (FRONT-END)
+    /// Gère la page principale, les statistiques publiques et le changement de langue.
+    /// </summary>
     public class HomeController(Microsoft.Extensions.Logging.ILogger<HomeController> logger, croupe_06_TournoiGolf.Data.GolfDbContext context) : Controller
     {
         private readonly Microsoft.Extensions.Logging.ILogger<HomeController> _logger = logger;
@@ -16,13 +20,13 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             try
             {
-                // Stats pour la page d'accueil (peuvent être nulles si BDD non initialisée)
+                // RÉCUPÉRATION DES STATISTIQUES (BACKENDparlant à la BDD via Entity Framework)
                 ViewBag.NbTournois = _context.Tournois.Count();
                 ViewBag.NbParticipants = _context.Participants.Count();
                 ViewBag.NbEquipes = _context.Equipes.Count();
                 ViewBag.NbTournoisOuverts = _context.Tournois.Count(t => t.InscriptionsOuvertes);
 
-                // Prochain tournoi à venir
+                // AFFICHAGE DU PROCHAIN TOURNOI À VENIR
                 ViewBag.ProchainTournoi = _context.Tournois
                     .Where(t => t.DateTournoi >= DateTime.Today)
                     .OrderBy(t => t.DateTournoi)
