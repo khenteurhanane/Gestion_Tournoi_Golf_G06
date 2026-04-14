@@ -374,3 +374,7 @@ run_log_utf8.txt
 # Résultats de tests (générés automatiquement)
 Tests/TestResults/
 
+# Fichiers locaux personnels (ne pas pusher)
+.claude/
+Documentation/
+docs/
