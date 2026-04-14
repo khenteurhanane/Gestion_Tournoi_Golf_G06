@@ -63,8 +63,9 @@
 
                     <div class="d-flex justify-content-between mt-5">
                         <a href="/Boutique/Panier" class="btn btn-light"><i class="fas fa-arrow-left"></i> Retour au panier</a>
-                        <button type="submit" class="btn btn-success px-5 fw-bold">
-                            Payer @Model.Panier.TotalFinal.ToString("C") <i class="fas fa-lock ms-2"></i>
+                        <button type="submit" class="btn btn-success px-5 fw-bold" id="submitBtn">
+                            <span id="btnText">Payer @Model.Panier.TotalFinal.ToString("C")</span> <i class="fas fa-lock ms-2" id="btnIcon"></i>
+                            <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display:none;"></span>
                         </button>
                     </div>
                 </form>
@@ -74,6 +75,34 @@
 </div>
 
 <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const form = this;
+        if (form.getAttribute("data-submitting") === "true") {
+            e.preventDefault();
+            return;
+        }
+        
+        // Validation check (si des champs requis ne sont pas remplis, le navigateur bloque nativement)
+        if (!form.checkValidity()) {
+            return; // Laisse le navigateur afficher ses erreurs natives
+        }
+        
+        const btn = document.getElementById('submitBtn');
+        const text = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        const icon = document.getElementById('btnIcon');
+        
+        form.setAttribute("data-submitting", "true");
+        
+        setTimeout(function() {
+            btn.disabled = true;
+            if (text) text.innerText = "Déjà payé";
+            if (spinner) spinner.style.display = "inline-block";
+            if (icon) icon.style.display = "none";
+            btn.style.filter = "grayscale(0.5)";
+        }, 0);
+    });
+
     document.querySelectorAll('input[name="ModePaiement"]').forEach(radio => {
         radio.addEventListener('change', function() {
             var formCarte = document.getElementById('formCarte');

@@ -105,10 +105,36 @@
                     </div>
 
                     <button type="submit" class="premium-submit-btn" id="submitBtn">
-                        <span>Confirmer le paiement</span>
-                        <i class="fas fa-lock"></i>
+                        <span id="btnText">Confirmer le paiement</span>
+                        <i class="fas fa-lock" id="btnIcon"></i>
+                        <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display:none;"></span>
                     </button>
                 </form>
+
+                <script>
+                    document.querySelector('form').addEventListener('submit', function(e) {
+                        const form = this;
+                        if (form.getAttribute("data-submitting") === "true") {
+                            e.preventDefault();
+                            return;
+                        }
+                        
+                        const btn = document.getElementById('submitBtn');
+                        const text = document.getElementById('btnText');
+                        const spinner = document.getElementById('spinner');
+                        const icon = document.getElementById('btnIcon');
+                        
+                        form.setAttribute("data-submitting", "true");
+                        
+                        setTimeout(function() {
+                            btn.disabled = true;
+                            if (text) text.innerText = "Déjà payé";
+                            if (spinner) spinner.style.display = "inline-block";
+                            if (icon) icon.style.display = "none";
+                            btn.style.filter = "grayscale(0.5)";
+                        }, 0);
+                    });
+                </script>
             </div>
         </div>
         
