@@ -25,9 +25,12 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
         [HttpPost]
+        // LE LIEN WEB <--> BACKEND SE FAIT ICI :
+        // "string email" récupère la valeur du <input name="email"> de Login.cshtml
+        // "string motDePasse" récupère la valeur du <input name="motDePasse"> de Login.cshtml
         public IActionResult Login(string email, string motDePasse)
         {
-            // Chercher l'utilisateur dans la base de données
+            // Chercher l'utilisateur dans la base de données (Backend communiquant avec SQL)
             var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == email);
 
             if (utilisateur != null && _passwordHasher.VerifyPassword(motDePasse, utilisateur.MotDePasseHash))
