@@ -1,5 +1,7 @@
 # Schéma de la Base de Données - Golf Tournoi G06
 
+![Vue d'ensemble du Schéma](golf_db_schema.png)
+
 Voici l'organisation de la base de données du projet. Le système utilise Entity Framework Core avec SQL Server.
 
 ## Diagramme des Relations (ERD)
