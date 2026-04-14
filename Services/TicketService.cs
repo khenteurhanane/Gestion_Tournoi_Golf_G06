@@ -153,6 +153,145 @@ public class TicketService
             $"LIEU={participant.Tournoi.Lieu}");
     }
 
+    public byte[] GenererRecuPdf(CommandeBoutique commande)
+    {
+        using var outputStream = new MemoryStream();
+        using var document = new Document(PageSize.A4, 36f, 36f, 40f, 36f);
+        PdfWriter.GetInstance(document, outputStream);
+
+        document.Open();
+
+        var titreFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 22f, new BaseColor(45, 106, 46));
+        var sousTitreFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, new BaseColor(80, 80, 80));
+        var etiquetteFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10f, new BaseColor(26, 46, 18));
+        var valeurFont = FontFactory.GetFont(FontFactory.HELVETICA, 10f, new BaseColor(0, 0, 0));
+        var itemsTableFont = FontFactory.GetFont(FontFactory.HELVETICA, 10f, new BaseColor(0, 0, 0));
+        var itemsHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10f, new BaseColor(255, 255, 255));
+        var footerFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9f, new BaseColor(90, 90, 90));
+
+        var titre = new Paragraph("Recu de Transaction - Boutique Golf G06", titreFont)
+        {
+            Alignment = Element.ALIGN_CENTER,
+            SpacingAfter = 8f
+        };
+        document.Add(titre);
+
+        var dateStr = commande.DateCommande.ToString("dddd d MMMM yyyy HH:mm", CultureInfo.GetCultureInfo("fr-CA"));
+        var numCommande = $"#{commande.CommandeId:D6}";
+        var sousTitre = new Paragraph($"Commande {numCommande} - Date : {dateStr}", sousTitreFont)
+        {
+            Alignment = Element.ALIGN_CENTER,
+            SpacingAfter = 20f
+        };
+        document.Add(sousTitre);
+
+        // Client Info
+        var clientNom = $"{commande.Utilisateur?.Prenom} {commande.Utilisateur?.Nom}".Trim();
+        if (string.IsNullOrWhiteSpace(clientNom)) clientNom = commande.Utilisateur?.Email ?? "Client Boutique";
+
+        var clientInfo = new Paragraph($"Client : {clientNom}", etiquetteFont)
+        {
+            Alignment = Element.ALIGN_LEFT,
+            SpacingAfter = 15f
+        };
+        document.Add(clientInfo);
+
+        // Items Table
+        var tableItems = new PdfPTable(4)
+        {
+            WidthPercentage = 100,
+            SpacingBefore = 10f,
+            SpacingAfter = 15f
+        };
+        tableItems.SetWidths(new[] { 3.5f, 1f, 1f, 1f });
+
+        // Headers
+        tableItems.AddCell(CreerCellule("Article", itemsHeaderFont, new BaseColor(45, 106, 46)));
+        tableItems.AddCell(CreerCellule("Prix Unitaire", itemsHeaderFont, new BaseColor(45, 106, 46)));
+        tableItems.AddCell(CreerCellule("Qté", itemsHeaderFont, new BaseColor(45, 106, 46)));
+        tableItems.AddCell(CreerCellule("Total", itemsHeaderFont, new BaseColor(45, 106, 46)));
+
+        foreach (var item in commande.Items)
+        {
+            tableItems.AddCell(CreerCellule(item.ArticleNom, itemsTableFont, BaseColor.White));
+            tableItems.AddCell(CreerCellule($"{item.PrixUnitaire:F2} $", itemsTableFont, BaseColor.White));
+            tableItems.AddCell(CreerCellule(item.Quantite.ToString(), itemsTableFont, BaseColor.White));
+            tableItems.AddCell(CreerCellule($"{item.Total:F2} $", itemsTableFont, BaseColor.White));
+        }
+
+        document.Add(tableItems);
+
+        // Totals Table
+        var tableTotaux = new PdfPTable(2)
+        {
+            HorizontalAlignment = Element.ALIGN_RIGHT,
+            WidthPercentage = 40,
+            SpacingAfter = 30f
+        };
+        tableTotaux.SetWidths(new[] { 2f, 1.5f });
+
+        AjouterLigneTotale(tableTotaux, "Sous-Total", $"{commande.SousTotal:F2} $", extraction: false);
+        if (commande.Rabais > 0)
+        {
+            AjouterLigneTotale(tableTotaux, "Rabais (Etudiant)", $"-{commande.Rabais:F2} $", extraction: true);
+        }
+        AjouterLigneTotale(tableTotaux, "Taxes (TPS/TVQ)", $"{commande.Taxes:F2} $", extraction: false);
+        AjouterLigneTotale(tableTotaux, "TOTAL FINAL", $"{commande.TotalFinal:F2} $", extraction: false, bold: true);
+
+        document.Add(tableTotaux);
+
+        // QR Code for verification
+        var contenuQr = $"GOLF-G06-SHOP\nID={commande.CommandeId}\nTOTAL={commande.TotalFinal:F2}\nDATE={commande.DateCommande:yyyy-MM-dd}";
+        var qrCodeBytes = GenererQrCode(contenuQr);
+        var qrImage = Image.GetInstance(qrCodeBytes);
+        qrImage.Alignment = Element.ALIGN_CENTER;
+        qrImage.ScaleToFit(140f, 140f);
+        qrImage.SpacingAfter = 10f;
+        document.Add(qrImage);
+
+        var footer = new Paragraph(
+            $"Mode de paiement : {commande.ModePaiement.ToUpper()} | Merci de votre confiance !",
+            footerFont)
+        {
+            Alignment = Element.ALIGN_CENTER
+        };
+        document.Add(footer);
+
+        document.Close();
+        return outputStream.ToArray();
+    }
+
+    private static void AjouterLigneTotale(PdfPTable table, string etiquette, string valeur, bool extraction, bool bold = false)
+    {
+        var font = bold ? FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10) : FontFactory.GetFont(FontFactory.HELVETICA, 10);
+        var color = extraction ? new BaseColor(185, 28, 28) : BaseColor.Black; // Red for discount
+        if (extraction) font.Color = color;
+
+        var cellLabel = new PdfPCell(new Phrase(etiquette, font))
+        {
+            Border = Rectangle.NO_BORDER,
+            Padding = 5f,
+            HorizontalAlignment = Element.ALIGN_RIGHT
+        };
+        var cellValue = new PdfPCell(new Phrase(valeur, font))
+        {
+            Border = Rectangle.NO_BORDER,
+            Padding = 5f,
+            HorizontalAlignment = Element.ALIGN_RIGHT
+        };
+
+        if (bold)
+        {
+            cellLabel.BorderWidthTop = 1f;
+            cellValue.BorderWidthTop = 1f;
+            cellLabel.PaddingTop = 10f;
+            cellValue.PaddingTop = 10f;
+        }
+
+        table.AddCell(cellLabel);
+        table.AddCell(cellValue);
+    }
+
     private static byte[] GenererQrCode(string contenuQr)
     {
         using var qrGenerator = new QRCodeGenerator();

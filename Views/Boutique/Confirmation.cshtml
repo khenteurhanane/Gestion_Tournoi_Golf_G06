@@ -2,6 +2,7 @@
     ViewData["Title"] = "Confirmation de Commande";
     var montantPaye = TempData["MontantPaye"];
     var modePaiement = TempData["ModePaiement"];
+    var commandeId = TempData["CommandeId"];
 }
 
 <div class="row justify-content-center mt-5">
@@ -33,6 +34,12 @@
             </div>
 
             <div>
+                @if (commandeId != null)
+                {
+                    <a href="/Boutique/TelechargerRecu?commandeId=@commandeId" class="btn btn-warning me-2">
+                        <i class="fas fa-file-pdf me-2"></i> Télécharger mon reçu
+                    </a>
+                }
                 <a href="/Boutique/Index" class="btn btn-outline-primary me-2">Retourner à la boutique</a>
                 <a href="/" class="btn btn-primary">Retourner à l'accueil</a>
             </div>

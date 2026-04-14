@@ -1,5 +1,6 @@
 using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
+using croupe_06_TournoiGolf.Models;
 using croupe_06_TournoiGolf.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +82,45 @@ using (var scope = app.Services.CreateScope())
 
   // Crée la base et les tables basées sur les classes Models/ si elles n'existent pas encore
   context.Database.EnsureCreated();
+
+  // --- REPARATION BASE DE DONNEES (GOLF-REPAIR) ---
+  // On s'assure que les nouvelles tables de la boutique existent (Car EnsureCreated ne les ajoute pas si la DB existe déjà)
+  context.Database.ExecuteSqlRaw(@"
+    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CommandesBoutique')
+    BEGIN
+        CREATE TABLE CommandesBoutique (
+            CommandeId INT IDENTITY(1,1) PRIMARY KEY,
+            UtilisateurId INT NULL,
+            SousTotal DECIMAL(18,2) NOT NULL,
+            Rabais DECIMAL(18,2) NOT NULL,
+            Taxes DECIMAL(18,2) NOT NULL,
+            TotalFinal DECIMAL(18,2) NOT NULL,
+            ModePaiement NVARCHAR(50) NOT NULL,
+            DateCommande DATETIME2 NOT NULL,
+            CONSTRAINT FK_CommandesBoutique_Utilisateurs_UtilisateurId FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(UtilisateurId)
+        );
+    END
+
+    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ItemsCommandesBoutique')
+    BEGIN
+        CREATE TABLE ItemsCommandesBoutique (
+            ItemId INT IDENTITY(1,1) PRIMARY KEY,
+            CommandeId INT NOT NULL,
+            ArticleId INT NOT NULL,
+            ArticleNom NVARCHAR(100) NOT NULL,
+            PrixUnitaire DECIMAL(18,2) NOT NULL,
+            Quantite INT NOT NULL,
+            CONSTRAINT FK_ItemsCommandesBoutique_CommandesBoutique_CommandeId FOREIGN KEY (CommandeId) REFERENCES CommandesBoutique(CommandeId) ON DELETE CASCADE
+        );
+    END
+
+    -- Correction GOLF143 (EstEnCours dans Tournois)
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'EstEnCours')
+    BEGIN
+        ALTER TABLE Tournois ADD EstEnCours BIT NOT NULL DEFAULT 0;
+    END
+  ");
+  // ------------------------------------------------
 
   // --- SEEDING : AJOUT DE L'ADMIN PAR DÉFAUT ---
   if (!context.Utilisateurs.Any(u => u.Role == "ADMIN"))

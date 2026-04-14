@@ -4,11 +4,18 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using croupe_06_TournoiGolf.Models.ViewModels;
+using croupe_06_TournoiGolf.Data;
+using croupe_06_TournoiGolf.Models;
+using croupe_06_TournoiGolf.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class BoutiqueController : BaseController
+    public class BoutiqueController(GolfDbContext context, TicketService ticketService) : BaseController
     {
+        private readonly GolfDbContext _context = context;
+        private readonly TicketService _ticketService = ticketService;
+
         // Inventaire simulé
         private static readonly List<ArticleBoutique> Catalogue = new List<ArticleBoutique>
         {
@@ -114,21 +121,64 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
-        public IActionResult ConfirmerPaiement(PaiementBoutiqueViewModel model)
+        public async Task<IActionResult> ConfirmerPaiement(PaiementBoutiqueViewModel model)
         {
             var panier = ObtenirPanier();
             if (!panier.Items.Any()) return RedirectToAction("Index");
 
-            // Simulation du traitement du paiement...
-            
-            // On conserve un résumé avant de vider le panier
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            // Créer la commande en base de données pour le reçu (GOLF-SHOP-RECEIPT)
+            var commande = new CommandeBoutique
+            {
+                UtilisateurId = userId,
+                SousTotal = panier.SousTotal,
+                Rabais = panier.Rabais,
+                Taxes = panier.Taxes,
+                TotalFinal = panier.TotalFinal,
+                ModePaiement = model.ModePaiement,
+                DateCommande = DateTime.Now,
+                Items = panier.Items.Select(i => new ItemCommandeBoutique
+                {
+                    ArticleId = i.Article.Id,
+                    ArticleNom = i.Article.Nom,
+                    PrixUnitaire = i.Article.Prix,
+                    Quantite = i.Quantite
+                }).ToList()
+            };
+
+            _context.CommandesBoutique.Add(commande);
+            await _context.SaveChangesAsync();
+
+            // On conserve les infos pour la confirmation
             TempData["MontantPaye"] = panier.TotalFinal.ToString("F2");
             TempData["ModePaiement"] = model.ModePaiement;
+            TempData["CommandeId"] = commande.CommandeId;
             
             // Vider le panier
             HttpContext.Session.Remove("PanierBoutique");
 
             return RedirectToAction("Confirmation");
+        }
+
+        public async Task<IActionResult> TelechargerRecu(int commandeId)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            
+            var commande = await _context.CommandesBoutique
+                .Include(c => c.Utilisateur)
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.CommandeId == commandeId && c.UtilisateurId == userId);
+
+            if (commande == null)
+            {
+                return NotFound();
+            }
+
+            var pdfBytes = _ticketService.GenererRecuPdf(commande);
+            var nomFichier = $"recu-{commande.CommandeId:D6}.pdf";
+            
+            return File(pdfBytes, "application/pdf", nomFichier);
         }
 
         public IActionResult Confirmation()
