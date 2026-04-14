@@ -13,6 +13,7 @@
 <div class="btn-group">
     <a href="/Tournoi/Edit/@tournoi.TournoiId" class="btn">Modifier</a>
     <form action="/Tournoi/Delete" method="post" style="display:inline;" onsubmit="return confirm('Supprimer ce tournoi et toutes ses inscriptions? Cette action est irréversible.');">
+        @Html.AntiForgeryToken()
         <input type="hidden" name="id" value="@tournoi.TournoiId" />
         <button type="submit" class="btn btn-danger">Supprimer</button>
     </form>
