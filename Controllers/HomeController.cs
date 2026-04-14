@@ -14,17 +14,29 @@ namespace croupe_06_TournoiGolf.Controllers
 
         public IActionResult Index()
         {
-            // Stats pour la page d'accueil
-            ViewBag.NbTournois = _context.Tournois.Count();
-            ViewBag.NbParticipants = _context.Participants.Count();
-            ViewBag.NbEquipes = _context.Equipes.Count();
-            ViewBag.NbTournoisOuverts = _context.Tournois.Count(t => t.InscriptionsOuvertes);
+            try
+            {
+                // Stats pour la page d'accueil (peuvent être nulles si BDD non initialisée)
+                ViewBag.NbTournois = _context.Tournois.Count();
+                ViewBag.NbParticipants = _context.Participants.Count();
+                ViewBag.NbEquipes = _context.Equipes.Count();
+                ViewBag.NbTournoisOuverts = _context.Tournois.Count(t => t.InscriptionsOuvertes);
 
-            // Prochain tournoi à venir (pour afficher sur la page d'accueil)
-            ViewBag.ProchainTournoi = _context.Tournois
-                .Where(t => t.DateTournoi >= DateTime.Today)
-                .OrderBy(t => t.DateTournoi)
-                .FirstOrDefault();
+                // Prochain tournoi à venir
+                ViewBag.ProchainTournoi = _context.Tournois
+                    .Where(t => t.DateTournoi >= DateTime.Today)
+                    .OrderBy(t => t.DateTournoi)
+                    .FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Erreur d'accès à la base de données : {Message}. L'application continue avec des données vides.", ex.Message);
+                ViewBag.NbTournois = 0;
+                ViewBag.NbParticipants = 0;
+                ViewBag.NbEquipes = 0;
+                ViewBag.NbTournoisOuverts = 0;
+                ViewBag.ProchainTournoi = null;
+            }
 
             return View();
         }
