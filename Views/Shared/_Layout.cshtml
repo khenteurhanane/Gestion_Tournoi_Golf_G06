@@ -153,6 +153,11 @@
     <!-- Overlay mobile -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    <!-- Bouton hamburger flottant (mobile uniquement) -->
+    <button class="fab-hamburger" id="fabHamburger" aria-label="Ouvrir le menu">
+        <i class="fas fa-bars" id="fabIcon"></i>
+    </button>
+
     <style>
         :root {
             --sidebar-width: 250px;
@@ -464,6 +469,43 @@
         .topbar-left h2, .topbar-left span {
             display: block;
         }
+
+        /* ===== FAB HAMBURGER (mobile uniquement) ===== */
+        .fab-hamburger {
+            display: none; /* caché sur desktop */
+        }
+
+        @media (max-width: 991px) {
+            .fab-hamburger {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
+                border: none;
+                background: var(--primary-navy);
+                color: #ffffff;
+                font-size: 1.4rem;
+                cursor: pointer;
+                z-index: 400;
+                box-shadow: 0 6px 24px rgba(15,23,42,0.35), 0 2px 8px rgba(0,0,0,0.2);
+                transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+            }
+            .fab-hamburger:hover {
+                background: #1e3a5f;
+                transform: scale(1.08);
+                box-shadow: 0 10px 32px rgba(15,23,42,0.45);
+            }
+            .fab-hamburger.open {
+                background: #e53935;
+                transform: rotate(90deg) scale(1.05);
+                box-shadow: 0 8px 28px rgba(229,57,53,0.4);
+            }
+        }
     </style>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -472,33 +514,61 @@
     @await RenderSectionAsync("Scripts", required: false)
     <script>
         const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('.app-sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const toggleIcon = sidebarToggle.querySelector('i');
+        const fabHamburger  = document.getElementById('fabHamburger');
+        const fabIcon       = document.getElementById('fabIcon');
+        const sidebar       = document.querySelector('.app-sidebar');
+        const overlay       = document.getElementById('sidebarOverlay');
+        const toggleIcon    = sidebarToggle ? sidebarToggle.querySelector('i') : null;
 
         function openSidebar() {
             sidebar.classList.add('open');
             overlay.classList.add('active');
-            sidebarToggle.classList.add('open');
-            toggleIcon.classList.replace('fa-bars', 'fa-times');
+            // Topbar toggle
+            if (sidebarToggle) { sidebarToggle.classList.add('open'); }
+            if (toggleIcon)    { toggleIcon.classList.replace('fa-bars', 'fa-times'); }
+            // FAB
+            if (fabHamburger)  { fabHamburger.classList.add('open'); fabHamburger.setAttribute('aria-label','Fermer le menu'); }
+            if (fabIcon)       { fabIcon.classList.replace('fa-bars', 'fa-times'); }
             document.body.style.overflow = 'hidden';
         }
+
         function closeSidebar() {
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
-            sidebarToggle.classList.remove('open');
-            toggleIcon.classList.replace('fa-times', 'fa-bars');
+            // Topbar toggle
+            if (sidebarToggle) { sidebarToggle.classList.remove('open'); }
+            if (toggleIcon)    { toggleIcon.classList.replace('fa-times', 'fa-bars'); }
+            // FAB
+            if (fabHamburger)  { fabHamburger.classList.remove('open'); fabHamburger.setAttribute('aria-label','Ouvrir le menu'); }
+            if (fabIcon)       { fabIcon.classList.replace('fa-times', 'fa-bars'); }
             document.body.style.overflow = '';
         }
 
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-        });
+        // Topbar button
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () =>
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
+            );
+        }
+        // FAB button
+        if (fabHamburger) {
+            fabHamburger.addEventListener('click', () =>
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
+            );
+        }
+        // Overlay click closes sidebar
         overlay.addEventListener('click', closeSidebar);
 
-        // Fermer sidebar au clic sur un lien
+        // Fermer sidebar au clic sur un lien (mobile)
         document.querySelectorAll('.sidebar-nav a').forEach(link => {
-            link.addEventListener('click', closeSidebar);
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 991) closeSidebar();
+            });
+        });
+
+        // Fermer avec la touche Échap
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
         });
     </script>
 </body>
