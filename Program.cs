@@ -2,6 +2,7 @@ using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
 using croupe_06_TournoiGolf.Models;
 using croupe_06_TournoiGolf.Hubs;
+using croupe_06_TournoiGolf.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,10 @@ builder.Services.AddScoped<TicketService>();
 builder.Services.AddSignalR();
 
 builder.Services.AddHttpContextAccessor();
+
+// Services Météo
+builder.Services.AddHttpClient<WeatherService>();
+builder.Services.AddScoped<WeatherService>();
 
 // Support multilingue (US-Localization)
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -80,7 +85,8 @@ using (var scope = app.Services.CreateScope())
  {
   var context = services.GetRequiredService<GolfDbContext>();
 
-  // Crée la base et les tables basées sur les classes Models/ si elles n'existent pas encore
+  // RÉINITIALISATION COMPLÈTE (Développement)
+  context.Database.EnsureDeleted(); 
   context.Database.EnsureCreated();
 
   // --- REPARATION BASE DE DONNEES (GOLF-REPAIR) ---
@@ -133,6 +139,7 @@ using (var scope = app.Services.CreateScope())
     Role = "ADMIN",
     Prenom = "Admin",
     Nom = "G06",
+    Telephone = "514-000-0000",
     CreeLe = DateTime.Now
    });
    context.SaveChanges();

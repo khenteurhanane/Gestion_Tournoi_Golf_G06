@@ -36,10 +36,28 @@ namespace croupe_06_TournoiGolf.Data
                 .HasDatabaseName("IX_Equipes_CodeSecret");
 
             // Index composé pour accélérer les recherches par tournoi et utilisateur
-            // UtilisateurId est nullable pour les invités commandités
             modelBuilder.Entity<Participant>()
                 .HasIndex(p => new { p.TournoiId, p.UtilisateurId })
                 .HasDatabaseName("IX_Participants_TournoiId_UtilisateurId");
+
+            // Désactivation des suppressions en cascade pour éviter les cycles (Erreur 1785)
+            modelBuilder.Entity<Participant>()
+                .HasOne(p => p.Tournoi)
+                .WithMany()
+                .HasForeignKey(p => p.TournoiId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Equipe>()
+                .HasOne(e => e.Tournoi)
+                .WithMany()
+                .HasForeignKey(e => e.TournoiId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Equipe>()
+                .HasOne(e => e.Createur)
+                .WithMany()
+                .HasForeignKey(e => e.CreeParUtilisateurId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

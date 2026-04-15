@@ -56,45 +56,114 @@
     </div>
 </div>
 
-<!-- ========== WIDGET MÉTÉO ========== -->
-<div class="weather-strip" id="weatherWidget">
-    <div class="weather-loading">
-        <i class="fas fa-spinner fa-spin"></i>
-        <span>Chargement de la météo pour Ottawa...</span>
-    </div>
-    <div class="weather-content" style="display:none;">
-        <div class="weather-location">
-            <i class="fas fa-map-marker-alt"></i>
-            <span id="weatherCity">Ottawa, ON</span>
-            <span class="weather-label">— Conditions pour le prochain tournoi</span>
-        </div>
-        <div class="weather-details">
-            <div class="weather-main">
-                <span class="weather-icon-big" id="weatherIcon">☀️</span>
-                <span class="weather-temp" id="weatherTemp">--°C</span>
-                <span class="weather-desc" id="weatherDesc">Chargement...</span>
+<!-- ========== WIDGET MÉTÉO PREMIUM ========== -->
+<div class="weather-card" id="weatherWidget">
+    <!-- Animated background elements -->
+    <div class="weather-bg-orb orb-1" id="wOrb1"></div>
+    <div class="weather-bg-orb orb-2" id="wOrb2"></div>
+
+    @if (ViewBag.Weather != null)
+    {
+        var w = (croupe_06_TournoiGolf.Services.WeatherData)ViewBag.Weather;
+        string icon = w.WeatherCode == 0 ? "☀️" :
+                      w.WeatherCode <= 2 ? "⛅" :
+                      w.WeatherCode == 3 ? "☁️" :
+                      w.WeatherCode <= 49 ? "🌫️" :
+                      w.WeatherCode <= 67 ? "🌧️" :
+                      w.WeatherCode <= 77 ? "❄️" :
+                      w.WeatherCode <= 82 ? "🌦️" : "⛈️";
+        string desc = w.WeatherCode == 0 ? "Ciel dégagé" :
+                      w.WeatherCode <= 2 ? "Partiellement nuageux" :
+                      w.WeatherCode == 3 ? "Couvert" :
+                      w.WeatherCode <= 49 ? "Brouillard" :
+                      w.WeatherCode <= 57 ? "Bruine légère" :
+                      w.WeatherCode <= 67 ? "Pluie" :
+                      w.WeatherCode <= 77 ? "Neige" :
+                      w.WeatherCode <= 82 ? "Averses" : "Orage";
+        int golfScore = (w.WeatherCode <= 2 && w.RainProb < 30 && w.WindSpeed < 30) ? 5 :
+                        (w.WeatherCode <= 3 && w.RainProb < 50) ? 4 :
+                        (w.WeatherCode <= 49 && w.RainProb < 60) ? 3 :
+                        (w.WeatherCode <= 67) ? 2 : 1;
+        string golfLabel = golfScore == 5 ? "Parfait" : golfScore == 4 ? "Très bon" : golfScore == 3 ? "Correct" : golfScore == 2 ? "Difficile" : "Déconseillé";
+        string golfEmoji = golfScore == 5 ? "🏆" : golfScore == 4 ? "🏌️" : golfScore == 3 ? "⛳" : golfScore == 2 ? "🌂" : "⛔";
+
+        // Date du jour en français (côté serveur)
+        System.Globalization.CultureInfo fr = new System.Globalization.CultureInfo("fr-CA");
+        string dateJour = DateTime.Now.ToString("dddd d MMMM yyyy", fr);
+        string heureJour = DateTime.Now.ToString("HH:mm", fr);
+        // Majuscule sur le premier caractère
+        dateJour = char.ToUpper(dateJour[0]) + dateJour.Substring(1);
+
+        <div class="wc-left">
+            <div class="wc-date-row">
+                <span class="wc-date" id="weatherDateText">@dateJour</span>
+                <span class="wc-time" id="weatherTimeText">@heureJour</span>
             </div>
-            <div class="weather-extras">
-                <div class="weather-stat">
-                    <i class="fas fa-tint"></i>
-                    <span id="weatherHumidity">--</span>%
-                    <small>Humidité</small>
-                </div>
-                <div class="weather-stat">
-                    <i class="fas fa-wind"></i>
-                    <span id="weatherWind">--</span> km/h
-                    <small>Vent</small>
-                </div>
-                <div class="weather-stat">
-                    <i class="fas fa-cloud-rain"></i>
-                    <span id="weatherRain">--</span>%
-                    <small>Pluie</small>
+            <div class="wc-location">
+                <i class="fas fa-location-dot"></i>
+                <span id="weatherCityText">@w.City</span>
+            </div>
+            <div class="wc-temp-block">
+                <div class="wc-icon" id="weatherIconText">@icon</div>
+                <div class="wc-temp-main">
+                    <span class="wc-temp" id="weatherTempText">@Math.Round(w.Temp)°</span>
+                    <span class="wc-unit">C</span>
                 </div>
             </div>
-            <div class="weather-advice" id="weatherAdvice"></div>
+            <div class="wc-desc" id="weatherDescText">@desc</div>
+            <div class="wc-feels">Ressenti <span id="weatherApparentText">@Math.Round(w.ApparentTemp)°C</span></div>
         </div>
-    </div>
+
+        <div class="wc-divider"></div>
+
+        <div class="wc-right">
+            <!-- Stats row -->
+            <div class="wc-stats">
+                <div class="wc-stat-item">
+                    <div class="wc-stat-icon">💧</div>
+                    <div class="wc-stat-val" id="weatherHumidityText">@w.Humidity%</div>
+                    <div class="wc-stat-lbl">Humidité</div>
+                </div>
+                <div class="wc-stat-item">
+                    <div class="wc-stat-icon">🌬️</div>
+                    <div class="wc-stat-val" id="weatherWindText">@Math.Round(w.WindSpeed) km/h</div>
+                    <div class="wc-stat-lbl">Vent</div>
+                </div>
+                <div class="wc-stat-item">
+                    <div class="wc-stat-icon">🌧️</div>
+                    <div class="wc-stat-val" id="weatherRainText">@w.RainProb%</div>
+                    <div class="wc-stat-lbl">Précip.</div>
+                </div>
+                <div class="wc-stat-item">
+                    <div class="wc-stat-icon">☀️</div>
+                    <div class="wc-stat-val" id="weatherUvText">@w.UvIndex.ToString("F1")</div>
+                    <div class="wc-stat-lbl">Indice UV</div>
+                </div>
+            </div>
+
+            <!-- Golf score -->
+            <div class="wc-golf-rating" id="weatherAdviceText">
+                <span class="wc-golf-emoji" id="weatherGolfEmoji">@golfEmoji</span>
+                <div>
+                    <div class="wc-golf-title">Conditions de golf</div>
+                    <div class="wc-golf-stars" id="weatherGolfStars">
+                        @for(int i = 1; i <= 5; i++) {
+                            <span class="wc-star @(i <= golfScore ? "filled" : "empty")">★</span>
+                        }
+                        <span class="wc-golf-label" id="weatherGolfLabel"> @golfLabel</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="wc-error">
+            <span>⚠️ Météo indisponible</span>
+        </div>
+    }
 </div>
+
 
 <!-- ========== STATISTIQUES ========== -->
 <div class="stats-grid">
@@ -707,190 +776,395 @@
 </style>
 
 @section Scripts {
+<script>
+(function() {
+    // Detect weather gradient theme
+    function applyWeatherTheme(code) {
+        const card = document.getElementById('weatherWidget');
+        const o1 = document.getElementById('wOrb1');
+        const o2 = document.getElementById('wOrb2');
+        if (!card) return;
+        let bg, c1, c2;
+        if (code === 0) { bg = 'linear-gradient(135deg,#1a6fc4 0%,#0e4a8c 100%)'; c1='rgba(255,200,50,0.35)'; c2='rgba(100,180,255,0.2)'; }
+        else if (code <= 2) { bg = 'linear-gradient(135deg,#2d6ab4 0%,#154a8e 100%)'; c1='rgba(200,220,255,0.25)'; c2='rgba(255,200,50,0.15)'; }
+        else if (code <= 3) { bg = 'linear-gradient(135deg,#3d4f6e 0%,#1e2d45 100%)'; c1='rgba(150,170,200,0.25)'; c2='rgba(100,130,170,0.2)'; }
+        else if (code <= 49) { bg = 'linear-gradient(135deg,#4a5568 0%,#2d3748 100%)'; c1='rgba(160,170,185,0.25)'; c2='rgba(120,140,160,0.15)'; }
+        else if (code <= 67) { bg = 'linear-gradient(135deg,#2c4a6e 0%,#1a3050 100%)'; c1='rgba(80,150,220,0.3)'; c2='rgba(30,100,180,0.2)'; }
+        else if (code <= 77) { bg = 'linear-gradient(135deg,#3d5a80 0%,#1e3a5f 100%)'; c1='rgba(200,220,255,0.3)'; c2='rgba(150,200,255,0.2)'; }
+        else { bg = 'linear-gradient(135deg,#1a2a4a 0%,#0d1b33 100%)'; c1='rgba(255,100,50,0.25)'; c2='rgba(255,180,50,0.2)'; }
+        card.style.background = bg;
+        if(o1) o1.style.background = `radial-gradient(circle, ${c1} 0%, transparent 70%)`;
+        if(o2) o2.style.background = `radial-gradient(circle, ${c2} 0%, transparent 70%)`;
+    }
+
+    function calcGolfScore(code, rainProb, windSpeed) {
+        if (code <= 2 && rainProb < 30 && windSpeed < 30) return [5,'Parfait','🏆'];
+        if (code <= 3 && rainProb < 50) return [4,'Très bon','🏌️'];
+        if (code <= 49 && rainProb < 60) return [3,'Correct','⛳'];
+        if (code <= 67) return [2,'Difficile','🌂'];
+        return [1,'Déconseillé','⛔'];
+    }
+
+    function updateGolfStars(score, label, emoji) {
+        const starsEl = document.getElementById('weatherGolfStars');
+        const emojiEl = document.getElementById('weatherGolfEmoji');
+        const labelEl = document.getElementById('weatherGolfLabel');
+        if (starsEl) {
+            let html = '';
+            for(let i=1;i<=5;i++) html += `<span class="wc-star ${i<=score?'filled':'empty'}">★</span>`;
+            starsEl.innerHTML = html;
+            if(labelEl) { starsEl.appendChild(Object.assign(document.createElement('span'),{className:'wc-golf-label',textContent:' '+label})); }
+        }
+        if(emojiEl) emojiEl.textContent = emoji;
+    }
+
+    function getWeatherInfo(c) {
+        if(c===0) return ['☀️','Ciel dégagé'];
+        if(c<=2) return ['⛅','Partiellement nuageux'];
+        if(c<=3) return ['☁️','Couvert'];
+        if(c<=49) return ['🌫️','Brouillard'];
+        if(c<=57) return ['🌦️','Bruine légère'];
+        if(c<=67) return ['🌧️','Pluie'];
+        if(c<=77) return ['❄️','Neige'];
+        if(c<=82) return ['🌦️','Averses'];
+        return ['⛈️','Orage'];
+    }
+
+    // Fonction principale : charge la météo pour une lat/lon donnée
+    function loadWeather(lat, lon, cityOverride) {
+        fetch(`/Weather/GetWeather?lat=${lat}&lon=${lon}`)
+            .then(r => r.json())
+            .then(data => {
+                const info = getWeatherInfo(data.weatherCode);
+                const [score, label, emoji] = calcGolfScore(data.weatherCode, data.rainProb, data.windSpeed);
+                const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+                setText('weatherCityText', cityOverride || data.city);
+                setText('weatherTempText', Math.round(data.temp) + '°');
+                setText('weatherIconText', info[0]);
+                setText('weatherDescText', info[1]);
+                setText('weatherHumidityText', data.humidity + '%');
+                setText('weatherWindText', Math.round(data.windSpeed) + ' km/h');
+                setText('weatherRainText', data.rainProb + '%');
+                setText('weatherUvText', data.uvIndex.toFixed(1));
+                setText('weatherApparentText', Math.round(data.apparentTemp) + '°C');
+                updateGolfStars(score, label, emoji);
+                applyWeatherTheme(data.weatherCode);
+            })
+            .catch(() => {});
+    }
+
+    // Fallback via IP si GPS refusé
+    function loadWeatherByIP() {
+        fetch('https://ip-api.com/json/?lang=fr&fields=city,regionName,lat,lon,status')
+            .then(r => r.json())
+            .then(geo => {
+                if (geo.status === 'success') {
+                    const cityLabel = geo.city + ', ' + geo.regionName;
+                    loadWeather(geo.lat, geo.lon, cityLabel);
+                }
+            })
+            .catch(() => {});
+    }
+
+    // Indicateur de chargement
+    const cityEl = document.getElementById('weatherCityText');
+    if (cityEl) cityEl.textContent = 'Détection...';
+
+    // GPS en premier — demande immédiate de permission
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                // Géocodage inversé : obtenir le vrai nom de la ville
+                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=fr`)
+                    .then(r => r.json())
+                    .then(geo => {
+                        const addr = geo.address || {};
+                        const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+                        const province = addr.state || addr.region || '';
+                        const cityLabel = city && province ? `${city}, ${province}` : (city || province || 'Ma position');
+                        loadWeather(lat, lon, cityLabel);
+                    })
+                    .catch(() => loadWeather(lat, lon, 'Ma position'));
+            },
+            function() {
+                // GPS refusé : fallback IP
+                loadWeatherByIP();
+            },
+            { timeout: 8000, maximumAge: 300000 }
+        );
+    } else {
+        // Navigateur sans GPS : fallback IP
+        loadWeatherByIP();
+    }
+
+    // Apply initial theme from server-rendered code
+    const initIcon = document.getElementById('weatherIconText');
+    if (initIcon) {
+        const ic = initIcon.textContent.trim();
+        if(ic==='☀️') applyWeatherTheme(0);
+        else if(ic==='⛅') applyWeatherTheme(1);
+        else if(ic==='☁️') applyWeatherTheme(3);
+        else if(ic==='🌧️') applyWeatherTheme(61);
+        else if(ic==='❄️') applyWeatherTheme(71);
+        else if(ic==='⛈️') applyWeatherTheme(95);
+        else applyWeatherTheme(3);
+    }
+
+    // Live clock - updates every second
+    function updateClock() {
+        const now = new Date();
+        const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+        const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+        const dayName = days[now.getDay()];
+        const date = now.getDate();
+        const month = months[now.getMonth()];
+        const year = now.getFullYear();
+        const hours = String(now.getHours()).padStart(2,'0');
+        const mins = String(now.getMinutes()).padStart(2,'0');
+        const secs = String(now.getSeconds()).padStart(2,'0');
+
+        const dateEl = document.getElementById('weatherDateText');
+        const timeEl = document.getElementById('weatherTimeText');
+        if(dateEl) dateEl.textContent = `${dayName} ${date} ${month} ${year}`;
+        if(timeEl) timeEl.textContent = `${hours}:${mins}:${secs}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+})();
+</script>
 <style>
-    /* ===== WIDGET MÉTÉO ===== */
-    .weather-strip {
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-        border-radius: 20px;
-        margin: 0 0 30px 0;
-        padding: 20px 30px;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 8px 32px rgba(15,23,42,0.15);
-        border: 1px solid rgba(148,163,184,0.15);
-        min-height: 90px;
-        overflow: hidden;
+    /* ===== PREMIUM WEATHER CARD ===== */
+    .weather-card {
         position: relative;
-    }
-    .weather-strip::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(148,163,184,0.08) 0%, transparent 70%);
-        pointer-events: none;
-    }
-    .weather-loading {
-        color: rgba(255,255,255,0.6);
+        overflow: hidden;
+        border-radius: 28px;
+        margin: 0 0 30px 0;
+        padding: 32px 36px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        font-size: 0.95rem;
-        width: 100%;
-        justify-content: center;
+        gap: 0;
+        min-height: 180px;
+        background: linear-gradient(135deg, #1a6fc4 0%, #0e4a8c 100%);
+        box-shadow: 0 20px 60px rgba(14,74,140,0.35), 0 4px 16px rgba(0,0,0,0.2);
+        transition: background 1.2s ease, box-shadow 1s ease;
+        color: #fff;
     }
-    .weather-content {
-        width: 100%;
+    .weather-card:hover {
+        box-shadow: 0 28px 70px rgba(14,74,140,0.45), 0 8px 24px rgba(0,0,0,0.25);
+        transform: translateY(-2px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 1.2s ease;
     }
-    .weather-location {
+    .weather-bg-orb {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        transition: background 1.2s ease;
+    }
+    .orb-1 {
+        width: 300px; height: 300px;
+        top: -80px; left: -60px;
+        background: radial-gradient(circle, rgba(255,200,50,0.35) 0%, transparent 70%);
+        animation: orbFloat1 8s ease-in-out infinite;
+    }
+    .orb-2 {
+        width: 250px; height: 250px;
+        bottom: -100px; right: 20%;
+        background: radial-gradient(circle, rgba(100,180,255,0.2) 0%, transparent 70%);
+        animation: orbFloat2 11s ease-in-out infinite;
+    }
+    @@keyframes orbFloat1 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50% { transform: translate(20px,-15px) scale(1.08); }
+    }
+    @@keyframes orbFloat2 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50% { transform: translate(-15px,20px) scale(1.05); }
+    }
+    /* Left section */
+    .wc-left {
+        position: relative;
+        z-index: 2;
+        flex: 0 0 auto;
+        padding-right: 36px;
+    }
+    .wc-location {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: rgba(255,255,255,0.6);
-        font-size: 0.8rem;
-        margin-bottom: 12px;
-        text-transform: uppercase;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.7);
         letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
     }
-    .weather-location i { color: #94a3b8; }
-    #weatherCity { color: #cbd5e1; font-weight: 700; }
-    .weather-label { color: rgba(255,255,255,0.4); }
-    .weather-details {
+    .wc-location i { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+    .wc-temp-block {
         display: flex;
         align-items: center;
-        gap: 30px;
-        flex-wrap: wrap;
+        gap: 8px;
+        line-height: 1;
     }
-    .weather-main {
-        display: flex;
-        align-items: center;
-        gap: 15px;
+    .wc-icon {
+        font-size: 3.5rem;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        animation: iconPulse 4s ease-in-out infinite;
+    }
+    @@keyframes iconPulse {
+        0%,100% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.06) rotate(3deg); }
+    }
+    .wc-temp {
+        font-family: 'Outfit', sans-serif;
+        font-size: 5.5rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -4px;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        line-height: 1;
+    }
+    .wc-unit {
+        font-size: 2rem;
+        font-weight: 300;
+        color: rgba(255,255,255,0.6);
+        align-self: flex-start;
+        margin-top: 12px;
+        margin-left: 2px;
+    }
+    .wc-desc {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        margin-top: 8px;
+        letter-spacing: 0.2px;
+    }
+    .wc-feels {
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.55);
+        margin-top: 4px;
+    }
+    /* Divider */
+    .wc-divider {
+        position: relative;
+        z-index: 2;
+        width: 1px;
+        align-self: stretch;
+        background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
+        margin: 0 36px;
         flex-shrink: 0;
     }
-    .weather-icon-big { font-size: 2.5rem; line-height: 1; }
-    .weather-temp {
-        font-size: 2rem;
+    /* Right section */
+    .wc-right {
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .wc-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+    .wc-stat-item {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 16px;
+        padding: 12px 10px;
+        text-align: center;
+        transition: background 0.3s;
+    }
+    .wc-stat-item:hover { background: rgba(255,255,255,0.18); }
+    .wc-stat-icon { font-size: 1.3rem; margin-bottom: 4px; }
+    .wc-stat-val {
+        font-size: 0.95rem;
         font-weight: 800;
         color: #fff;
         font-family: 'Outfit', sans-serif;
-        line-height: 1;
     }
-    .weather-desc {
-        font-size: 0.9rem;
-        color: rgba(255,255,255,0.7);
-        font-weight: 500;
-    }
-    .weather-extras {
-        display: flex;
-        gap: 25px;
-        flex-wrap: wrap;
-    }
-    .weather-stat {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        color: rgba(255,255,255,0.85);
-        font-size: 0.95rem;
-        font-weight: 700;
-    }
-    .weather-stat i {
-        color: #94a3b8;
-        font-size: 0.85rem;
-        margin-bottom: 2px;
-    }
-    .weather-stat small {
-        font-size: 0.65rem;
-        color: rgba(255,255,255,0.4);
-        font-weight: 500;
+    .wc-stat-lbl {
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.55);
+        margin-top: 2px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .weather-advice {
-        margin-left: auto;
-        background: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-        padding: 10px 18px;
-        color: rgba(255,255,255,0.85);
-        font-size: 0.85rem;
-        font-weight: 600;
+    /* Golf rating */
+    .wc-golf-rating {
         display: flex;
         align-items: center;
-        gap: 8px;
-        max-width: 280px;
+        gap: 14px;
+        background: rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 16px;
+        padding: 14px 18px;
+    }
+    .wc-golf-emoji { font-size: 2rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+    .wc-golf-title {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255,255,255,0.55);
+        margin-bottom: 4px;
+    }
+    .wc-golf-stars { display: flex; align-items: center; gap: 2px; }
+    .wc-star { font-size: 1.1rem; line-height: 1; transition: transform 0.2s; }
+    .wc-star.filled { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.6); }
+    .wc-star.empty { color: rgba(255,255,255,0.25); }
+    .wc-golf-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.85);
+        margin-left: 6px;
+    }
+    .wc-error {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.6);
+        text-align: center;
+        width: 100%;
+        padding: 20px;
+    }
+    /* Responsive */
+    @@media (max-width: 900px) {
+        .weather-card { flex-direction: column; padding: 24px; }
+        .wc-divider { width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); margin: 20px 0; }
+        .wc-stats { grid-template-columns: repeat(2, 1fr); }
+        .wc-temp { font-size: 4rem; }
+    }
+    @@media (max-width: 576px) {
+        .wc-stats { grid-template-columns: repeat(2, 1fr); }
+        .wc-temp { font-size: 3.5rem; }
+        .wc-icon { font-size: 2.5rem; }
+    }
+    /* Date & time row */
+    .wc-date-row {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .wc-date {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.85);
+        letter-spacing: 0.3px;
+        text-transform: capitalize;
+    }
+    .wc-time {
+        font-family: 'Outfit', monospace;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 1px;
+        background: rgba(255,255,255,0.08);
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.12);
     }
 </style>
-<script>
-(function() {
-    // API Open-Meteo — Ottawa, Ontario (aucune clé requise)
-    const LAT = 45.4215;
-    const LON = -75.6919;
-    const CITY = "Ottawa, ON";
-
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
-        `&current_weather=true` +
-        `&hourly=relativehumidity_2m,precipitation_probability` +
-        `&timezone=America/Toronto&forecast_days=1`;
-
-    function getWeatherIcon(code) {
-        if (code === 0) return "☀️";
-        if (code <= 2) return "⛅";
-        if (code === 3) return "☁️";
-        if (code <= 49) return "🌫️";
-        if (code <= 67) return "🌧️";
-        if (code <= 77) return "❄️";
-        if (code <= 82) return "🌦️";
-        return "⛈️";
-    }
-
-    function getWeatherDesc(code) {
-        if (code === 0) return "Ciel dégagé";
-        if (code <= 2) return "Partiellement nuageux";
-        if (code === 3) return "Couvert";
-        if (code <= 49) return "Brouillard";
-        if (code <= 57) return "Bruine";
-        if (code <= 67) return "Pluie";
-        if (code <= 77) return "Neige";
-        if (code <= 82) return "Averses";
-        return "Orage";
-    }
-
-    function getAdvice(code, rain) {
-        if (code >= 61 || rain > 60) return "☔ Prévoir un imperméable — risque de pluie";
-        if (code >= 45 && code <= 57) return "🌫️ Conditions brumeuses — conduite prudente";
-        if (code === 0 || code <= 2) return "🏌️ Conditions idéales pour jouer !";
-        if (code === 3) return "⛅ Temps couvert — confortable pour le golf";
-        return "🌤️ Bonnes conditions de jeu";
-    }
-
-    fetch(url)
-        .then(r => r.json())
-        .then(data => {
-            const cw = data.current_weather;
-            const hourIndex = 0; // heure actuelle
-            const humidity = data.hourly.relativehumidity_2m[hourIndex] ?? "--";
-            const rainProb = data.hourly.precipitation_probability[hourIndex] ?? "--";
-
-            document.getElementById('weatherTemp').textContent = Math.round(cw.temperature) + "°C";
-            document.getElementById('weatherIcon').textContent = getWeatherIcon(cw.weathercode);
-            document.getElementById('weatherDesc').textContent = getWeatherDesc(cw.weathercode);
-            document.getElementById('weatherHumidity').textContent = humidity;
-            document.getElementById('weatherWind').textContent = Math.round(cw.windspeed);
-            document.getElementById('weatherRain').textContent = rainProb;
-            document.getElementById('weatherCity').textContent = CITY;
-            document.getElementById('weatherAdvice').innerHTML =
-                '<span>' + getAdvice(cw.weathercode, rainProb) + '</span>';
-
-            document.querySelector('.weather-loading').style.display = 'none';
-            document.querySelector('.weather-content').style.display = 'block';
-        })
-        .catch(() => {
-            document.querySelector('.weather-loading').innerHTML =
-                '<i class="fas fa-exclamation-triangle"></i><span>Météo indisponible</span>';
-        });
-})();
-</script>
 }

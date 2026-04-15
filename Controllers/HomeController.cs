@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using croupe_06_TournoiGolf.Models;
+using croupe_06_TournoiGolf.Services;
+using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,15 +13,18 @@ namespace croupe_06_TournoiGolf.Controllers
     /// CONTRÔLEUR D'ACCUEIL (FRONT-END)
     /// Gère la page principale, les statistiques publiques et le changement de langue.
     /// </summary>
-    public class HomeController(Microsoft.Extensions.Logging.ILogger<HomeController> logger, croupe_06_TournoiGolf.Data.GolfDbContext context) : Controller
+    public class HomeController(Microsoft.Extensions.Logging.ILogger<HomeController> logger, croupe_06_TournoiGolf.Data.GolfDbContext context, croupe_06_TournoiGolf.Services.WeatherService weatherService) : Controller
     {
         private readonly Microsoft.Extensions.Logging.ILogger<HomeController> _logger = logger;
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
+        private readonly croupe_06_TournoiGolf.Services.WeatherService _weatherService = weatherService;
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
+                // Météo en temps réel (via le service backend pour plus de fiabilité)
+                ViewBag.Weather = await _weatherService.GetCurrentWeatherAsync();
                 // RÉCUPÉRATION DES STATISTIQUES (BACKENDparlant à la BDD via Entity Framework)
                 ViewBag.NbTournois = _context.Tournois.Count();
                 ViewBag.NbParticipants = _context.Participants.Count();
@@ -34,7 +39,7 @@ namespace croupe_06_TournoiGolf.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Erreur d'accès à la base de données : {Message}. L'application continue avec des données vides.", ex.Message);
+                _logger.LogError(ex, "ERREUR CRITIQUE dans HomeController.Index : {Message}", ex.Message);
                 ViewBag.NbTournois = 0;
                 ViewBag.NbParticipants = 0;
                 ViewBag.NbEquipes = 0;
