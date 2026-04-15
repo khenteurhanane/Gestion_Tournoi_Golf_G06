@@ -20,6 +20,7 @@
         <div class="card">
             <h3>Paramètres de l'équipe</h3>
             <form action="/Admin/ModifierEquipe" method="post">
+                @Html.AntiForgeryToken()
                 <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
                 
                 <div class="form-group">
@@ -70,10 +71,17 @@
                         @foreach (var m in membres)
                         {
                             <tr>
-                                <td>@m.Utilisateur?.Prenom @m.Utilisateur?.Nom</td>
+                                <td>
+                                    @if (m.UtilisateurId == Model.CreeParUtilisateurId)
+                                    {
+                                        <span class="badge-capitaine"><i class="fas fa-crown"></i> Capitaine</span>
+                                    }
+                                    @m.Utilisateur?.Prenom @m.Utilisateur?.Nom
+                                </td>
                                 <td>@m.Utilisateur?.Email</td>
                                 <td>
                                     <form action="/Admin/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce participant de l\'équipe ?');">
+                                        @Html.AntiForgeryToken()
                                         <input type="hidden" name="participantId" value="@m.ParticipantId" />
                                         <input type="hidden" name="equipeId" value="@Model.EquipeId" />
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
@@ -92,6 +100,7 @@
     .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .btn-outline-danger { border: 1px solid #dc3545; color: #dc3545; background: transparent; padding: 4px 8px; border-radius: 4px; }
     .btn-outline-danger:hover { background: #dc3545; color: white; }
+    .badge-capitaine { background: rgba(255, 193, 7, 0.15); color: #856404; border: 1px solid rgba(255, 193, 7, 0.3); padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 0.75em; margin-right: 5px; }
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 500; }
     .form-group input { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; }

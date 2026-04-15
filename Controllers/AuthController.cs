@@ -329,9 +329,57 @@ namespace croupe_06_TournoiGolf.Controllers
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             if (userId == 0) return RedirectToAction("Login");
 
-            var participant = _context.Participants.FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
+            var participant = _context.Participants
+                .Include(p => p.Tournoi)
+                .Include(p => p.Utilisateur)
+                .FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
+
             if (participant != null)
             {
+                // Gestion du désistement d'équipe (Créateur/Capitaine)
+                if (participant.EquipeId != null)
+                {
+                    var equipe = _context.Equipes.Find(participant.EquipeId.Value);
+                    if (equipe != null && equipe.CreeParUtilisateurId == userId)
+                    {
+                        // Le participant est le créateur de l'équipe
+                        // Chercher les autres membres (qui ont un compte utilisateur)
+                        var autresMembres = _context.Participants
+                            .Where(p => p.EquipeId == equipe.EquipeId && p.ParticipantId != participant.ParticipantId && p.UtilisateurId != null)
+                            .OrderBy(p => p.CreeLe)
+                            .Include(p => p.Utilisateur)
+                            .ToList();
+
+                        if (autresMembres.Any())
+                        {
+                            // Transfert au prochain membre
+                            var nouveauCapitaine = autresMembres.First();
+                            equipe.CreeParUtilisateurId = nouveauCapitaine.UtilisateurId!.Value;
+
+                            // Créer une notification pour l'admin
+                            _context.Notifications.Add(new Notification
+                            {
+                                Titre = "Transfert de Capitaine",
+                                Message = $"Le créateur {participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom} de l'équipe '{equipe.NomEquipe}' s'est désisté. Le rôle a été transféré à {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.",
+                                DateCreation = DateTime.Now
+                            });
+                        }
+                        else
+                        {
+                            // L'équipe devient vide, on la supprime
+                            _context.Equipes.Remove(equipe);
+
+                            // Créer une notification pour l'admin
+                            _context.Notifications.Add(new Notification
+                            {
+                                Titre = "Équipe Supprimée",
+                                Message = $"L'équipe '{equipe.NomEquipe}' a été supprimée suite au désistement de son seul membre/créateur ({participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom}).",
+                                DateCreation = DateTime.Now
+                            });
+                        }
+                    }
+                }
+
                 _context.Participants.Remove(participant);
                 _context.SaveChanges();
             }

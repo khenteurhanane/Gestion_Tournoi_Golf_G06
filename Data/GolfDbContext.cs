@@ -18,6 +18,7 @@ namespace croupe_06_TournoiGolf.Data
         public DbSet<ScoreTrou> ScoresTrous { get; set; }
         public DbSet<CommandeBoutique> CommandesBoutique { get; set; }
         public DbSet<ItemCommandeBoutique> ItemsCommandesBoutique { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

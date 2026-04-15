@@ -301,8 +301,9 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var equipe = _context.Equipes.Find(equipeId);
+            if (equipe == null) return RedirectToAction("Index");
 
-            if (equipe != null && equipe.CreeParUtilisateurId == userId)
+            if (equipe.CreeParUtilisateurId == userId)
             {
                 var participant = _context.Participants.Find(participantId);
                 if (participant != null && participant.EquipeId == equipeId)

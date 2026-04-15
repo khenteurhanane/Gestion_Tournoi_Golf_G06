@@ -37,7 +37,10 @@
                     <tr>
                         <td><strong>@eq.NomEquipe</strong></td>
                         <td>@eq.Tournoi?.Nom</td>
-                        <td>@eq.Createur?.Prenom @eq.Createur?.Nom</td>
+                        <td>
+                            <span class="badge-capitaine"><i class="fas fa-crown"></i></span>
+                            @eq.Createur?.Prenom @eq.Createur?.Nom
+                        </td>
                         <td>
                             <span class="badge @(count >= eq.NbJoueursMax ? "badge-ferme" : "badge-ouvert")">
                                 @count / @eq.NbJoueursMax
@@ -54,6 +57,7 @@
                             <div style="display: flex; gap: 5px;">
                                 <a href="/Admin/DetailsEquipe/@eq.EquipeId" class="btn btn-sm">Gérer</a>
                                 <form action="/Admin/SupprimerEquipe" method="post" onsubmit="return confirm('Supprimer cette équipe ? Les membres deviendront des participants individuels.');">
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@eq.EquipeId" />
                                     <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
                                 </form>
@@ -74,4 +78,5 @@
     .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
     .btn-danger { background-color: #dc3545; color: white; border: none; }
     .btn-danger:hover { background-color: #c82333; }
+    .badge-capitaine { background: rgba(255, 193, 7, 0.15); color: #856404; border: 1px solid rgba(255, 193, 7, 0.3); padding: 2px 5px; border-radius: 8px; font-weight: bold; font-size: 0.7em; }
 </style>

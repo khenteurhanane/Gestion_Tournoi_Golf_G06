@@ -119,6 +119,18 @@ using (var scope = app.Services.CreateScope())
     BEGIN
         ALTER TABLE Tournois ADD EstEnCours BIT NOT NULL DEFAULT 0;
     END
+
+    -- Ajout table Notifications
+    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Notifications')
+    BEGIN
+        CREATE TABLE Notifications (
+            NotificationId INT IDENTITY(1,1) PRIMARY KEY,
+            Titre NVARCHAR(100) NOT NULL,
+            Message NVARCHAR(MAX) NOT NULL,
+            DateCreation DATETIME2 NOT NULL,
+            EstLu BIT NOT NULL DEFAULT 0
+        );
+    END
   ");
   // ------------------------------------------------
 

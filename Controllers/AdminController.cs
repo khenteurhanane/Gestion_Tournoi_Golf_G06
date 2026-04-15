@@ -217,12 +217,57 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             if (!EstAdmin()) return View("AccesRefuse");
 
-            var participant = _context.Participants.Find(participantId);
-            if (participant != null && participant.EquipeId == equipeId)
+            var participant = _context.Participants.Include(p => p.Utilisateur).FirstOrDefault(p => p.ParticipantId == participantId);
+            var equipe = _context.Equipes.Find(equipeId);
+
+            if (participant != null && equipe != null && participant.EquipeId == equipeId)
             {
+                bool etaitCapitaine = (equipe.CreeParUtilisateurId == participant.UtilisateurId);
+
+                // Retirer le membre de l'équipe
                 participant.EquipeId = null;
                 _context.SaveChanges();
-                TempData["Success"] = "Le membre a été retiré de l'équipe.";
+
+                if (etaitCapitaine)
+                {
+                    // Trouver le prochain membre pour devenir capitaine
+                    var autresMembres = _context.Participants
+                        .Where(p => p.EquipeId == equipeId)
+                        .Include(p => p.Utilisateur)
+                        .OrderBy(p => p.CreeLe)
+                        .ToList();
+
+                    if (autresMembres.Any())
+                    {
+                        var nouveauCapitaine = autresMembres.First();
+                        equipe.CreeParUtilisateurId = nouveauCapitaine.UtilisateurId!.Value;
+
+                        _context.Notifications.Add(new Notification
+                        {
+                            Titre = "Transfert de Capitaine (Admin)",
+                            Message = $"L'administrateur a retiré le capitaine {participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom} de l'équipe '{equipe.NomEquipe}'. Le rôle a été transféré à {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.",
+                            DateCreation = DateTime.Now
+                        });
+
+                        TempData["Success"] = $"Le membre a été retiré. Nouveau capitaine : {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.";
+                    }
+                    else
+                    {
+                        _context.Equipes.Remove(equipe);
+                        _context.Notifications.Add(new Notification
+                        {
+                            Titre = "Équipe Supprimée (Admin)",
+                            Message = $"L'administrateur a retiré le seul membre/capitaine ({participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom}) de l'équipe '{equipe.NomEquipe}'. L'équipe a été supprimée.",
+                            DateCreation = DateTime.Now
+                        });
+                        TempData["Success"] = "Le capitaine a été retiré et l'équipe a été supprimée car elle était vide.";
+                    }
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    TempData["Success"] = "Le membre a été retiré de l'équipe.";
+                }
             }
 
             return RedirectToAction("DetailsEquipe", new { id = equipeId });

@@ -73,13 +73,15 @@
                         @foreach (var m in membres)
                         {
                             <tr>
-                                <td>@m.Utilisateur?.Prenom @m.Utilisateur?.Nom</td>
                                 <td>
                                     @if (m.UtilisateurId == Model.CreeParUtilisateurId)
                                     {
-                                        <span class="badge badge-ouvert">Créateur</span>
+                                        <span class="badge badge-capitaine"><i class="fas fa-crown"></i> Capitaine</span>
                                     }
-                                    else if (estCreateur)
+                                    @m.Utilisateur?.Prenom @m.Utilisateur?.Nom
+                                </td>
+                                <td>
+                                    @if (m.UtilisateurId != Model.CreeParUtilisateurId && estCreateur)
                                     {
                                         <div class="d-flex gap-1">
                                             <form action="/Equipe/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce membre ?');">
@@ -103,5 +105,5 @@
 <style>
     .btn-outline-danger { color: #dc3545; border-color: #dc3545; }
     .btn-outline-danger:hover { background-color: #dc3545; color: white; }
-    .badge-ouvert { background: rgba(46, 204, 113, 0.1); color: #27ae60; }
+    .badge-capitaine { background: rgba(255, 193, 7, 0.15); color: #856404; border: 1px solid rgba(255, 193, 7, 0.3); padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 0.8em; margin-right: 8px; }
 </style>
