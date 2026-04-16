@@ -15,9 +15,15 @@ builder.Services.AddSession(options =>
  options.Cookie.IsEssential = true;
 });
 
-// Connexion à la base de données
+// Connexion à la base de données (SQL Server en dev, PostgreSQL en production)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<GolfDbContext>(options =>
- options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+ if (builder.Environment.IsProduction())
+  options.UseNpgsql(connectionString);
+ else
+  options.UseSqlServer(connectionString);
+});
 
 // Service de hashage
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -49,6 +55,11 @@ builder.Services.AddControllersWithViews(options =>
  .AddViewLocalization()
  .AddDataAnnotationsLocalization();
 
+// Render fournit le port via la variable PORT
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+ builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 var app = builder.Build();
 
 // Configuration des cultures supportées
@@ -68,7 +79,8 @@ if (!app.Environment.IsDevelopment())
  app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
@@ -88,59 +100,12 @@ using (var scope = app.Services.CreateScope())
  {
   var context = services.GetRequiredService<GolfDbContext>();
 
-  // Applique les migrations EF Core au démarrage
-  context.Database.Migrate();
-
-  // --- REPARATION BASE DE DONNEES (GOLF-REPAIR) ---
-  // On s'assure que les nouvelles tables existent (compatibilité)
-  context.Database.ExecuteSqlRaw(@"
-    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CommandesBoutique')
-    BEGIN
-        CREATE TABLE CommandesBoutique (
-            CommandeId INT IDENTITY(1,1) PRIMARY KEY,
-            UtilisateurId INT NULL,
-            SousTotal DECIMAL(18,2) NOT NULL,
-            Rabais DECIMAL(18,2) NOT NULL,
-            Taxes DECIMAL(18,2) NOT NULL,
-            TotalFinal DECIMAL(18,2) NOT NULL,
-            ModePaiement NVARCHAR(50) NOT NULL,
-            DateCommande DATETIME2 NOT NULL,
-            CONSTRAINT FK_CommandesBoutique_Utilisateurs_UtilisateurId FOREIGN KEY (UtilisateurId) REFERENCES Utilisateurs(UtilisateurId)
-        );
-    END
-
-    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ItemsCommandesBoutique')
-    BEGIN
-        CREATE TABLE ItemsCommandesBoutique (
-            ItemId INT IDENTITY(1,1) PRIMARY KEY,
-            CommandeId INT NOT NULL,
-            ArticleId INT NOT NULL,
-            ArticleNom NVARCHAR(100) NOT NULL,
-            PrixUnitaire DECIMAL(18,2) NOT NULL,
-            Quantite INT NOT NULL,
-            CONSTRAINT FK_ItemsCommandesBoutique_CommandesBoutique_CommandeId FOREIGN KEY (CommandeId) REFERENCES CommandesBoutique(CommandeId) ON DELETE CASCADE
-        );
-    END
-
-    -- Correction GOLF143 (EstEnCours dans Tournois)
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Tournois') AND name = 'EstEnCours')
-    BEGIN
-        ALTER TABLE Tournois ADD EstEnCours BIT NOT NULL DEFAULT 0;
-    END
-
-    -- Ajout table Notifications
-    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Notifications')
-    BEGIN
-        CREATE TABLE Notifications (
-            NotificationId INT IDENTITY(1,1) PRIMARY KEY,
-            Titre NVARCHAR(100) NOT NULL,
-            Message NVARCHAR(MAX) NOT NULL,
-            DateCreation DATETIME2 NOT NULL,
-            EstLu BIT NOT NULL DEFAULT 0
-        );
-    END
-  ");
-  // ------------------------------------------------
+  // En production (PostgreSQL) : crée les tables depuis le modèle
+  // En dev (SQL Server) : applique les migrations
+  if (app.Environment.IsProduction())
+   context.Database.EnsureCreated();
+  else
+   context.Database.Migrate();
 
   // --- SEEDING : AJOUT DE L'ADMIN PAR DÉFAUT ---
   if (!context.Utilisateurs.Any(u => u.Role == "ADMIN"))
