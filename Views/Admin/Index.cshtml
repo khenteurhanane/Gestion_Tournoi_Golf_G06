@@ -3,6 +3,7 @@
     var prochains = ViewBag.ProchainsTournois as List<croupe_06_TournoiGolf.Models.Tournoi>;
     var inscriptionsRecentes = ViewBag.InscriptionsRecentes as List<croupe_06_TournoiGolf.Models.Participant>;
     var tournoiStatus = ViewBag.TournoiStatus as List<croupe_06_TournoiGolf.Models.TournoiStatusViewModel>;
+    var commanditaires = ViewBag.Commanditaires as List<croupe_06_TournoiGolf.Models.Commandite>;
 }
 
 <div class="dashboard-header mb-4">
@@ -224,6 +225,36 @@
                     }
                 </div>
             </div>
+
+            <!-- Commanditaires (US-13) -->
+            <div class="premium-card mt-20">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3><i class="fas fa-handshake"></i> Commanditaires</h3>
+                    <a href="/Commandite/Index" class="btn btn-sm btn-outline-success rounded-pill px-3" style="font-size:0.75rem;">Voir tout</a>
+                </div>
+                <div class="commanditaires-list">
+                    @if (commanditaires != null && commanditaires.Any())
+                    {
+                        @foreach (var c in commanditaires)
+                        {
+                            <div class="commanditaire-item">
+                                <div class="commanditaire-badge @c.TypeCommandite.ToLower()">
+                                    @c.TypeCommandite.Substring(0, 1)
+                                </div>
+                                <div class="commanditaire-details">
+                                    <span class="commanditaire-nom">@c.Utilisateur?.Prenom @c.Utilisateur?.Nom</span>
+                                    <span class="commanditaire-meta">@c.TypeCommandite · @c.Tournoi?.Nom</span>
+                                </div>
+                                <span class="commanditaire-montant">@c.Montant.ToString("C")</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Aucun commanditaire enregistré.</p>
+                    }
+                </div>
+            </div>
         </div>
     </div>
     </div>
@@ -274,5 +305,20 @@
     .stat-equipes-detail { font-size: 0.75rem; }
     .badge-completes { color: #27ae60; font-weight: 600; }
     .badge-incompletes { color: #e67e22; font-weight: 600; }
+    .commanditaires-list { display: flex; flex-direction: column; gap: 12px; }
+    .commanditaire-item { display: flex; align-items: center; gap: 12px; }
+    .commanditaire-badge {
+        width: 36px; height: 36px; min-width: 36px;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.85rem; color: #fff;
+    }
+    .commanditaire-badge.bronze { background: #cd7f32; }
+    .commanditaire-badge.argent { background: #95a5a6; }
+    .commanditaire-badge.or { background: #f39c12; }
+    .commanditaire-badge.autre { background: #7f8c8d; }
+    .commanditaire-details { flex: 1; display: flex; flex-direction: column; }
+    .commanditaire-nom { font-size: 0.875rem; font-weight: 600; color: #2c3e50; }
+    .commanditaire-meta { font-size: 0.75rem; color: #7f8c8d; }
+    .commanditaire-montant { font-size: 0.875rem; font-weight: 700; color: #27ae60; white-space: nowrap; }
 </style>
 

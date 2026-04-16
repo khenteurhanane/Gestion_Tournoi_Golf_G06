@@ -84,6 +84,15 @@ namespace croupe_06_TournoiGolf.Controllers
                 .Take(5)
                 .ToList();
 
+            // Liste des commanditaires (US-13)
+            ViewBag.Commanditaires = _context.Commandites
+                .AsNoTracking()
+                .Include(c => c.Utilisateur)
+                .Include(c => c.Tournoi)
+                .OrderByDescending(c => c.DateCreation)
+                .Take(10)
+                .ToList();
+
             return View();
         }
 
