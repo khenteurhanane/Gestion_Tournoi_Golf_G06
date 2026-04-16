@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using croupe_06_TournoiGolf.Data;
 
@@ -11,9 +12,11 @@ using croupe_06_TournoiGolf.Data;
 namespace croupe_06_TournoiGolf.Data.Migrations
 {
     [DbContext(typeof(GolfDbContext))]
-    partial class GolfDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414173147_AddResetPasswordToken")]
+    partial class AddResetPasswordToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -36,5 +36,9 @@ namespace croupe_06_TournoiGolf.Models
         public string? Adresse { get; set; }
 
         public DateTime CreeLe { get; set; } = DateTime.Now;
+
+        // --- Reset Password sécurisé (GOLF-131) ---
+        public string? ResetPasswordToken { get; set; }
+        public DateTime? ResetPasswordTokenExpiry { get; set; }
     }
 }

@@ -69,14 +69,16 @@
                 <div id="sectionCreer" style="display:none;">
                     <div class="form-group">
                         <label>Nom de l'équipe</label>
-                        <input name="NomEquipe" type="text" placeholder="Ex: Les Aigles" />
+                        <input name="NomEquipe" id="NomEquipe" type="text" placeholder="Ex: Les Aigles" />
+                        <span asp-validation-for="NomEquipe" class="text-danger" style="color:red;font-size:0.9em;display:block;"></span>
                     </div>
                 </div>
 
                 <div id="sectionRejoindre" style="display:none;">
                     <div class="form-group">
                         <label>Code secret de l'équipe</label>
-                        <input name="CodeEquipe" type="text" placeholder="Ex: ABC123" />
+                        <input name="CodeEquipe" id="CodeEquipe" type="text" placeholder="Ex: ABC123" />
+                        <span asp-validation-for="CodeEquipe" class="text-danger" style="color:red;font-size:0.9em;display:block;"></span>
                     </div>
                 </div>
 
@@ -104,3 +106,7 @@
         document.getElementById('montantAffiche').value = montant;
     }
 </script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

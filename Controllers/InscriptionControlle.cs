@@ -85,6 +85,28 @@ namespace croupe_06_TournoiGolf.Controllers
         [HttpPost]
         public IActionResult Index(InscriptionViewModel model)
         {
+            // Vérification de la validation de base
+            if (!ModelState.IsValid)
+            {
+                ViewBag.NomTournoi = _context.Tournois.Find(model.TournoiId)?.Nom;
+                return View(model);
+            }
+
+            // Validation spécifique pour les équipes
+            if (model.ChoixEquipe == "creer" && string.IsNullOrWhiteSpace(model.NomEquipe))
+            {
+                ModelState.AddModelError("NomEquipe", "Le nom d'équipe est obligatoire si vous choisissez de créer une équipe.");
+                ViewBag.NomTournoi = _context.Tournois.Find(model.TournoiId)?.Nom;
+                return View(model);
+            }
+
+            if (model.ChoixEquipe == "rejoindre" && string.IsNullOrWhiteSpace(model.CodeEquipe))
+            {
+                ModelState.AddModelError("CodeEquipe", "Le code de l'équipe est obligatoire si vous choisissez de rejoindre une équipe.");
+                ViewBag.NomTournoi = _context.Tournois.Find(model.TournoiId)?.Nom;
+                return View(model);
+            }
+
             // Récupérer l'utilisateur connecté
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
 

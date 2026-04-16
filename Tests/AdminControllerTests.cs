@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using croupe_06_TournoiGolf.Controllers;
 using croupe_06_TournoiGolf.Data;
 using croupe_06_TournoiGolf.Models;
+using croupe_06_TournoiGolf.Services;
 
 namespace GolfTournoi.Tests
 {
@@ -15,13 +17,14 @@ namespace GolfTournoi.Tests
         {
             var options = new DbContextOptionsBuilder<GolfDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .Options;
             return new GolfDbContext(options);
         }
 
         private AdminController CreerControllerAdmin(GolfDbContext context)
         {
-            var controller = new AdminController(context);
+            var controller = new AdminController(context, new MatchmakingService(context));
             var httpContext = new DefaultHttpContext();
             httpContext.Session = new TestSession();
             httpContext.Session.SetString("UserRole", "ADMIN");
@@ -38,7 +41,7 @@ namespace GolfTournoi.Tests
 
         private AdminController CreerControllerNonAdmin(GolfDbContext context)
         {
-            var controller = new AdminController(context);
+            var controller = new AdminController(context, new MatchmakingService(context));
             var httpContext = new DefaultHttpContext();
             httpContext.Session = new TestSession();
             httpContext.Session.SetString("UserRole", "PARTICIPANT");

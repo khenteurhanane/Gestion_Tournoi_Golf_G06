@@ -7,6 +7,9 @@ namespace croupe_06_TournoiGolf.Models.ViewModels
         [Required]
         public string Email { get; set; } = string.Empty;
 
+        /// <summary>Token sécurisé passé dans l'URL depuis l'email (GOLF-131)</summary>
+        public string Token { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Le nouveau mot de passe est obligatoire.")]
         [StringLength(100, ErrorMessage = "Le {0} doit faire au moins {2} caractères.", MinimumLength = 6)]
         [DataType(DataType.Password)]

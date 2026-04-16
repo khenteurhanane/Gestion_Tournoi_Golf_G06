@@ -12,9 +12,10 @@ namespace croupe_06_TournoiGolf.Controllers
     /// Réservé aux utilisateurs avec le rôle "ADMIN".
     /// Permet de gérer les tournois, les utilisateurs, les équipes et de voir les revenus.
     /// </summary>
-    public class AdminController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
+    public class AdminController(croupe_06_TournoiGolf.Data.GolfDbContext context, croupe_06_TournoiGolf.Services.MatchmakingService matchmakingService) : BaseController
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
+        private readonly croupe_06_TournoiGolf.Services.MatchmakingService _matchmakingService = matchmakingService;
 
         // Vérifie que l'utilisateur est admin
         private bool EstAdmin()
@@ -44,6 +45,7 @@ namespace croupe_06_TournoiGolf.Controllers
             var equipes = _context.Equipes.ToList();
             var nbMembres = _context.Participants
                 .Where(p => p.EquipeId != null)
+                .AsEnumerable()
                 .GroupBy(p => p.EquipeId)
                 .ToDictionary(g => g.Key ?? 0, g => g.Count());
 
@@ -165,6 +167,7 @@ namespace croupe_06_TournoiGolf.Controllers
             // Compter les membres par équipe
             var nbMembres = _context.Participants
                 .Where(p => p.EquipeId != null)
+                .AsEnumerable()
                 .GroupBy(p => p.EquipeId)
                 .ToDictionary(g => g.Key ?? 0, g => g.Count());
             ViewBag.NbMembres = nbMembres;
@@ -296,6 +299,27 @@ namespace croupe_06_TournoiGolf.Controllers
 
             return RedirectToAction("Equipes");
         }
+        // Compléter les équipes automatiquement (Algorithme)
+        [HttpPost]
+        public IActionResult CompleterEquipes(int tournoiId)
+        {
+            if (!EstAdmin()) return View("AccesRefuse");
+
+            // On récupère l'ID admin pour savoir qui a créé l'équipe
+            int adminId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
+            int nbJoueursPlaces = _matchmakingService.CompleterEquipes(tournoiId, adminId);
+
+            if (nbJoueursPlaces > 0)
+            {
+                TempData["Success"] = $"Succès : L'algorithme a placé {nbJoueursPlaces} joueur(s) dans des équipes automatiquement !";
+            }
+            else
+            {
+                TempData["Info"] = "Aucun joueur confirmé sans équipe n'a été trouvé pour ce tournoi.";
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }
-

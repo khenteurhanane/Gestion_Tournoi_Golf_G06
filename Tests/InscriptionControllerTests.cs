@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using croupe_06_TournoiGolf.Controllers;
 using croupe_06_TournoiGolf.Data;
 using croupe_06_TournoiGolf.Models;
@@ -16,6 +17,7 @@ namespace GolfTournoi.Tests
         {
             var options = new DbContextOptionsBuilder<GolfDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                 .Options;
             return new GolfDbContext(options);
         }

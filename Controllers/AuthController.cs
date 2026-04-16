@@ -5,18 +5,26 @@ using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
 using croupe_06_TournoiGolf.Models;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using croupe_06_TournoiGolf.Models.ViewModels;
+
 namespace croupe_06_TournoiGolf.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly croupe_06_TournoiGolf.Services.IPasswordHasher _passwordHasher;
-        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly GolfDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public AuthController(croupe_06_TournoiGolf.Services.IPasswordHasher passwordHasher, croupe_06_TournoiGolf.Data.GolfDbContext context)
+        public AuthController(
+            IPasswordHasher passwordHasher,
+            GolfDbContext context,
+            IEmailService emailService)
         {
             _passwordHasher = passwordHasher;
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -24,6 +32,7 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             return View();
         }
+
         [HttpPost]
         // LE LIEN WEB <--> BACKEND SE FAIT ICI :
         // "string email" récupère la valeur du <input name="email"> de Login.cshtml
@@ -35,20 +44,13 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (utilisateur != null && _passwordHasher.VerifyPassword(motDePasse, utilisateur.MotDePasseHash))
             {
-                // Utilisateur trouvé et mot de passe correct
                 SetUserSession(utilisateur);
 
-                // Redirection selon le rôle
                 if (utilisateur.Role == "ADMIN")
-                {
                     return RedirectToAction("Index", "Admin");
-                }
                 else
-                {
                     return RedirectToAction("Index", "Tournoi");
-                }
             }
-
 
             ViewBag.Error = "Email ou mot de passe incorrect.";
             return View();
@@ -81,14 +83,11 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid == false)
-            {
+            if (!ModelState.IsValid)
                 return View(model);
-            }
 
-            // Vérifier si le email existe déjà dans la BD
             var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateurExistant != null)
             {
@@ -96,7 +95,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
-            // Créer le nouvel utilisateur dans la BD
             var utilisateur = new Utilisateur
             {
                 Email = model.Email,
@@ -111,15 +109,20 @@ namespace croupe_06_TournoiGolf.Controllers
             _context.SaveChanges();
 
             // Connecter l'utilisateur après création du compte
-            HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
-            HttpContext.Session.SetString("IsLoggedIn", "true");
-            HttpContext.Session.SetString("UserRole", utilisateur.Role);
-            HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
-            HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
-            HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
-            HttpContext.Session.SetString("UserTelephone", "");
+            SetUserSession(utilisateur);
 
-            // Rediriger vers la liste des tournois
+            // Envoyer l'email de bienvenue (en arrière-plan, on ignore les erreurs smtp pour ne pas bloquer l'inscription)
+            try
+            {
+                var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
+                await _emailService.SendWelcomeEmailAsync(utilisateur.Email, fullName);
+            }
+            catch (Exception ex)
+            {
+                // Log silencieux : l'inscription réussit même si l'email échoue
+                Console.WriteLine($"[EmailService] Erreur envoi bienvenue : {ex.Message}");
+            }
+
             return RedirectToAction("Index", "Tournoi");
         }
 
@@ -132,14 +135,11 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
-        public IActionResult InscriptionCommanditaire(InscriptionCommanditaireViewModel model)
+        public async Task<IActionResult> InscriptionCommanditaire(InscriptionCommanditaireViewModel model)
         {
-            if (ModelState.IsValid == false)
-            {
+            if (!ModelState.IsValid)
                 return View(model);
-            }
 
-            // Vérifier si le email existe déjà dans la BD
             var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateurExistant != null)
             {
@@ -147,16 +147,12 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
-            // Créer le nouvel utilisateur commanditaire dans la BD
             var utilisateur = new Utilisateur
             {
                 Email = model.Email,
                 Prenom = model.Prenom,
                 Nom = model.Nom,
                 Telephone = model.Telephone,
-                // On peut stocker le nom de l'entreprise dans le prénom/nom ou l'adresse,
-                // mais puisque NomEntreprise est demandé on peut l'ajouter à l'adresse pour l'instant
-                // ou simplement le garder pour le contact (l'idéal serait une table Commanditaire)
                 Adresse = "Entreprise: " + model.NomEntreprise,
                 MotDePasseHash = _passwordHasher.HashPassword(model.MotDePasse),
                 Role = "COMMANDITAIRE",
@@ -166,26 +162,28 @@ namespace croupe_06_TournoiGolf.Controllers
             _context.Utilisateurs.Add(utilisateur);
             _context.SaveChanges();
 
-            // Connecter l'utilisateur après création du compte
-            HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
-            HttpContext.Session.SetString("IsLoggedIn", "true");
-            HttpContext.Session.SetString("UserRole", utilisateur.Role);
-            HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom ?? "");
-            HttpContext.Session.SetString("UserNom", utilisateur.Nom ?? "");
-            HttpContext.Session.SetString("UserEmail", utilisateur.Email ?? "");
-            HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
+            SetUserSession(utilisateur);
 
-            // Rediriger vers la page de confirmation d'inscription commanditaire (US-11-T05)
+            // Email de bienvenue commanditaire
+            try
+            {
+                var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
+                await _emailService.SendWelcomeEmailAsync(utilisateur.Email, fullName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EmailService] Erreur envoi bienvenue commanditaire : {ex.Message}");
+            }
+
             return RedirectToAction("ConfirmationInscriptionCommanditaire", "Auth");
         }
 
-        // Action pour afficher la confirmation d'inscription commanditaire (US-11-T05)
         public IActionResult ConfirmationInscriptionCommanditaire()
         {
             return View();
         }
 
-        // --- Mot de passe oublié ---
+        // --- Mot de passe oublié (GOLF-131) ---
 
         [HttpGet]
         public IActionResult ForgotPassword()
@@ -194,40 +192,79 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
-        public IActionResult ForgotPassword(ForgotPasswordViewModel model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
-            // Vérifier si l'email existe
             var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateur == null)
             {
-                // Pour des raisons de sécurité, on ne devrait pas dire si l'email existe ou non,
-                // mais pour ce projet scolaire, on peut afficher une erreur.
-                ModelState.AddModelError("Email", "Aucun compte associé à cet email.");
+                // Sécurité : on affiche toujours un message de succès pour ne pas divulguer si l'email existe
+                TempData["Success"] = "Si cet email est associé à un compte, vous recevrez un lien de réinitialisation.";
+                return RedirectToAction("ForgotPasswordConfirmation");
+            }
+
+            // Générer un token sécurisé unique
+            var token = GenerateResetPasswordToken();
+
+            // Stocker le token hashé et son expiration (1 heure) en base
+            utilisateur.ResetPasswordToken = HashResetPasswordToken(token);
+            utilisateur.ResetPasswordTokenExpiry = DateTime.Now.AddHours(1);
+            _context.SaveChanges();
+
+            // Construire le lien de réinitialisation
+            var resetLink = Url.Action(
+                "ResetPassword", "Auth",
+                new { token = token, email = utilisateur.Email },
+                Request.Scheme
+            );
+
+            // Envoyer l'email
+            try
+            {
+                var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
+                await _emailService.SendPasswordResetEmailAsync(utilisateur.Email, fullName, resetLink!);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EmailService] Erreur envoi reset password : {ex.Message}");
+                TempData["Error"] = "Impossible d'envoyer l'email de réinitialisation. Veuillez réessayer plus tard.";
                 return View(model);
             }
 
-            // Simulation d'envoi d'email : on redirige vers une page de confirmation
-            // Pour le projet G06, on va mettre l'email en session temporairement pour simuler le lien reçu par email
-            HttpContext.Session.SetString("ResetEmail", model.Email);
-            TempData["Success"] = "Un lien de réinitialisation a été simulé. Vous pouvez maintenant réinitialiser votre mot de passe.";
-            return RedirectToAction("ResetPassword");
+            TempData["Success"] = "Si cet email est associé à un compte, vous recevrez un lien de réinitialisation.";
+            return RedirectToAction("ForgotPasswordConfirmation");
         }
 
         [HttpGet]
-        public IActionResult ResetPassword()
+        public IActionResult ForgotPasswordConfirmation()
         {
-            var email = HttpContext.Session.GetString("ResetEmail");
-            if (string.IsNullOrEmpty(email))
+            return View();
+        }
+
+        // --- Réinitialisation via le lien dans l'email ---
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+                return RedirectToAction("ForgotPassword");
+
+            // Valider le token
+            var hashedToken = HashResetPasswordToken(token);
+            var utilisateur = _context.Utilisateurs.FirstOrDefault(u =>
+                u.Email == email &&
+                (u.ResetPasswordToken == hashedToken || u.ResetPasswordToken == token) &&
+                u.ResetPasswordTokenExpiry > DateTime.Now);
+
+            if (utilisateur == null)
             {
+                TempData["Error"] = "Ce lien de réinitialisation est invalide ou a expiré.";
                 return RedirectToAction("ForgotPassword");
             }
 
-            var model = new ResetPasswordViewModel { Email = email };
+            var model = new ResetPasswordViewModel { Email = email, Token = token };
             return View(model);
         }
 
@@ -235,28 +272,29 @@ namespace croupe_06_TournoiGolf.Controllers
         public IActionResult ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
-            // Vérifier que c'est bien l'email en cours de réinitialisation
-            var resetEmail = HttpContext.Session.GetString("ResetEmail");
-            if (resetEmail != model.Email)
-            {
-                return RedirectToAction("Login");
-            }
+            // Revalider le token
+            var hashedToken = HashResetPasswordToken(model.Token);
+            var utilisateur = _context.Utilisateurs.FirstOrDefault(u =>
+                u.Email == model.Email &&
+                (u.ResetPasswordToken == hashedToken || u.ResetPasswordToken == model.Token) &&
+                u.ResetPasswordTokenExpiry > DateTime.Now);
 
-            var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateur == null)
             {
-                return RedirectToAction("Login");
+                TempData["Error"] = "Ce lien de réinitialisation est invalide ou a expiré.";
+                return RedirectToAction("ForgotPassword");
             }
 
+            // Mettre à jour le mot de passe
             utilisateur.MotDePasseHash = _passwordHasher.HashPassword(model.NewPassword);
-            _context.SaveChanges();
 
-            // Nettoyer la session
-            HttpContext.Session.Remove("ResetEmail");
+            // Invalider le token (usage unique)
+            utilisateur.ResetPasswordToken = null;
+            utilisateur.ResetPasswordTokenExpiry = null;
+
+            _context.SaveChanges();
 
             TempData["Success"] = "Votre mot de passe a été réinitialisé avec succès.";
             return RedirectToAction("Login");
@@ -285,14 +323,12 @@ namespace croupe_06_TournoiGolf.Controllers
             var utilisateur = _context.Utilisateurs.Find(userId);
             if (utilisateur == null) return RedirectToAction("Login");
 
-            // Mettre à jour les infos
             utilisateur.Prenom = Prenom ?? "";
             utilisateur.Nom = Nom ?? "";
             utilisateur.Telephone = Telephone ?? "";
             utilisateur.Adresse = Adresse;
             _context.SaveChanges();
 
-            // Mettre à jour la session
             HttpContext.Session.SetString("UserPrenom", utilisateur.Prenom);
             HttpContext.Session.SetString("UserNom", utilisateur.Nom);
             HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone);
@@ -313,8 +349,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 .Include(p => p.Tournoi)
                 .ToList();
 
-            // Récupérer les équipes
-            var equipeIds = inscriptions.Where(p => p.EquipeId != null).Select(p => p.EquipeId.Value).ToList();
+            var equipeIds = inscriptions.Where(p => p.EquipeId != null).Select(p => p.EquipeId!.Value).ToList();
             var equipes = _context.Equipes.Where(e => equipeIds.Contains(e.EquipeId)).ToDictionary(e => e.EquipeId);
             ViewBag.Equipes = equipes;
 
@@ -387,6 +422,18 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("MesInscriptions");
         }
 
-        // --- Mot de passe oublié (Fin) ---
+        private static string GenerateResetPasswordToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .Replace("=", "");
+        }
+
+        private static string HashResetPasswordToken(string token)
+        {
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            return Convert.ToHexString(hash);
+        }
     }
 }

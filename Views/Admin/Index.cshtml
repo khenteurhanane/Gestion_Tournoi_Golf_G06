@@ -134,6 +134,13 @@
                                     <td>
                                         <a href="/Tournoi/Edit/@t.TournoiId" class="btn-icon" title="Modifier"><i class="fas fa-edit"></i></a>
                                         <a href="/Tournoi/Details/@t.TournoiId" class="btn-icon" title="Détails"><i class="fas fa-eye"></i></a>
+                                        
+                                        <form asp-action="CompleterEquipes" asp-controller="Admin" method="post" style="display:inline;">
+                                            <input type="hidden" name="tournoiId" value="@t.TournoiId" />
+                                            <button type="submit" class="btn-icon text-warning border-0 bg-transparent" style="cursor: pointer;" title="Affectation auto des équipes" onclick="return confirm('Voulez-vous répartir tous les étudiants sans équipe du tournoi ?');">
+                                                <i class="fas fa-magic"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             }

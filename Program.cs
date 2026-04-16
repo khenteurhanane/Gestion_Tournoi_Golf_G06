@@ -26,6 +26,12 @@ builder.Services.AddDbContext<GolfDbContext>(options =>
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<TicketService>();
 
+// Service de matchmaking pour remplir les équipes
+builder.Services.AddScoped<MatchmakingService>();
+
+// Service d'envoi d'emails (GOLF-131)
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 // SignalR pour le tableau de scores en temps réel (GOLF-143)
 builder.Services.AddSignalR();
 

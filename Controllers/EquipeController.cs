@@ -10,15 +10,18 @@ namespace croupe_06_TournoiGolf.Controllers
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
 
-        // Liste toutes les équipes (pour les participants)
+        // Liste les équipes de l'utilisateur (Mes Équipes)
         public IActionResult Index()
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             if (userId == 0) return RedirectToAction("Login", "Auth");
 
+            // On ne récupère QUE les équipes où l'utilisateur est le créateur OU dont il est membre
             var equipes = _context.Equipes
                 .Include(e => e.Tournoi)
                 .Include(e => e.Createur)
+                .Where(e => e.CreeParUtilisateurId == userId || 
+                            _context.Participants.Any(p => p.EquipeId == e.EquipeId && p.UtilisateurId == userId))
                 .ToList();
 
             return View(equipes);

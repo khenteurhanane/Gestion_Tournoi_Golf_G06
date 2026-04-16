@@ -23,16 +23,18 @@ namespace GolfTournoi.Tests
             Assert.False(string.IsNullOrEmpty(hash));
         }
 
-        // Test 2 : verifier que le meme mot de passe donne le meme hash
+        // Test 2 : verifier que le hash n'est pas deterministe a cause du sel BCrypt
         [Fact]
-        public void HashPassword_MemMotDePasse_MemHash()
+        public void HashPassword_MemMotDePasse_HashDifferentsMaisVerifiables()
         {
             string motDePasse = "Test1234";
 
             string hash1 = _hasher.HashPassword(motDePasse);
             string hash2 = _hasher.HashPassword(motDePasse);
 
-            Assert.Equal(hash1, hash2);
+            Assert.NotEqual(hash1, hash2);
+            Assert.True(_hasher.VerifyPassword(motDePasse, hash1));
+            Assert.True(_hasher.VerifyPassword(motDePasse, hash2));
         }
 
         // Test 3 : verifier que 2 mots de passe differents donnent des hash differents
