@@ -203,53 +203,6 @@
     </div>
 </div>
 
-<style>
-    .fw-600 { font-weight: 600; }
-    
-    .dashboard-card {
-        background: #ffffff;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        border: 1px solid var(--border-color);
-    }
-    
-    .text-primary-green { color: var(--primary-green); }
-    
-    .bg-success-subtle { background-color: rgba(45, 106, 46, 0.1); }
-    .text-success { color: var(--primary-green) !important; }
-    
-    .avatar-sm {
-        width: 38px;
-        height: 38px;
-        font-size: 0.8rem;
-    }
-    
-    .btn-action-circle {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s;
-    }
-    
-    .py-6 { padding-top: 5rem; padding-bottom: 5rem; }
-    
-    .custom-table tr:last-child td { border-bottom: none; }
-    
-    .scale-up { animation: scaleUp 0.3s ease-out; }
-    @@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-    @@keyframes shake {
-        10%, 90% { transform: translate3d(-1px, 0, 0); }
-        20%, 80% { transform: translate3d(2px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-        40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
-</style>
-
 @section Scripts {
     <script>
         (function () {
