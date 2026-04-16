@@ -6,6 +6,9 @@ using croupe_06_TournoiGolf.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 
+// Compatibilité DateTime.Now avec PostgreSQL (Npgsql 6+)
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSession(options =>
