@@ -1,86 +1,89 @@
-# Guide d'utilisation de la plateforme de gestion de tournois de golf
+# Manuel de Reference Utilisateur - Plateforme de Gestion de Tournois de Golf
 
-Ce document constitue le manuel d'utilisation complet de l'application de gestion de tournois de golf. Il a pour objectif de guider les utilisateurs a travers les differentes fonctionnalites de la plateforme, de l'inscription a la gestion administrative.
-
----
-
-## 1. Introduction
-La plateforme est un outil centralise permettant l'organisation, l'inscription et le suivi des tournois de golf. Elle offre des services dedies aux participants, aux commanditaires et aux administrateurs.
+Ce guide detaillé est conçu pour offrir une comprehension approfondie et une maîtrise totale de la plateforme de gestion de tournois de golf. Que vous soyez participant, commanditaire ou administrateur, ce manuel vous accompagne etape par etape pour garantir une experience fluide et professionnelle.
 
 ---
 
-## 2. Acces et Inscription
-
-### Creation d'un compte utilisateur
-Pour utiliser les services de la plateforme, chaque utilisateur doit posseder un compte personnel :
-1. Sur la page d'accueil, cliquez sur le bouton d'inscription.
-2. Saisissez votre prenom, votre nom et une adresse courriel valide.
-3. Definissez un mot de passe securise.
-4. Validez le formulaire pour activer votre compte.
-
-### Connexion au systeme
-Une fois le compte cree, l'utilisateur peut se connecter en saisissant son adresse courriel et son mot de passe sur la page de connexion. En cas d'oubli, une procedure de recuperation de mot de passe est disponible via un lien dedie.
+## 1. Vision de la Plateforme
+L'application a pour mission de moderniser et de simplifier l'organisation d'evenements sportifs de prestige. En centralisant les inscriptions, la logistique de boutique et le suivi des performances, elle assure une transparence totale et une interaction en temps reel entre tous les acteurs du tournoi.
 
 ---
 
-## 3. Gestion des Participations aux Tournois
+## 2. Authentification et Gestion du Profil
 
-### Inscription a un evenement
-1. Apres connexion, consultez la liste des tournois actifs.
-2. Selectionnez un tournoi pour en voir les details (date, lieu, prix).
-3. Cliquez sur le bouton d'inscription pour ce tournoi.
-4. Completez le processus de paiement en choisissant votre mode de transaction (Carte ou Debit).
+### Creation d'un compte personnel
+L'acces a l'ecosysteme du tournoi repose sur un compte utilisateur securise :
+- **Formulaire d'inscription** : Renseignez avec precision vos informations civiles (Nom, Prenom) et une adresse courriel valide qui servira d'identifiant unique.
+- **Securite** : Choisissez un mot de passe robuste combinant lettres, chiffres et caracteres speciaux pour proteger vos donnees de facturation.
+- **Verification** : Un processus de validation interne garantit l'integrité de la base de donnees des participants.
 
-### Organisation des equipes
-Le système fonctionne sur une base d'equipes de quatre joueurs :
-- **Creation d'une equipe** : L'utilisateur qui cree l'equipe en devient le capitaine. Il doit definir un nom d'equipe. Un code de securite unique compose de 6 caracteres alphanumeriques lui sera remis.
-- **Adhesion a une equipe** : Pour rejoindre une equipe existante, le participant doit saisir le code de securite fourni par son capitaine. Une equipe ne peut exceder quatre membres.
-
-### Consultation du classement
-Les participants peuvent suivre l'evolution des scores en temps reel via le tableau de classement accessible depuis la page du tournoi.
+### Acces a l'Espace Prive
+Une fois connecte, vous accédez a un tableau de bord personnalise vous permettant de suivre vos inscriptions, vos achats en boutique et vos resultats sportifs.
 
 ---
 
-## 4. Partenariats et Commandites
+## 3. Experience de Participation
 
-Les entreprises souhaitant soutenir un tournoi peuvent devenir commanditaires :
-1. Accedez a l'espace reserve aux commanditaires.
-2. Selectionnez un forfait de commandite parmis les options proposees (Bronze, Argent ou Or).
-3. Soumettez les informations relatives a l'entreprise, incluant le logo qui sera affiche sur les supports visuels de l'evenement.
-4. Finalisez la transaction pour valider la commandite.
+### Inscription aux tournois
+Le processus d'inscription est pense pour etre rapide et intuitif :
+1. **Consultation du Catalogue** : Parcourez les tournois disponibles, chacun affichant ses specifications (Lieu, Date, Frais d'inscription).
+2. **Formulaire d'Inscription** : Validez votre presence en enregistrant vos coordonnees spécifiques au tournoi.
+3. **Paiement Securise** : Finalisez votre engagement via notre interface de paiement certifiee. Les modes accepts sont les cartes de Credit, de Debit, ainsi que les virements Interac.
 
----
+### Gestion Strategique des Equipes
+Le succès d'un tournoi repose sur la cohesion des equipes (maximum 4 joueurs) :
+- **Le Role de Capitaine** : En créant une equipe, vous en devenez le responsable administratif. Vous definissez le nom de guerre de votre formation.
+- **Code Secret de Delegation** : Le systeme genere un code alphanumerique de 6 caracteres. Ce code est la cle de securite permettant a vos coequipiers de rejoindre officiellement votre formation. Ne le partagez qu'avec vos partenaires de jeu.
+- **Adhesion** : Les membres disposant du code secret s'inscrivent directement dans l'equipe, assurant ainsi un groupement correct pour le depart.
 
-## 5. Boutique et Services de Restauration
-
-La plateforme integre une boutique en ligne pour le materiel et la nourriture :
-1. Naviguez dans le catalogue des articles disponibles.
-2. Ajoutez les articles selectionnes a votre panier.
-3. Le systeme applique automatiquement une reduction de 20 pour cent pour toute personne utilisant une adresse courriel institutionnelle de La Cite.
-4. Procedez au paiement de la commande.
-5. Une fois la transaction confirmee, telechargez votre recu au format PDF. Ce document contient un code de validation necessaire pour le retrait de vos articles sur place.
+### Suivi de Performance
+Le tableau des scores est mis à jour instantanement par les commissaires de course. Vous pouvez consulter le classement global a tout moment pour ajuster votre strategie de jeu.
 
 ---
 
-## 6. Administration du Systeme
+## 4. Programme de Commandites Professionnelles
 
-Cette section decrit les outils mis a disposition des organisateurs possedant des droits d'administration.
+La plateforme offre une visibilité de premier plan aux partenaires de l'evenement.
 
-### Tableau de bord administratif
-L'administrateur dispose d'une vue d'ensemble incluant :
-- Le nombre total de participants et d'utilisateurs.
-- Les revenus generes par les inscriptions et la boutique.
-- L'etat de remplissage des tournois.
+### Structure des Forfaits
+| Niveau | Visibilité du Logo | Acces VIP | Support Marketing |
+| :--- | :--- | :--- | :--- |
+| **Bronze** | Site de base | Non | Inclus |
+| **Argent** | Pages de tournoi | Oui | Premium |
+| **Or** | Partout + Leaderboard | Oui | Complet |
 
-### Gestion des equipes et Matchmaking
-L'administrateur a le pouvoir de :
-- Surveiller les equipes incompletes.
-- Utiliser l'algorithme de matchmaking pour regrouper les joueurs inscrits individuellement dans des equipes de quatre, optimisant ainsi l'organisation du tournoi.
+### Activation de la Commandite
+- **Processus** : Selectionnez votre forfait, telechargez votre logo en haute definition et completez le paiement professionnel. Votre marque sera immediatement integree a l'interface utilisateur vue par des centaines de participants.
+
+---
+
+## 5. Services de Boutique et Restauration Optimises
+
+La boutique numerique permet de reserver votre materiel et vos repas a l'avance pour maximiser votre temps sur le terrain.
+
+### Avantages et Rabais
+- **Programme Academique** : Toute adresse courriel se terminant par **@lacite.ca** beneficie d'une reduction immediate de 20 pour cent sur l'ensemble de la boutique.
+- **Panier et Gestion** : Vous pouvez modifier vos quantites ou retirer des articles jusqu'a la validation finale du paiement.
+
+### Reçu Tactique PDF
+Apres chaque achat, un document PDF officiel est genere. Ce reçu inclut :
+- Le detail des taxes (TPS/TVQ).
+- Un Code QR de securité garantissant l'authenticite de la transaction lors du retrait des marchandises au comptoir.
+
+---
+
+## 6. Administration et Gouvernance
+
+L'espace administration offre des outils de pilotage de haut niveau pour les organisateurs.
+
+### Outils de Gestion
+- **Analytiques Finances** : Suivi rigoureux des revenus generes par les differentes activites.
+- **Matchmaking Automatise** : Un algorithme analyse les inscriptions orphelines pour suggerer et completer des equipes optimales, garantissant ainsi le plein potentiel de chaque depart.
 
 ---
 
 ## 7. Support Technique
-En cas de difficulte technique lors de l'utilisation de l'application, les utilisateurs sont invites a contacter l'equipe de support via les coordonnees fournies en bas de page ou a consulter la section Foire Aux Questions de leur profil.
+Nous nous engageons a proteger vos donnees personnelles conformement aux meilleures pratiques de l'industrie. Pour toute question relative a l'usage de la plateforme, une documentation technique complementaire est disponible sur demande auprès de l'administration du tournoi.
 
 ---
-Document genere le 16 avril 2026 par le systeme de gestion.
+*Manuel etablis le 16 avril 2026. Version 2.1 - Documentation Officielle.*
