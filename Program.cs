@@ -17,6 +17,13 @@ builder.Services.AddSession(options =>
 
 // Connexion à la base de données (SQL Server en dev, PostgreSQL en production)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (builder.Environment.IsProduction() && connectionString != null && connectionString.StartsWith("postgres"))
+{
+ var uri = new Uri(connectionString);
+ var userInfo = uri.UserInfo.Split(':');
+ var port = uri.Port > 0 ? uri.Port : 5432;
+ connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]}";
+}
 builder.Services.AddDbContext<GolfDbContext>(options =>
 {
  if (builder.Environment.IsProduction())
