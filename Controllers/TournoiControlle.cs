@@ -33,11 +33,12 @@ namespace croupe_06_TournoiGolf.Controllers
         // PAGE PUBLIQUE : Liste tous les tournois disponibles
         public IActionResult Index()
         {
-            var listeTournois = _context.Tournois.ToList();
+            var listeTournois = _context.Tournois.AsNoTracking().ToList();
 
             // Vérifier les tournois où l'utilisateur est déjà inscrit
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             var tournoiInscrits = _context.Participants
+                .AsNoTracking()
                 .Where(p => p.UtilisateurId == userId)
                 .Select(p => p.TournoiId)
                 .ToList();
@@ -45,6 +46,8 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Compter le nb d'inscrits par tournoi
             var nbInscritsParTournoi = _context.Participants
+                .AsNoTracking()
+                .AsEnumerable()
                 .GroupBy(p => p.TournoiId)
                 .ToDictionary(g => g.Key, g => g.Count());
             ViewBag.NbInscrits = nbInscritsParTournoi;
@@ -176,7 +179,9 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View("AccesRefuse");
             }
 
-            var tournoi = _context.Tournois.Find(id);
+            var tournoi = _context.Tournois
+                .AsNoTracking()
+                .FirstOrDefault(t => t.TournoiId == id);
             if (tournoi == null)
             {
                 return RedirectToAction("Index");
@@ -184,12 +189,14 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Récupérer les participants inscrits avec leurs infos
             var participants = _context.Participants
+                .AsNoTracking()
                 .Where(p => p.TournoiId == id)
                 .Include(p => p.Utilisateur)
                 .ToList();
 
             // Récupérer les équipes de ce tournoi
             var equipes = _context.Equipes
+                .AsNoTracking()
                 .Where(e => e.TournoiId == id)
                 .ToList();
 
@@ -212,7 +219,9 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View("AccesRefuse");
             }
 
-            var tournoi = _context.Tournois.Find(id);
+            var tournoi = _context.Tournois
+                .AsNoTracking()
+                .FirstOrDefault(t => t.TournoiId == id);
             if (tournoi == null)
             {
                 return RedirectToAction("Index");

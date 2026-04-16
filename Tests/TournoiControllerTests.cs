@@ -11,6 +11,11 @@ namespace GolfTournoi.Tests
 {
     public class TournoiControllerTests
     {
+        private static void AssertAucuneEntiteTrackee(GolfDbContext context)
+        {
+            Assert.Empty(context.ChangeTracker.Entries());
+        }
+
         // Configurer le controller avec une session admin simulée
         private TournoiController CreerControllerAvecSession(GolfDbContext context)
         {
@@ -126,6 +131,59 @@ namespace GolfTournoi.Tests
                 Assert.NotNull(tournoiMaj);
                 Assert.False(tournoiMaj.InscriptionsOuvertes);
             }
+        }
+
+        [Fact]
+        public void Index_Lecture_NeTrackePasLesTournoisAffiches()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "Open", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10), InscriptionsOuvertes = true });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAvecSession(context);
+
+            var resultat = controller.Index();
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
+        }
+
+        [Fact]
+        public void Details_Lecture_NeTrackePasTournoiParticipantsEtEquipesAffiches()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "Open", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10), InscriptionsOuvertes = true, PlacesParticipantsMax = 20 });
+            context.Utilisateurs.Add(new Utilisateur { UtilisateurId = 1, Email = "a@a.com", MotDePasseHash = "hash", Prenom = "A", Nom = "B" });
+            context.Equipes.Add(new Equipe { EquipeId = 1, TournoiId = 1, NomEquipe = "E1", CodeSecret = "CODE01", CreeParUtilisateurId = 1 });
+            context.SaveChanges();
+            context.Participants.Add(new Participant { ParticipantId = 1, TournoiId = 1, UtilisateurId = 1, EquipeId = 1, MontantPaye = 60m });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAvecSession(context);
+
+            var resultat = controller.Details(1);
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
+        }
+
+        [Fact]
+        public void Edit_GET_Lecture_NeTrackePasLeTournoiAffiche()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "Open", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10) });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAvecSession(context);
+
+            var resultat = controller.Edit(1);
+
+            var vue = Assert.IsType<ViewResult>(resultat);
+            Assert.IsType<Tournoi>(vue.Model);
+            AssertAucuneEntiteTrackee(context);
         }
 
         private GolfDbContext CreerContexte()

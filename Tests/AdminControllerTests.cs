@@ -13,6 +13,11 @@ namespace GolfTournoi.Tests
 {
     public class AdminControllerTests
     {
+        private static void AssertAucuneEntiteTrackee(GolfDbContext context)
+        {
+            Assert.Empty(context.ChangeTracker.Entries());
+        }
+
         private GolfDbContext CreerContexte()
         {
             var options = new DbContextOptionsBuilder<GolfDbContext>()
@@ -105,6 +110,48 @@ namespace GolfTournoi.Tests
 
             Assert.IsType<RedirectToActionResult>(resultat);
             Assert.Equal(0, context.Utilisateurs.Count());
+        }
+
+        [Fact]
+        public void Index_AvecDonnees_DeLecture_NeTrackePasLesEntitesAffichees()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "T1", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10), InscriptionsOuvertes = true });
+            context.Utilisateurs.Add(new Utilisateur { UtilisateurId = 1, Email = "a@a.com", MotDePasseHash = "hash1", Prenom = "A", Nom = "B" });
+            context.Equipes.Add(new Equipe { EquipeId = 1, TournoiId = 1, NomEquipe = "E1", CodeSecret = "CODE01", CreeParUtilisateurId = 1 });
+            context.SaveChanges();
+            context.Participants.Add(new Participant { ParticipantId = 1, TournoiId = 1, UtilisateurId = 1, EquipeId = 1, MontantPaye = 60.00m });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAdmin(context);
+
+            var resultat = controller.Index();
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
+        }
+
+        [Fact]
+        public void DetailsEquipe_EquipeExistante_NeTrackePasEquipeNiMembresAffiches()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "T1", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10) });
+            context.Utilisateurs.Add(new Utilisateur { UtilisateurId = 1, Email = "cap@a.com", MotDePasseHash = "hash1", Prenom = "Cap", Nom = "A" });
+            context.Utilisateurs.Add(new Utilisateur { UtilisateurId = 2, Email = "membre@a.com", MotDePasseHash = "hash2", Prenom = "Mem", Nom = "B" });
+            context.Equipes.Add(new Equipe { EquipeId = 1, TournoiId = 1, NomEquipe = "E1", CodeSecret = "CODE01", CreeParUtilisateurId = 1 });
+            context.SaveChanges();
+            context.Participants.Add(new Participant { ParticipantId = 1, TournoiId = 1, UtilisateurId = 1, EquipeId = 1, MontantPaye = 60m });
+            context.Participants.Add(new Participant { ParticipantId = 2, TournoiId = 1, UtilisateurId = 2, EquipeId = 1, MontantPaye = 60m });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAdmin(context);
+
+            var resultat = controller.DetailsEquipe(1);
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
         }
 
     }

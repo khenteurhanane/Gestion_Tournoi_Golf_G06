@@ -42,8 +42,9 @@ namespace croupe_06_TournoiGolf.Controllers
             ViewBag.RevenuTotal = _context.Participants.Sum(p => (decimal?)p.MontantPaye) ?? 0;
 
             // Détecter les équipes incomplètes (GOLF-146)
-            var equipes = _context.Equipes.ToList();
+            var equipes = _context.Equipes.AsNoTracking().ToList();
             var nbMembres = _context.Participants
+                .AsNoTracking()
                 .Where(p => p.EquipeId != null)
                 .AsEnumerable()
                 .GroupBy(p => p.EquipeId)
@@ -54,6 +55,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Inscriptions récentes
             ViewBag.InscriptionsRecentes = _context.Participants
+                .AsNoTracking()
                 .Include(p => p.Tournoi)
                 .Include(p => p.Utilisateur)
                 .OrderByDescending(p => p.CreeLe)
@@ -62,6 +64,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Taux d'occupation des tournois actifs
             var tStatus = _context.Tournois
+                .AsNoTracking()
                 .Where(t => t.DateTournoi >= DateTime.Today)
                 .Select(t => new TournoiStatusViewModel {
                     TournoiId = t.TournoiId,
@@ -73,6 +76,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Prochains tournois
             ViewBag.ProchainsTournois = _context.Tournois
+                .AsNoTracking()
                 .Where(t => t.DateTournoi >= DateTime.Today)
                 .OrderBy(t => t.DateTournoi)
                 .Take(5)
@@ -90,7 +94,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View("AccesRefuse");
             }
 
-            var utilisateurs = _context.Utilisateurs.OrderBy(u => u.Nom).ToList();
+            var utilisateurs = _context.Utilisateurs.AsNoTracking().OrderBy(u => u.Nom).ToList();
 
             // Compter le nombre d'inscriptions par utilisateur (Optimisé GOLF-134)
             var nbInscriptions = _context.Participants
@@ -109,6 +113,7 @@ namespace croupe_06_TournoiGolf.Controllers
             if (!EstAdmin()) return View("AccesRefuse");
 
             var participants = _context.Participants
+                .AsNoTracking()
                 .Include(p => p.Tournoi)
                 .Include(p => p.Utilisateur)
                 .Include(p => p.Commandite)
@@ -159,6 +164,7 @@ namespace croupe_06_TournoiGolf.Controllers
             if (!EstAdmin()) return View("AccesRefuse");
 
             var equipes = _context.Equipes
+                .AsNoTracking()
                 .Include(e => e.Tournoi)
                 .Include(e => e.Createur)
                 .OrderByDescending(e => e.CreeLe)
@@ -166,6 +172,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Compter les membres par équipe
             var nbMembres = _context.Participants
+                .AsNoTracking()
                 .Where(p => p.EquipeId != null)
                 .AsEnumerable()
                 .GroupBy(p => p.EquipeId)
@@ -181,6 +188,7 @@ namespace croupe_06_TournoiGolf.Controllers
             if (!EstAdmin()) return View("AccesRefuse");
 
             var equipe = _context.Equipes
+                .AsNoTracking()
                 .Include(e => e.Tournoi)
                 .Include(e => e.Createur)
                 .FirstOrDefault(e => e.EquipeId == id);
@@ -188,6 +196,7 @@ namespace croupe_06_TournoiGolf.Controllers
             if (equipe == null) return RedirectToAction("Equipes");
 
             var membres = _context.Participants
+                .AsNoTracking()
                 .Include(p => p.Utilisateur)
                 .Where(p => p.EquipeId == id)
                 .ToList();

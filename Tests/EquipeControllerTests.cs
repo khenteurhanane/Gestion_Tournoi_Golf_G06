@@ -11,6 +11,11 @@ namespace GolfTournoi.Tests
 {
     public class EquipeControllerTests
     {
+        private static void AssertAucuneEntiteTrackee(GolfDbContext context)
+        {
+            Assert.Empty(context.ChangeTracker.Entries());
+        }
+
         private GolfDbContext CreerContexte()
         {
             var options = new DbContextOptionsBuilder<GolfDbContext>()
@@ -115,6 +120,60 @@ namespace GolfTournoi.Tests
             var vue = Assert.IsType<ViewResult>(resultat);
             var modele = Assert.IsType<Equipe>(vue.Model);
             Assert.Equal("Winners", modele.NomEquipe);
+        }
+
+        [Fact]
+        public void Index_Lecture_NeTrackePasLesEquipesAffichees()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "T1", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10), InscriptionsOuvertes = true });
+            context.Utilisateurs.Add(new Utilisateur { UtilisateurId = 1, Email = "a@a.com", MotDePasseHash = "hash", Prenom = "A", Nom = "B" });
+            context.Equipes.Add(new Equipe { EquipeId = 1, TournoiId = 1, CreeParUtilisateurId = 1, NomEquipe = "Winners", CodeSecret = "WIN123" });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAvecSession(context);
+
+            var resultat = controller.Index();
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
+        }
+
+        [Fact]
+        public void Confirmation_EquipeExistante_NeTrackePasEquipeAffichee()
+        {
+            using var context = CreerContexte();
+            context.Equipes.Add(new Equipe { EquipeId = 1, NomEquipe = "Winners", TournoiId = 1, CreeParUtilisateurId = 1, CodeSecret = "WIN123" });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAvecSession(context);
+
+            var resultat = controller.Confirmation(1);
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
+        }
+
+        [Fact]
+        public void Gestion_EquipeExistante_NeTrackePasEquipeNiMembresAffiches()
+        {
+            using var context = CreerContexte();
+            context.Tournois.Add(new Tournoi { TournoiId = 1, Nom = "T1", Lieu = "Quebec", DateTournoi = DateTime.Today.AddDays(10) });
+            context.Utilisateurs.Add(new Utilisateur { UtilisateurId = 1, Email = "a@a.com", MotDePasseHash = "hash", Prenom = "A", Nom = "B" });
+            context.Equipes.Add(new Equipe { EquipeId = 1, TournoiId = 1, CreeParUtilisateurId = 1, NomEquipe = "Winners", CodeSecret = "WIN123" });
+            context.SaveChanges();
+            context.Participants.Add(new Participant { ParticipantId = 1, TournoiId = 1, UtilisateurId = 1, EquipeId = 1, MontantPaye = 60m });
+            context.SaveChanges();
+            context.ChangeTracker.Clear();
+
+            var controller = CreerControllerAvecSession(context);
+
+            var resultat = controller.Gestion(1);
+
+            Assert.IsType<ViewResult>(resultat);
+            AssertAucuneEntiteTrackee(context);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // On ne récupère QUE les équipes où l'utilisateur est le créateur OU dont il est membre
             var equipes = _context.Equipes
+                .AsNoTracking()
                 .Include(e => e.Tournoi)
                 .Include(e => e.Createur)
                 .Where(e => e.CreeParUtilisateurId == userId || 
@@ -39,6 +40,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Récupérer la liste des tournois actifs pour la sélection
             ViewBag.ListeTournois = _context.Tournois
+                .AsNoTracking()
                 .Where(t => t.DateTournoi >= DateTime.Today && t.InscriptionsOuvertes)
                 .OrderBy(t => t.DateTournoi)
                 .ToList();
@@ -118,7 +120,9 @@ namespace croupe_06_TournoiGolf.Controllers
         // Page de confirmation après création
         public IActionResult Confirmation(int equipeId)
         {
-            var equipe = _context.Equipes.Find(equipeId);
+            var equipe = _context.Equipes
+                .AsNoTracking()
+                .FirstOrDefault(e => e.EquipeId == equipeId);
 
             if (equipe == null)
             {
@@ -237,6 +241,7 @@ namespace croupe_06_TournoiGolf.Controllers
             if (userId == 0) return RedirectToAction("Login", "Auth");
 
             var equipe = _context.Equipes
+                .AsNoTracking()
                 .Include(e => e.Tournoi)
                 .Include(e => e.Createur)
                 .FirstOrDefault(e => e.EquipeId == id);
@@ -252,6 +257,7 @@ namespace croupe_06_TournoiGolf.Controllers
             }
 
             var membres = _context.Participants
+                .AsNoTracking()
                 .Include(p => p.Utilisateur)
                 .Where(p => p.EquipeId == id)
                 .ToList();
@@ -325,12 +331,16 @@ namespace croupe_06_TournoiGolf.Controllers
         public IActionResult DeplacerMembre(int participantId, int equipeId)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
-            var equipe = _context.Equipes.Include(e => e.Tournoi).FirstOrDefault(e => e.EquipeId == equipeId);
+            var equipe = _context.Equipes
+                .AsNoTracking()
+                .Include(e => e.Tournoi)
+                .FirstOrDefault(e => e.EquipeId == equipeId);
 
             if (equipe == null || equipe.CreeParUtilisateurId != userId)
                 return RedirectToAction("Index");
 
             var participant = _context.Participants
+                .AsNoTracking()
                 .Include(p => p.Utilisateur)
                 .FirstOrDefault(p => p.ParticipantId == participantId && p.EquipeId == equipeId);
 
@@ -338,6 +348,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             // Lister les autres equipes du meme tournoi qui ont encore de la place
             var autresEquipes = _context.Equipes
+                .AsNoTracking()
                 .Where(e => e.TournoiId == equipe.TournoiId && e.EquipeId != equipeId)
                 .ToList()
                 .Where(e => _context.Participants.Count(p => p.EquipeId == e.EquipeId) < e.NbJoueursMax)
