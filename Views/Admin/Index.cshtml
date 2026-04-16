@@ -60,6 +60,21 @@
                 <p>Revenus</p>
             </div>
         </div>
+        <div class="stat-premium-card">
+            <div class="stat-icon" style="background: rgba(46,204,113,0.1); color: #27ae60;"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <h3>@ViewBag.NbEquipes</h3>
+                <p>Équipes</p>
+                <div class="stat-equipes-detail mt-1">
+                    <span class="badge-completes me-2">
+                        <i class="fas fa-check-circle"></i> @ViewBag.NbEquipesCompletes complètes
+                    </span>
+                    <span class="badge-incompletes">
+                        <i class="fas fa-exclamation-circle"></i> @ViewBag.NbEquipesIncompletes incomplètes
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="dashboard-main-grid">
@@ -256,5 +271,8 @@
     .badge-ouvert { background: rgba(46, 204, 113, 0.15); color: #27ae60; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
     .badge-ferme { background: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
     .badge-en-cours { background: rgba(52, 152, 219, 0.15); color: #2980b9; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+    .stat-equipes-detail { font-size: 0.75rem; }
+    .badge-completes { color: #27ae60; font-weight: 600; }
+    .badge-incompletes { color: #e67e22; font-weight: 600; }
 </style>
 

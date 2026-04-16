@@ -51,7 +51,9 @@ namespace croupe_06_TournoiGolf.Controllers
                 .ToDictionary(g => g.Key ?? 0, g => g.Count());
 
             int nbIncompletes = equipes.Count(e => !nbMembres.ContainsKey(e.EquipeId) || nbMembres[e.EquipeId] < e.NbJoueursMax);
+            int nbCompletes = equipes.Count(e => nbMembres.ContainsKey(e.EquipeId) && nbMembres[e.EquipeId] >= e.NbJoueursMax);
             ViewBag.NbEquipesIncompletes = nbIncompletes;
+            ViewBag.NbEquipesCompletes = nbCompletes;
 
             // Inscriptions récentes
             ViewBag.InscriptionsRecentes = _context.Participants
