@@ -85,6 +85,42 @@ namespace croupe_06_TournoiGolf.Services
         }
 
         // ---------------------------------------------------------------
+        // Email : Code de vérification à l'inscription
+        // ---------------------------------------------------------------
+        public async Task SendVerificationCodeAsync(string toEmail, string toName, string code)
+        {
+            var subject = "Votre code de vérification — Golf Tournoi G06";
+
+            var body = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif; color: #333;'>
+                    <div style='max-width:600px; margin:auto; border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;'>
+                        <div style='background:#1a6e3c; padding:24px; text-align:center;'>
+                            <h1 style='color:#fff; margin:0;'>Golf Tournoi G06</h1>
+                        </div>
+                        <div style='padding:32px;'>
+                            <h2>Bonjour {toName},</h2>
+                            <p>Voici votre code de vérification pour activer votre compte :</p>
+                            <div style='text-align:center; margin:32px 0;'>
+                                <span style='background:#f4faf7; border:2px solid #1a6e3c; padding:16px 32px;
+                                             border-radius:8px; font-size:28px; font-weight:bold; letter-spacing:8px;
+                                             color:#1a6e3c;'>{code}</span>
+                            </div>
+                            <p style='color:#888; font-size:13px;'>
+                                Ce code expire dans <strong>15 minutes</strong>.<br/>
+                                Si vous n'avez pas demandé ce code, ignorez cet email.
+                            </p>
+                            <hr style='border:none; border-top:1px solid #e0e0e0;'/>
+                            <p style='color:#aaa; font-size:12px;'>Golf Tournoi G06 — Système de gestion des tournois</p>
+                        </div>
+                    </div>
+                </body>
+                </html>";
+
+            await SendEmailAsync(toEmail, toName, subject, body);
+        }
+
+        // ---------------------------------------------------------------
         // Méthode privée : envoi générique via MailKit
         // ---------------------------------------------------------------
         private async Task SendEmailAsync(string toEmail, string toName, string subject, string htmlBody)

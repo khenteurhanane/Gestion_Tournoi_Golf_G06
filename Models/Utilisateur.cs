@@ -40,5 +40,10 @@ namespace croupe_06_TournoiGolf.Models
         // --- Reset Password sécurisé (GOLF-131) ---
         public string? ResetPasswordToken { get; set; }
         public DateTime? ResetPasswordTokenExpiry { get; set; }
+
+        // --- Vérification email à l'inscription ---
+        public bool EmailVerifie { get; set; } = false;
+        public string? CodeVerification { get; set; }
+        public DateTime? CodeVerificationExpiry { get; set; }
     }
 }

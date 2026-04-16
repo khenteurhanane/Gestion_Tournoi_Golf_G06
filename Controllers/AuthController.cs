@@ -54,6 +54,13 @@ namespace croupe_06_TournoiGolf.Controllers
             // Vérification de l'existence de l'utilisateur et validation du mot de passe haché
             if (utilisateur != null && _passwordHasher.VerifyPassword(motDePasse, utilisateur.MotDePasseHash))
             {
+                // Vérifier si l'email a été vérifié (sauf pour l'admin)
+                if (!utilisateur.EmailVerifie && utilisateur.Role != "ADMIN")
+                {
+                    ViewBag.Error = "Veuillez vérifier votre adresse email avant de vous connecter.";
+                    return View();
+                }
+
                 // Si correct, on initialise la session HTTP
                 SetUserSession(utilisateur);
 
@@ -104,6 +111,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         /// <summary>
         /// Gère l'inscription d'un nouveau participant.
+        /// Envoie un code de vérification par email avant d'activer le compte.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -117,9 +125,21 @@ namespace croupe_06_TournoiGolf.Controllers
             var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateurExistant != null)
             {
-                ModelState.AddModelError("Email", "Un compte existe déjà avec cet email.");
-                return View(model);
+                // Si le compte existe mais n'est pas vérifié, on le supprime pour permettre une nouvelle tentative
+                if (!utilisateurExistant.EmailVerifie)
+                {
+                    _context.Utilisateurs.Remove(utilisateurExistant);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    ModelState.AddModelError("Email", "Un compte existe déjà avec cet email.");
+                    return View(model);
+                }
             }
+
+            // Générer un code de vérification à 6 chiffres
+            var code = new Random().Next(100000, 999999).ToString();
 
             // Création de l'objet utilisateur avec hachage du mot de passe pour la sécurité
             var utilisateur = new Utilisateur
@@ -129,16 +149,89 @@ namespace croupe_06_TournoiGolf.Controllers
                 Nom = model.Nom,
                 MotDePasseHash = _passwordHasher.HashPassword(model.MotDePasse),
                 Role = "PARTICIPANT",
-                CreeLe = DateTime.Now
+                CreeLe = DateTime.Now,
+                EmailVerifie = false,
+                CodeVerification = code,
+                CodeVerificationExpiry = DateTime.Now.AddMinutes(15)
             };
 
             _context.Utilisateurs.Add(utilisateur);
             _context.SaveChanges();
 
-            // Connexion automatique immédiate après l'inscription
+            // Envoyer le code de vérification par email
+            bool emailEnvoye = false;
+            try
+            {
+                var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
+                await _emailService.SendVerificationCodeAsync(utilisateur.Email, fullName, code);
+                emailEnvoye = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur envoi code verification : {ex.Message}");
+            }
+
+            // Si l'email n'a pas pu etre envoyé, afficher le code sur la page (mode dev)
+            if (!emailEnvoye)
+            {
+                TempData["CodeAffiche"] = code;
+            }
+
+            // Rediriger vers la page de vérification
+            TempData["VerificationEmail"] = utilisateur.Email;
+            return RedirectToAction("VerifierEmail");
+        }
+
+        /// <summary>
+        /// Affiche la page de saisie du code de vérification.
+        /// </summary>
+        [HttpGet]
+        public IActionResult VerifierEmail()
+        {
+            var email = TempData["VerificationEmail"]?.ToString();
+            if (string.IsNullOrEmpty(email))
+                return RedirectToAction("Register");
+
+            ViewBag.Email = email;
+            return View();
+        }
+
+        /// <summary>
+        /// Vérifie le code saisi par l'utilisateur et active le compte.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifierEmail(string email, string code)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
+            {
+                ViewBag.Error = "Veuillez saisir le code de vérification.";
+                ViewBag.Email = email;
+                return View();
+            }
+
+            var utilisateur = _context.Utilisateurs.FirstOrDefault(u =>
+                u.Email == email &&
+                u.CodeVerification == code.Trim() &&
+                u.CodeVerificationExpiry > DateTime.Now);
+
+            if (utilisateur == null)
+            {
+                ViewBag.Error = "Code invalide ou expiré. Veuillez réessayer.";
+                ViewBag.Email = email;
+                return View();
+            }
+
+            // Activer le compte
+            utilisateur.EmailVerifie = true;
+            utilisateur.CodeVerification = null;
+            utilisateur.CodeVerificationExpiry = null;
+            _context.SaveChanges();
+
+            // Connexion automatique
             SetUserSession(utilisateur);
 
-            // Tente d'envoyer un email de bienvenue (sans bloquer si le service email échoue)
+            // Envoyer email de bienvenue
             try
             {
                 var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
@@ -149,7 +242,40 @@ namespace croupe_06_TournoiGolf.Controllers
                 Console.WriteLine($"Erreur envoi email bienvenue : {ex.Message}");
             }
 
+            TempData["Success"] = "Votre compte a été vérifié et activé avec succès !";
             return RedirectToAction("Index", "Tournoi");
+        }
+
+        /// <summary>
+        /// Renvoie un nouveau code de vérification.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RenvoyerCode(string email)
+        {
+            var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == email && !u.EmailVerifie);
+            if (utilisateur == null)
+                return RedirectToAction("Register");
+
+            var code = new Random().Next(100000, 999999).ToString();
+            utilisateur.CodeVerification = code;
+            utilisateur.CodeVerificationExpiry = DateTime.Now.AddMinutes(15);
+            _context.SaveChanges();
+
+            try
+            {
+                var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
+                await _emailService.SendVerificationCodeAsync(utilisateur.Email, fullName, code);
+                TempData["Success"] = "Un nouveau code a été envoyé à votre adresse email.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur renvoi code : {ex.Message}");
+                TempData["Error"] = "Impossible d'envoyer le code. Veuillez réessayer.";
+            }
+
+            TempData["VerificationEmail"] = email;
+            return RedirectToAction("VerifierEmail");
         }
 
         /// <summary>

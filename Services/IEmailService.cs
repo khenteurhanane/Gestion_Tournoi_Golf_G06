@@ -7,5 +7,8 @@ namespace croupe_06_TournoiGolf.Services
 
         /// <summary>Envoie un email de bienvenue après la création du compte.</summary>
         Task SendWelcomeEmailAsync(string toEmail, string toName);
+
+        /// <summary>Envoie un code de vérification par email lors de l'inscription.</summary>
+        Task SendVerificationCodeAsync(string toEmail, string toName, string code);
     }
 }

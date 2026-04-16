@@ -11,7 +11,7 @@
             <h2>Créer un compte</h2>
             <p class="sub">Inscris-toi pour participer aux tournois de golf.</p>
 
-            <form action="/Auth/Register" method="post">
+            <form action="/Auth/Register" method="post" autocomplete="off">
                 @Html.AntiForgeryToken()
 
 
@@ -32,7 +32,7 @@
 
                 <div class="form-group">
                     <label for="Email">Adresse courriel</label>
-                    <input id="Email" name="Email" type="email" placeholder="exemple@email.com" value="@Model?.Email" required />
+                    <input id="Email" name="Email" type="email" placeholder="exemple@email.com" value="@Model?.Email" required autocomplete="new-email" />
                     @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
                     {
                         <span class="text-danger">@ViewData.ModelState["Email"].Errors[0].ErrorMessage</span>
