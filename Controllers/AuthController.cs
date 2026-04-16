@@ -45,6 +45,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// <param name="email">Email saisi par l'utilisateur</param>
         /// <param name="motDePasse">Mot de passe saisi en clair</param>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Login(string email, string motDePasse)
         {
             // Recherche de l'utilisateur dans la base de données SQL
@@ -105,6 +106,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Gère l'inscription d'un nouveau participant.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             // Validation automatique des contraintes du modèle
@@ -163,6 +165,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Gère l'inscription d'un compte COMMANDITAIRE (entreprise).
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> InscriptionCommanditaire(InscriptionCommanditaireViewModel model)
         {
             if (!ModelState.IsValid)
@@ -223,6 +226,7 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -300,6 +304,7 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -346,6 +351,7 @@ namespace croupe_06_TournoiGolf.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Profil(string Prenom, string Nom, string Telephone, string? Adresse)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -390,6 +396,7 @@ namespace croupe_06_TournoiGolf.Controllers
         // --- Annuler une inscription ---
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AnnulerInscription(int participantId)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;

@@ -59,6 +59,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Traitement du formulaire de création de commandite
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Creer(Commandite model)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -129,6 +130,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Simule le traitement d'un paiement de commandite (US-11-T04)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SimulerPaiement(int commanditeId, string methodePaiement)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -224,6 +226,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Ajoute un joueur à une commandite
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AjouterJoueur(int commanditeId, string prenom, string nom, string email)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -291,8 +294,14 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Supprime un joueur d'une commandite
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SupprimerJoueur(int participantId, int commanditeId)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var commandite = _context.Commandites.Find(commanditeId);
+            if (commandite == null || commandite.UtilisateurId != userId)
+                return RedirectToAction("Index");
+
             var participant = _context.Participants.Find(participantId);
             if (participant != null && participant.CommanditeId == commanditeId)
             {

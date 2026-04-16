@@ -137,6 +137,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Supprimer un utilisateur (admin)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SupprimerUtilisateur(int id)
         {
             if (!EstAdmin())
@@ -218,6 +219,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Modifier une équipe (POST)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ModifierEquipe(int EquipeId, string NomEquipe, string CodeSecret)
         {
             if (!EstAdmin()) return View("AccesRefuse");
@@ -236,6 +238,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Retirer un membre d'une équipe
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult RetirerMembre(int participantId, int equipeId)
         {
             if (!EstAdmin()) return View("AccesRefuse");
@@ -298,6 +301,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Supprimer une équipe
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SupprimerEquipe(int id)
         {
             if (!EstAdmin()) return View("AccesRefuse");
@@ -321,6 +325,7 @@ namespace croupe_06_TournoiGolf.Controllers
         }
         // Compléter les équipes automatiquement (Algorithme)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CompleterEquipes(int tournoiId)
         {
             if (!EstAdmin()) return View("AccesRefuse");

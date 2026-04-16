@@ -94,6 +94,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// </summary>
         /// <param name="model">Les données saisies par l'utilisateur</param>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Index(InscriptionViewModel model)
         {
             // Validation des champs obligatoires définis dans le ViewModel
@@ -254,6 +255,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
         // Simule le paiement (GOLF-37)
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SimulerPaiement(int participantId, string methodePaiement)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;

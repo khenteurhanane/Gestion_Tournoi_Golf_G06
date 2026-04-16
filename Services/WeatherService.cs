@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 
+namespace croupe_06_TournoiGolf.Services
+{
     /// <summary>
     /// Service chargé de récupérer les données météorologiques en temps réel.
     /// Utilise l'API externe gratuite Open-Meteo sans nécessiter de clé API.

@@ -72,6 +72,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Enregistre un nouveau tournoi et gère l'upload de son image de couverture.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Tournoi tournoi, IFormFile? imageFile)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -100,6 +101,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Active la possibilité de s'inscrire à un tournoi donné.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult OuvrirInscriptions(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -118,6 +120,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Change l'état du tournoi à 'En cours', activant ainsi la saisie des scores SignalR.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DemarrerTournoi(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -136,6 +139,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Arrête le tournoi et fige les scores.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult TerminerTournoi(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -154,6 +158,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Désactive le formulaire d'inscription pour tout le monde.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult FermerInscriptions(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -225,6 +230,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Traite les modifications d'un tournoi existant.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Tournoi model, IFormFile? imageFile)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -276,6 +282,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Supprime un tournoi et nettoie en cascade les participants et équipes liés.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";

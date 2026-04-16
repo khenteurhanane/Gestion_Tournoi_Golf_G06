@@ -6,10 +6,6 @@ using croupe_06_TournoiGolf.Data;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class EquipeController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
-    {
-        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
-
     /// <summary>
     /// Contrôleur gérant le cycle de vie des équipes (Création, Adhésion, Modification, Suppression).
     /// </summary>
@@ -66,6 +62,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Enregistre une nouvelle équipe. Utilise une transaction pour limiter le nombre d'équipes par tournoi.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Creer(Equipe model)
         {
             if (ModelState.IsValid == false)
@@ -179,6 +176,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Traite l'adhésion d'un participant à une équipe en vérifiant le code secret et la capacité.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Rejoindre(int participantId, string codeSecret)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -286,6 +284,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Permet au capitaine de renommer son équipe.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ModifierNom(int EquipeId, string NomEquipe)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -305,6 +304,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Supprime l'équipe et détache tous ses participants.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SupprimerEquipe(int id)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -327,6 +327,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Permet au capitaine de retirer un membre de l'équipe.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult RetirerMembre(int participantId, int equipeId)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -385,6 +386,7 @@ namespace croupe_06_TournoiGolf.Controllers
         /// Valide le transfert d'un membre d'une équipe A vers une équipe B.
         /// </summary>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeplacerMembre(int participantId, int equipeSourceId, int equipeCibleId)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
