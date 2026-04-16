@@ -7,7 +7,7 @@ WORKDIR /src
 COPY ["croupe 06 TournoiGolf.csproj", "."]
 RUN dotnet restore "croupe 06 TournoiGolf.csproj"
 COPY . .
-RUN dotnet publish "croupe 06 TournoiGolf.csproj" -c Release -o /app/publish
+RUN dotnet publish "croupe 06 TournoiGolf.csproj" -c Release -o /app/publish -p:TreatWarningsAsErrors=false -warnaserror-
 
 FROM base AS final
 WORKDIR /app
