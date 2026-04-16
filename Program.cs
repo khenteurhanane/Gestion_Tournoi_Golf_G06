@@ -8,9 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
 builder.Services.AddSession(options =>
 {
  options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -91,12 +88,11 @@ using (var scope = app.Services.CreateScope())
  {
   var context = services.GetRequiredService<GolfDbContext>();
 
-  // RÉINITIALISATION COMPLÈTE (Développement)
-  context.Database.EnsureDeleted(); 
-  context.Database.EnsureCreated();
+  // Applique les migrations EF Core au démarrage
+  context.Database.Migrate();
 
   // --- REPARATION BASE DE DONNEES (GOLF-REPAIR) ---
-  // On s'assure que les nouvelles tables de la boutique existent (Car EnsureCreated ne les ajoute pas si la DB existe déjà)
+  // On s'assure que les nouvelles tables existent (compatibilité)
   context.Database.ExecuteSqlRaw(@"
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CommandesBoutique')
     BEGIN
@@ -158,7 +154,8 @@ using (var scope = app.Services.CreateScope())
     Prenom = "Admin",
     Nom = "G06",
     Telephone = "514-000-0000",
-    CreeLe = DateTime.Now
+    CreeLe = DateTime.Now,
+    EmailVerifie = true
    });
    context.SaveChanges();
   }
