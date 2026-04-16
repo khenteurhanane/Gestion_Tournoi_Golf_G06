@@ -7,6 +7,10 @@ using croupe_06_TournoiGolf.Models;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
+    /// <summary>
+    /// Contrôleur gérant le suivi des scores et le classement en temps réel des tournois.
+    /// Utilise SignalR pour pousser les mises à jour aux spectateurs sans rafraîchir la page.
+    /// </summary>
     public class ScoreController : Controller
     {
         private readonly GolfDbContext _context;
@@ -18,8 +22,10 @@ namespace croupe_06_TournoiGolf.Controllers
             _hubContext = hubContext;
         }
 
-        // Affiche le tableau de classement en direct
-        // Accessible aux utilisateurs connectés seulement
+        /// <summary>
+        /// Affiche la vue du tableau de classement pour un tournoi donné.
+        /// Calcule le classement initial côté serveur.
+        /// </summary>
         public IActionResult Tableau(int id)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -30,19 +36,20 @@ namespace croupe_06_TournoiGolf.Controllers
             if (tournoi == null)
                 return RedirectToAction("Index", "Tournoi");
 
-            // Récupérer les équipes du tournoi
+            // Chargement des données nécessaires en utilisant AsNoTracking pour optimiser la lecture
             var equipes = _context.Equipes
                 .Where(e => e.TournoiId == id)
                 .AsNoTracking()
                 .ToList();
 
-            // Récupérer tous les scores du tournoi
             var scores = _context.ScoresTrous
                 .Where(s => s.TournoiId == id)
                 .AsNoTracking()
                 .ToList();
 
-            // Calculer le classement (moins de coups = meilleur)
+            // Logique de classement : Addition des coups de chaque trou pour chaque équipe.
+            // On trie par nombre de coups ascendant (le golf se joue au score le plus bas).
+            // Les équipes n'ayant pas encore joué sont placées à la fin (int.MaxValue).
             var classement = equipes.Select(e => new
             {
                 equipe = e,
@@ -59,7 +66,10 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Page de saisie des scores trou par trou (admin seulement)
+        /// <summary>
+        /// Affiche l'interface de saisie des scores réservée aux administrateurs.
+        /// Uniquement disponible si le tournoi a le statut 'EstEnCours'.
+        /// </summary>
         public IActionResult Saisie(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
@@ -90,10 +100,14 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Enregistre le score d'un trou et diffuse le classement via SignalR
+        /// <summary>
+        /// Point de terminaison API pour enregistrer le score d'un trou spécifique.
+        /// Après enregistrement, déclenche une diffusion SignalR à tous les clients connectés.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> SaisirScore(int tournoiId, int equipeId, int numeroTrou, int nbCoups)
         {
+            // Vérification stricte des droits ADMIN via la session
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             if (role != "ADMIN")
                 return Json(new { succes = false, message = "Accès refusé" });
@@ -102,19 +116,17 @@ namespace croupe_06_TournoiGolf.Controllers
             if (tournoi == null || !tournoi.EstEnCours)
                 return Json(new { succes = false, message = "Tournoi non disponible" });
 
-            // Chercher un score existant pour ce trou et cette équipe
+            // On vérifie si un score existe déjà pour ce trou/équipe pour faire un Update ou un Create
             var scoreExistant = _context.ScoresTrous
                 .FirstOrDefault(s => s.TournoiId == tournoiId && s.EquipeId == equipeId && s.NumeroTrou == numeroTrou);
 
             if (scoreExistant != null)
             {
-                // Mettre à jour le score existant
                 scoreExistant.NbCoups = nbCoups;
                 scoreExistant.SaisiLe = DateTime.Now;
             }
             else
             {
-                // Créer un nouveau score
                 var nouveauScore = new ScoreTrou
                 {
                     TournoiId = tournoiId,
@@ -128,7 +140,7 @@ namespace croupe_06_TournoiGolf.Controllers
 
             _context.SaveChanges();
 
-            // Calculer le classement mis à jour
+            // Création du nouvel objet de classement pour diffusion
             var equipes = _context.Equipes
                 .Where(e => e.TournoiId == tournoiId)
                 .AsNoTracking()
@@ -149,13 +161,17 @@ namespace croupe_06_TournoiGolf.Controllers
             .OrderBy(c => c.trousJoues == 0 ? int.MaxValue : c.totalCoups)
             .ToList();
 
-            // Diffuser le classement à tous les navigateurs connectés
+            // SIGNALR : On envoie l'événement "MiseAJourClassement" à tous les clients du Hub
+            // Cela permet aux spectateurs de voir le score changer sans recharger leur navigateur.
             await _hubContext.Clients.All.SendAsync("MiseAJourClassement", tournoiId, classement);
 
             return Json(new { succes = true });
         }
 
-        // Retourne le classement actuel en JSON (pour le chargement initial de la page)
+        /// <summary>
+        /// Retourne le classement actuel sous format JSON.
+        /// Utilisé au chargement du tableau de bord pour éviter un rendu serveur complet.
+        /// </summary>
         public IActionResult ClassementJson(int id)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -184,5 +200,6 @@ namespace croupe_06_TournoiGolf.Controllers
 
             return Json(classement);
         }
+
     }
 }

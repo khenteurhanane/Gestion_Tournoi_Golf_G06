@@ -10,13 +10,22 @@ namespace croupe_06_TournoiGolf.Controllers
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
 
-        // Liste les équipes de l'utilisateur (Mes Équipes)
+    /// <summary>
+    /// Contrôleur gérant le cycle de vie des équipes (Création, Adhésion, Modification, Suppression).
+    /// </summary>
+    public class EquipeController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
+    {
+        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
+
+        /// <summary>
+        /// Affiche la liste des équipes auxquelles l'utilisateur appartient ou qu'il a créées.
+        /// </summary>
         public IActionResult Index()
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             if (userId == 0) return RedirectToAction("Login", "Auth");
 
-            // On ne récupère QUE les équipes où l'utilisateur est le créateur OU dont il est membre
+            // Récupération des équipes liées à l'utilisateur (Capitaine ou membre)
             var equipes = _context.Equipes
                 .AsNoTracking()
                 .Include(e => e.Tournoi)
@@ -28,7 +37,10 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(equipes);
         }
 
-        // Affiche le formulaire de création d'équipe
+        /// <summary>
+        /// Affiche le formulaire pour créer une nouvelle équipe.
+        /// Génère un code secret par défaut pour permettre aux futurs membres de rejoindre.
+        /// </summary>
         public IActionResult Creer(int? tournoiId)
         {
             var model = new Equipe();
@@ -38,20 +50,21 @@ namespace croupe_06_TournoiGolf.Controllers
                 model.TournoiId = tournoiId.Value;
             }
 
-            // Récupérer la liste des tournois actifs pour la sélection
+            // Liste des tournois ouverts aux inscriptions
             ViewBag.ListeTournois = _context.Tournois
                 .AsNoTracking()
                 .Where(t => t.DateTournoi >= DateTime.Today && t.InscriptionsOuvertes)
                 .OrderBy(t => t.DateTournoi)
                 .ToList();
 
-            // Générer le code secret automatiquement (GOLF-41)
             model.CodeSecret = GenererCodeSecret();
 
             return View(model);
         }
 
-        // Enregistre l'équipe en BDD (GOLF-45)
+        /// <summary>
+        /// Enregistre une nouvelle équipe. Utilise une transaction pour limiter le nombre d'équipes par tournoi.
+        /// </summary>
         [HttpPost]
         public IActionResult Creer(Equipe model)
         {
@@ -60,7 +73,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
-            // Vérifier que le tournoi existe
             var tournoi = _context.Tournois.Find(model.TournoiId);
             if (tournoi == null)
             {
@@ -68,36 +80,35 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
-            // Vérifier que le code secret est unique (GOLF-41)
+            // Validation de l'unicité du code secret
             var codeExiste = _context.Equipes.FirstOrDefault(e => e.CodeSecret == model.CodeSecret);
             if (codeExiste != null)
             {
-                // Regénérer un code unique
                 model.CodeSecret = GenererCodeSecret();
             }
 
-            // Récupérer l'utilisateur connecté
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             model.CreeParUtilisateurId = userId;
             model.CreeLe = DateTime.Now;
-            model.NbJoueursMax = 4; // GOLF-44 : max 4 joueurs
+            model.NbJoueursMax = 4; // Contrainte métier : Maximum 4 joueurs par équipe
 
             using (var tx = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable))
             {
                 try
                 {
-                    // Vérifier s'il reste des places d'équipes
+                    // Vérification de la limite d'équipes pour ce tournoi
                     int nbEquipes = _context.Equipes.Count(e => e.TournoiId == model.TournoiId);
                     if (nbEquipes >= tournoi.NbEquipesMax)
                     {
-                        ViewBag.Error = "Navré, la limite d'équipes pour ce tournoi est atteinte.";
+                        ViewBag.Error = "La limite d'équipes pour ce tournoi est atteinte.";
                         return View(model);
                     }
 
                     _context.Equipes.Add(model);
                     _context.SaveChanges();
 
-                    // Ajouter automatiquement le créateur à l'équipe en tant que participant (si possible)
+                    // Si l'utilisateur est déjà inscrit au tournoi en tant que participant libre, 
+                    // on le lie automatiquement à sa nouvelle équipe.
                     var participant = _context.Participants.FirstOrDefault(p => p.UtilisateurId == userId && p.TournoiId == model.TournoiId);
                     if (participant != null)
                     {
@@ -111,13 +122,15 @@ namespace croupe_06_TournoiGolf.Controllers
                 catch (Exception)
                 {
                     tx.Rollback();
-                    ViewBag.Error = "Erreur lors de la création de l'équipe. Veuillez réessayer.";
+                    ViewBag.Error = "Erreur lors de la création de l'équipe.";
                     return View(model);
                 }
             }
         }
 
-        // Page de confirmation après création
+        /// <summary>
+        /// Page de succès affichant le code secret à partager.
+        /// </summary>
         public IActionResult Confirmation(int equipeId)
         {
             var equipe = _context.Equipes
@@ -132,15 +145,17 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(equipe);
         }
 
-        // Génère un code secret de 6 caractères alphanumériques (GOLF-41)
+        /// <summary>
+        /// Générateur de code secret alphanumérique de 6 caractères.
+        /// </summary>
         private string GenererCodeSecret()
         {
             return Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
         }
 
-        // --- US-08 : Rejoindre une équipe existante ---
-
-        // Affiche le formulaire pour rejoindre une équipe
+        /// <summary>
+        /// Affiche le formulaire pour rejoindre une équipe via son code secret.
+        /// </summary>
         [HttpGet]
         public IActionResult Rejoindre(int participantId)
         {
@@ -150,7 +165,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("MesInscriptions", "Auth");
             }
 
-            // Vérifier si le participant est déjà dans une équipe
             if (participant.EquipeId != null)
             {
                 TempData["Error"] = "Vous faites déjà partie d'une équipe.";
@@ -161,7 +175,9 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Traite la demande pour rejoindre une équipe
+        /// <summary>
+        /// Traite l'adhésion d'un participant à une équipe en vérifiant le code secret et la capacité.
+        /// </summary>
         [HttpPost]
         public IActionResult Rejoindre(int participantId, string codeSecret)
         {
@@ -177,27 +193,25 @@ namespace croupe_06_TournoiGolf.Controllers
 
             var participant = _context.Participants.Find(participantId);
             
-            // Sécurité : Vérifier l'appartenance
             if (participant == null || participant.UtilisateurId != userId)
             {
                 return RedirectToAction("MesInscriptions", "Auth");
             }
 
-            // Vérifier si déjà dans une équipe
             if (participant.EquipeId != null)
             {
                 TempData["Error"] = "Vous faites déjà partie d'une équipe.";
                 return RedirectToAction("MesInscriptions", "Auth");
             }
 
-            // Chercher l'équipe par son code secret (GOLF-47)
+            // Recherche de l'équipe correspondante au code secret unique dans le même tournoi
             var codeNettoye = codeSecret.Trim().ToUpper();
             var equipe = _context.Equipes
                 .FirstOrDefault(e => e.CodeSecret == codeNettoye && e.TournoiId == participant.TournoiId);
 
             if (equipe == null)
             {
-                ViewBag.Error = "Code d'équipe invalide ou introuvable pour ce tournoi.";
+                ViewBag.Error = "Code d'équipe invalide ou introuvable.";
                 ViewBag.ParticipantId = participantId;
                 return View();
             }
@@ -206,16 +220,15 @@ namespace croupe_06_TournoiGolf.Controllers
             {
                 try
                 {
-                    // Vérifier si l'équipe est pleine (à l'intérieur de la transaction)
+                    // Validation de la capacité de l'équipe sous verrou de transaction
                     int nbMembres = _context.Participants.Count(p => p.EquipeId == equipe.EquipeId);
                     if (nbMembres >= equipe.NbJoueursMax)
                     {
-                        ViewBag.Error = "Navré, cette équipe vient d'être complétée.";
+                        ViewBag.Error = "Cette équipe est déjà complète.";
                         ViewBag.ParticipantId = participantId;
                         return View();
                     }
 
-                    // Rejoindre l'équipe (GOLF-49)
                     participant.EquipeId = equipe.EquipeId;
                     _context.SaveChanges();
                     tx.Commit();
@@ -226,15 +239,16 @@ namespace croupe_06_TournoiGolf.Controllers
                 catch
                 {
                     tx.Rollback();
-                    ViewBag.Error = "Erreur lors de l'adhésion à l'équipe. Veuillez réessayer.";
+                    ViewBag.Error = "Erreur lors de l'adhésion.";
                     ViewBag.ParticipantId = participantId;
                     return View();
                 }
             }
         }
-        // --- Gestion de l'équipe par le créateur ---
 
-        // Affiche la page de gestion d'équipe
+        /// <summary>
+        /// Affiche la dashboard de gestion de l'équipe pour le capitaine ou l'admin.
+        /// </summary>
         public IActionResult Gestion(int id)
         {
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -248,9 +262,10 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (equipe == null) return RedirectToAction("Index");
 
-            // Vérifier que l'utilisateur fait partie de l'équipe ou est admin
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             bool estMembre = _context.Participants.Any(p => p.EquipeId == id && p.UtilisateurId == userId);
+            
+            // Seul le capitaine, un membre ou un admin peut voir cette page
             if (!estMembre && equipe.CreeParUtilisateurId != userId && role != "ADMIN")
             {
                 return RedirectToAction("Index");
@@ -267,7 +282,9 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(equipe);
         }
 
-        // Modifier le nom de l'équipe (par le créateur)
+        /// <summary>
+        /// Permet au capitaine de renommer son équipe.
+        /// </summary>
         [HttpPost]
         public IActionResult ModifierNom(int EquipeId, string NomEquipe)
         {
@@ -284,7 +301,9 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Gestion", new { id = EquipeId });
         }
 
-        // Supprimer l'équipe (par le créateur)
+        /// <summary>
+        /// Supprime l'équipe et détache tous ses participants.
+        /// </summary>
         [HttpPost]
         public IActionResult SupprimerEquipe(int id)
         {
@@ -293,7 +312,6 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (equipe != null && equipe.CreeParUtilisateurId == userId)
             {
-                // Détacher les membres
                 var membres = _context.Participants.Where(p => p.EquipeId == id).ToList();
                 foreach (var m in membres) m.EquipeId = null;
 
@@ -304,7 +322,10 @@ namespace croupe_06_TournoiGolf.Controllers
 
             return RedirectToAction("Index");
         }
-        // Retirer un membre de l'équipe (par le créateur)
+
+        /// <summary>
+        /// Permet au capitaine de retirer un membre de l'équipe.
+        /// </summary>
         [HttpPost]
         public IActionResult RetirerMembre(int participantId, int equipeId)
         {
@@ -326,7 +347,9 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Gestion", new { id = equipeId });
         }
 
-        // Affiche le formulaire pour deplacer un membre vers une autre equipe
+        /// <summary>
+        /// Propose de déplacer un membre vers une autre équipe du même tournoi disposant de places libres.
+        /// </summary>
         [HttpGet]
         public IActionResult DeplacerMembre(int participantId, int equipeId)
         {
@@ -346,7 +369,6 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (participant == null) return RedirectToAction("Gestion", new { id = equipeId });
 
-            // Lister les autres equipes du meme tournoi qui ont encore de la place
             var autresEquipes = _context.Equipes
                 .AsNoTracking()
                 .Where(e => e.TournoiId == equipe.TournoiId && e.EquipeId != equipeId)
@@ -359,7 +381,9 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(participant);
         }
 
-        // Traite le deplacement d'un membre vers une autre equipe
+        /// <summary>
+        /// Valide le transfert d'un membre d'une équipe A vers une équipe B.
+        /// </summary>
         [HttpPost]
         public IActionResult DeplacerMembre(int participantId, int equipeSourceId, int equipeCibleId)
         {
@@ -373,21 +397,21 @@ namespace croupe_06_TournoiGolf.Controllers
             if (participant == null || participant.EquipeId != equipeSourceId)
                 return RedirectToAction("Gestion", new { id = equipeSourceId });
 
-            // Verifier que l'equipe cible a encore de la place
             var equipeCible = _context.Equipes.Find(equipeCibleId);
             if (equipeCible == null) return RedirectToAction("Gestion", new { id = equipeSourceId });
 
             int nbMembres = _context.Participants.Count(p => p.EquipeId == equipeCibleId);
             if (nbMembres >= equipeCible.NbJoueursMax)
             {
-                TempData["Error"] = "L'equipe selectionnee est deja complete.";
+                TempData["Error"] = "L'équipe sélectionnée est déjà complète.";
                 return RedirectToAction("DeplacerMembre", new { participantId, equipeId = equipeSourceId });
             }
 
             participant.EquipeId = equipeCibleId;
             _context.SaveChanges();
-            TempData["Success"] = $"Le membre a ete deplace vers l'equipe '{equipeCible.NomEquipe}'.";
+            TempData["Success"] = $"Le membre a été déplacé vers l'équipe '{equipeCible.NomEquipe}'.";
             return RedirectToAction("Gestion", new { id = equipeSourceId });
         }
+
     }
 }

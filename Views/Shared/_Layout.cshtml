@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tournoi de Golf G06</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=20260331" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site.css?v=20260415" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body class="dashboard-body">
     @using Microsoft.AspNetCore.Http
@@ -26,10 +26,15 @@
         <!-- Sidebar -->
         <aside class="app-sidebar">
             <div class="sidebar-header">
-                <div class="logo">
-                    <i class="fas fa-golf-ball"></i>
-                    <span>Golf G06</span>
-                </div>
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-golf-ball"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">Golf G06</span>
+                        <span class="logo-subtitle">Tournoi Annuel</span>
+                    </div>
+                </a>
             </div>
 
             <nav class="sidebar-nav">
@@ -112,19 +117,43 @@
                     <button class="hamburger-btn" id="sidebarToggle" aria-label="Menu">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h2 class="page-title">@ViewData["Title"]</h2>
-                    <span class="page-subtitle">Gestion du tournoi annuel</span>
+                    <div class="topbar-page-info">
+                        <h2 class="page-title">@ViewData["Title"]</h2>
+                        <span class="page-subtitle">Tournoi de Golf — Cité Collégiale</span>
+                    </div>
                 </div>
                 <div class="topbar-right">
-                    <div class="lang-switcher me-4">
-                        @{
-                            string targetLang = currentLang == "FR" ? "EN" : "FR";
-                        }
-                        <a href="/Home/SetLanguage?lang=@targetLang" class="lang-btn">
-                            <span class="lang-flag">@(currentLang == "FR" ? "🇫🇷" : "🇬🇧")</span>
-                            <span class="ms-2">@currentLang</span>
-                            <i class="fas fa-sync-alt ms-2" style="font-size: 0.7rem; opacity: 0.5;"></i>
-                        </a>
+                    <div class="lang-dropdown-wrapper me-4" id="langDropdown">
+                        <button class="lang-btn" id="langDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                            <span class="lang-flag" id="langCurrentFlag">
+                                @(currentLang == "EN" ? "🇬🇧" : currentLang == "NL" ? "🇳🇱" : currentLang == "DE" ? "🇩🇪" : currentLang == "ES" ? "🇪🇸" : currentLang == "IT" ? "🇮🇹" : currentLang == "SV" ? "🇸🇪" : "🇫🇷")
+                            </span>
+                            <span class="ms-2 lang-code">@currentLang</span>
+                            <i class="fas fa-chevron-down ms-2" id="langChevron" style="font-size:0.65rem; transition: transform 0.2s;"></i>
+                        </button>
+                        <div class="lang-menu" id="langMenu" role="listbox">
+                            <a href="/Home/SetLanguage?lang=EN" class="lang-option @(currentLang == "EN" ? "active" : "")" role="option">
+                                <span>🇬🇧</span> <span>English</span>
+                            </a>
+                            <a href="/Home/SetLanguage?lang=FR" class="lang-option @(currentLang == "FR" ? "active" : "")" role="option">
+                                <span>🇫🇷</span> <span>Français</span>
+                            </a>
+                            <a href="/Home/SetLanguage?lang=NL" class="lang-option @(currentLang == "NL" ? "active" : "")" role="option">
+                                <span>🇳🇱</span> <span>Nederlands</span>
+                            </a>
+                            <a href="/Home/SetLanguage?lang=DE" class="lang-option @(currentLang == "DE" ? "active" : "")" role="option">
+                                <span>🇩🇪</span> <span>Deutsch</span>
+                            </a>
+                            <a href="/Home/SetLanguage?lang=ES" class="lang-option @(currentLang == "ES" ? "active" : "")" role="option">
+                                <span>🇪🇸</span> <span>Español</span>
+                            </a>
+                            <a href="/Home/SetLanguage?lang=IT" class="lang-option @(currentLang == "IT" ? "active" : "")" role="option">
+                                <span>🇮🇹</span> <span>Italiano</span>
+                            </a>
+                            <a href="/Home/SetLanguage?lang=SV" class="lang-option @(currentLang == "SV" ? "active" : "")" role="option">
+                                <span>🇸🇪</span> <span>Svenska</span>
+                            </a>
+                        </div>
                     </div>
                     @if (estConnecte)
                     {
@@ -390,6 +419,10 @@
             transform: scale(1.05) rotate(5deg);
         }
 
+        /* ===== LANGUAGE DROPDOWN ===== */
+        .lang-dropdown-wrapper {
+            position: relative;
+        }
         .lang-btn {
             display: flex;
             align-items: center;
@@ -401,13 +434,56 @@
             border-radius: 10px;
             background: var(--light-silver);
             transition: all 0.2s;
-            border-bottom: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
         }
-        
         .lang-btn:hover {
             background: var(--accent-silver);
             color: #fff;
         }
+        .lang-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 180px;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(15,23,42,0.15), 0 2px 8px rgba(0,0,0,0.08);
+            z-index: 9999;
+            overflow: hidden;
+            animation: langMenuIn 0.18s ease;
+        }
+        .lang-menu.open { display: block; }
+        @@keyframes langMenuIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: background 0.15s;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+        .lang-option:last-child { border-bottom: none; }
+        .lang-option:hover {
+            background: var(--light-silver);
+            text-decoration: none;
+            color: var(--text-main);
+        }
+        .lang-option.active {
+            background: rgba(15,23,42,0.06);
+            font-weight: 700;
+            color: var(--primary-navy);
+        }
+        .lang-option span:first-child { font-size: 1.2rem; }
 
         .lang-flag { font-size: 1.1rem; }
 
@@ -570,6 +646,40 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
         });
+    </script>
+
+    <script>
+        // ===== LANGUAGE DROPDOWN =====
+        const langBtn  = document.getElementById('langDropdownBtn');
+        const langMenu = document.getElementById('langMenu');
+        const langChev = document.getElementById('langChevron');
+
+        if (langBtn && langMenu) {
+            langBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = langMenu.classList.toggle('open');
+                langBtn.setAttribute('aria-expanded', isOpen);
+                if (langChev) langChev.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+
+            document.addEventListener('click', function() {
+                langMenu.classList.remove('open');
+                langBtn.setAttribute('aria-expanded', 'false');
+                if (langChev) langChev.style.transform = 'rotate(0deg)';
+            });
+
+            langMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    langMenu.classList.remove('open');
+                    langBtn.setAttribute('aria-expanded', 'false');
+                    if (langChev) langChev.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
     </script>
 </body>
 </html>

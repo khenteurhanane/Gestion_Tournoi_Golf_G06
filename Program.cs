@@ -55,7 +55,7 @@ builder.Services.AddControllersWithViews(options =>
 var app = builder.Build();
 
 // Configuration des cultures supportées
-var supportedCultures = new[] { "fr", "en" };
+var supportedCultures = new[] { "fr", "en", "nl", "de", "es", "it", "sv" };
 
 var localizationOptions = new RequestLocalizationOptions()
  .SetDefaultCulture("fr")

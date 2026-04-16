@@ -62,19 +62,31 @@ namespace croupe_06_TournoiGolf.Controllers
 
         public IActionResult SetLanguage(string lang)
         {
-            string culture = lang.ToLower() == "en" ? "en" : "fr";
-            
-            // Définir le cookie de culture standard (reconnu par le middleware)
+            var validLangs = new[] { "FR", "EN", "NL", "DE", "ES", "IT", "SV" };
+            string code = (lang ?? "FR").ToUpper();
+            if (!System.Linq.Enumerable.Contains(validLangs, code)) code = "FR";
+
+            string culture = code switch
+            {
+                "EN" => "en",
+                "NL" => "nl",
+                "DE" => "de",
+                "ES" => "es",
+                "IT" => "it",
+                "SV" => "sv",
+                _    => "fr"
+            };
+
+            // Cookie de culture
             Response.Cookies.Append(
                 Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.DefaultCookieName,
                 Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
                 new Microsoft.AspNetCore.Http.CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
             );
 
-            // Optionnel : Garder la session pour la compatibilité avec vos anciennes vues
-            HttpContext.Session.SetString("Lang", culture.ToUpper());
-            
-            // Retourner à la page précédente
+            // Session pour compatibilité vues
+            HttpContext.Session.SetString("Lang", code);
+
             string? returnUrl = Request.Headers["Referer"].ToString();
             if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index");
             return Redirect(returnUrl);

@@ -9,34 +9,34 @@ namespace croupe_06_TournoiGolf.Controllers
     // Extensions d'image acceptées
     // Dossier de destination : wwwroot/images/tournois/
     /// <summary>
-    /// CONTRÔLEUR DES TOURNOIS
-    /// Permet de lister les tournois (Public) et de les gérer (Admin).
-    /// Gère aussi l'inscription, l'ouverture/fermeture et le démarrage des événements.
+    /// Contrôleur gérant les opérations sur les tournois. 
+    /// Liste publique des tournois et actions administratives (CRUD, état du tournoi).
     /// </summary>
     public class TournoiController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
-        private readonly string _lang = "FR";
 
-        // On permet l'accès à la liste sans être connecté
+        // Redéfinition pour permettre l'accès public à l'Index sans authentification forcée par le BaseController
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             string actionName = context.ActionDescriptor.RouteValues["action"] ?? "";
             if (actionName == "Index")
             {
-                // La liste des tournois est publique
                 return;
             }
             base.OnActionExecuting(context);
         }
 
-        // PAGE PUBLIQUE : Liste tous les tournois disponibles
+        /// <summary>
+        /// Affiche la liste de tous les tournois. C'est la page principale pour les joueurs.
+        /// Calcule dynamiquement le nombre d'inscrits et vérifie si l'utilisateur connecté y participe déjà.
+        /// </summary>
         public IActionResult Index()
         {
             var listeTournois = _context.Tournois.AsNoTracking().ToList();
 
-            // Vérifier les tournois où l'utilisateur est déjà inscrit
             int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            // Récupération des IDs de tournois auxquels l'utilisateur est déjà inscrit
             var tournoiInscrits = _context.Participants
                 .AsNoTracking()
                 .Where(p => p.UtilisateurId == userId)
@@ -44,7 +44,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 .ToList();
             ViewBag.TournoiInscrits = tournoiInscrits;
 
-            // Compter le nb d'inscrits par tournoi
+            // Groupement des participants par tournoi pour afficher le taux de remplissage
             var nbInscritsParTournoi = _context.Participants
                 .AsNoTracking()
                 .AsEnumerable()
@@ -55,56 +55,55 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(listeTournois);
         }
 
-        // Affiche le formulaire de création (admin seulement)
+        /// <summary>
+        /// Affiche le formulaire de création de tournoi (Réservé ADMIN).
+        /// </summary>
         public IActionResult Create()
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             if (role != "ADMIN")
             {
-                ViewBag.Error = "Accès refusé : droits insuffisants.";
                 return View("AccesRefuse");
             }
             return View();
         }
 
-        // CRÉATION D'UN TOURNOI (ADMIN) : Enregistre le nom, le lieu, la date et l'image
+        /// <summary>
+        /// Enregistre un nouveau tournoi et gère l'upload de son image de couverture.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create(Tournoi tournoi, IFormFile? imageFile)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             if (role != "ADMIN")
             {
-                ViewBag.Error = "Accès refusé : droits insuffisants.";
                 return View("AccesRefuse");
             }
 
-            // Retirer ImageUrl de la validation (géré manuellement)
+            // ImageUrl est géré par la méthode SauvegarderImage, pas par la saisie directe
             ModelState.Remove("ImageUrl");
 
             if (!ModelState.IsValid)
                 return View(tournoi);
 
-            // Gestion de l'image
+            // Appel au service de stockage d'image local
             tournoi.ImageUrl = await SauvegarderImage(imageFile);
-
             tournoi.CreeLe = DateTime.Now;
+
             _context.Tournois.Add(tournoi);
             _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
-        // Ouvre les inscriptions (admin seulement)
+        /// <summary>
+        /// Active la possibilité de s'inscrire à un tournoi donné.
+        /// </summary>
         [HttpPost]
         public IActionResult OuvrirInscriptions(int id)
         {
-            // Vérifier que l'utilisateur est administrateur
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-            {
-                ViewBag.Error = "Accès refusé : droits insuffisants.";
-                return View("AccesRefuse");
-            }
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
@@ -115,13 +114,14 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Index");
         }
 
-        // Démarre le tournoi — active la saisie des scores (admin seulement)
+        /// <summary>
+        /// Change l'état du tournoi à 'En cours', activant ainsi la saisie des scores SignalR.
+        /// </summary>
         [HttpPost]
         public IActionResult DemarrerTournoi(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-                return View("AccesRefuse");
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
@@ -132,13 +132,14 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Details", new { id });
         }
 
-        // Termine le tournoi — désactive la saisie des scores (admin seulement)
+        /// <summary>
+        /// Arrête le tournoi et fige les scores.
+        /// </summary>
         [HttpPost]
         public IActionResult TerminerTournoi(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-                return View("AccesRefuse");
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
@@ -149,17 +150,14 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Details", new { id });
         }
 
-        // Ferme les inscriptions (admin seulement)
+        /// <summary>
+        /// Désactive le formulaire d'inscription pour tout le monde.
+        /// </summary>
         [HttpPost]
         public IActionResult FermerInscriptions(int id)
         {
-            // Vérifier que l'utilisateur est administrateur
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-            {
-                ViewBag.Error = "Accès refusé : droits insuffisants.";
-                return View("AccesRefuse");
-            }
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
@@ -170,31 +168,27 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Index");
         }
 
-        // Page détails d'un tournoi (admin) - affiche les participants
+        /// <summary>
+        /// Dashboard d'un tournoi affichant la liste complète des participants et équipes (Admin).
+        /// </summary>
         public IActionResult Details(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-            {
-                return View("AccesRefuse");
-            }
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois
                 .AsNoTracking()
                 .FirstOrDefault(t => t.TournoiId == id);
-            if (tournoi == null)
-            {
-                return RedirectToAction("Index");
-            }
+            
+            if (tournoi == null) return RedirectToAction("Index");
 
-            // Récupérer les participants inscrits avec leurs infos
+            // Récupération de tous les participants inscrits avec jointure sur Utilisateur
             var participants = _context.Participants
                 .AsNoTracking()
                 .Where(p => p.TournoiId == id)
                 .Include(p => p.Utilisateur)
                 .ToList();
 
-            // Récupérer les équipes de ce tournoi
             var equipes = _context.Equipes
                 .AsNoTracking()
                 .Where(e => e.TournoiId == id)
@@ -209,39 +203,36 @@ namespace croupe_06_TournoiGolf.Controllers
             return View();
         }
 
-        // Modifier un tournoi (admin)
+        /// <summary>
+        /// Affiche le formulaire d'édition pour modifier le lieu, la date ou les places max.
+        /// </summary>
         [HttpGet]
         public IActionResult Edit(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-            {
-                return View("AccesRefuse");
-            }
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois
                 .AsNoTracking()
                 .FirstOrDefault(t => t.TournoiId == id);
-            if (tournoi == null)
-            {
-                return RedirectToAction("Index");
-            }
+            
+            if (tournoi == null) return RedirectToAction("Index");
 
             return View(tournoi);
         }
 
+        /// <summary>
+        /// Traite les modifications d'un tournoi existant.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Edit(Tournoi model, IFormFile? imageFile)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-                return View("AccesRefuse");
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois.Find(model.TournoiId);
-            if (tournoi == null)
-                return RedirectToAction("Index");
+            if (tournoi == null) return RedirectToAction("Index");
 
-            // Mettre à jour les champs
             tournoi.Nom = model.Nom;
             tournoi.DateTournoi = model.DateTournoi;
             tournoi.Lieu = model.Lieu;
@@ -249,7 +240,7 @@ namespace croupe_06_TournoiGolf.Controllers
             tournoi.PlacesParticipantsMax = model.PlacesParticipantsMax;
             tournoi.DateLimiteInscription = model.DateLimiteInscription;
 
-            // Nouvelle image uploadée ?
+            // Remplacement de l'image si un nouveau fichier est fourni
             if (imageFile != null && imageFile.Length > 0)
                 tournoi.ImageUrl = await SauvegarderImage(imageFile);
 
@@ -257,22 +248,21 @@ namespace croupe_06_TournoiGolf.Controllers
             return RedirectToAction("Details", new { id = tournoi.TournoiId });
         }
 
-        // ─── Méthode privée : sauvegarde d'image ───────────────────────────
+        /// <summary>
+        /// Service de sauvegarde physique des images sur le serveur.
+        /// Génère un nom de fichier unique basé sur le temps pour éviter les collisions.
+        /// </summary>
         private async Task<string?> SauvegarderImage(IFormFile? fichier)
         {
-            if (fichier == null || fichier.Length == 0)
-                return null;
+            if (fichier == null || fichier.Length == 0) return null;
 
             var extensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
             var ext = Path.GetExtension(fichier.FileName).ToLowerInvariant();
-            if (!extensions.Contains(ext))
-                return null;
+            if (!extensions.Contains(ext)) return null;
 
             var dossier = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "tournois");
-            if (!Directory.Exists(dossier))
-                Directory.CreateDirectory(dossier);
+            if (!Directory.Exists(dossier)) Directory.CreateDirectory(dossier);
 
-            // Nom unique basé sur timestamp
             var nomFichier = $"tournoi_{DateTime.Now:yyyyMMddHHmmss}{ext}";
             var chemin = Path.Combine(dossier, nomFichier);
 
@@ -282,24 +272,22 @@ namespace croupe_06_TournoiGolf.Controllers
             return $"/images/tournois/{nomFichier}";
         }
 
-        // Supprimer un tournoi (admin)
+        /// <summary>
+        /// Supprime un tournoi et nettoie en cascade les participants et équipes liés.
+        /// </summary>
         [HttpPost]
         public IActionResult Delete(int id)
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
-            if (role != "ADMIN")
-            {
-                return View("AccesRefuse");
-            }
+            if (role != "ADMIN") return View("AccesRefuse");
 
             var tournoi = _context.Tournois.Find(id);
             if (tournoi != null)
             {
-                // Supprimer les participants liés
+                // Nettoyage manuel des dépendances pour garantir l'intégrité référentielle
                 var participants = _context.Participants.Where(p => p.TournoiId == id).ToList();
                 _context.Participants.RemoveRange(participants);
 
-                // Supprimer les équipes liées
                 var equipes = _context.Equipes.Where(e => e.TournoiId == id).ToList();
                 _context.Equipes.RemoveRange(equipes);
 
@@ -309,5 +297,6 @@ namespace croupe_06_TournoiGolf.Controllers
 
             return RedirectToAction("Index");
         }
+
     }
 }

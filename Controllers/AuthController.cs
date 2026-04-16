@@ -11,6 +11,9 @@ using croupe_06_TournoiGolf.Models.ViewModels;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
+    /// <summary>
+    /// Contrôleur gérant l'authentification des utilisateurs (Connexion, Déconnexion, Inscription, Récupération de mot de passe).
+    /// </summary>
     public class AuthController : Controller
     {
         private readonly IPasswordHasher _passwordHasher;
@@ -27,36 +30,48 @@ namespace croupe_06_TournoiGolf.Controllers
             _emailService = emailService;
         }
 
+        /// <summary>
+        /// Affiche la page de connexion.
+        /// </summary>
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
+        /// <summary>
+        /// Gère la soumission du formulaire de connexion.
+        /// </summary>
+        /// <param name="email">Email saisi par l'utilisateur</param>
+        /// <param name="motDePasse">Mot de passe saisi en clair</param>
         [HttpPost]
-        // LE LIEN WEB <--> BACKEND SE FAIT ICI :
-        // "string email" récupère la valeur du <input name="email"> de Login.cshtml
-        // "string motDePasse" récupère la valeur du <input name="motDePasse"> de Login.cshtml
         public IActionResult Login(string email, string motDePasse)
         {
-            // Chercher l'utilisateur dans la base de données (Backend communiquant avec SQL)
+            // Recherche de l'utilisateur dans la base de données SQL
             var utilisateur = _context.Utilisateurs.FirstOrDefault(u => u.Email == email);
 
+            // Vérification de l'existence de l'utilisateur et validation du mot de passe haché
             if (utilisateur != null && _passwordHasher.VerifyPassword(motDePasse, utilisateur.MotDePasseHash))
             {
+                // Si correct, on initialise la session HTTP
                 SetUserSession(utilisateur);
 
+                // Redirection basée sur le rôle de l'utilisateur
                 if (utilisateur.Role == "ADMIN")
                     return RedirectToAction("Index", "Admin");
                 else
                     return RedirectToAction("Index", "Tournoi");
             }
 
+            // En cas d'erreur, on repasse un message à la vue via ViewBag
             ViewBag.Error = "Email ou mot de passe incorrect.";
             return View();
         }
 
-        // Helper pour remplir la session
+        /// <summary>
+        /// Remplit les variables de session à partir des données de l'utilisateur.
+        /// Ces informations seront utilisées à travers toute l'application.
+        /// </summary>
         private void SetUserSession(Utilisateur utilisateur)
         {
             HttpContext.Session.SetInt32("UserId", utilisateur.UtilisateurId);
@@ -68,26 +83,35 @@ namespace croupe_06_TournoiGolf.Controllers
             HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
         }
 
+        /// <summary>
+        /// Déconnecte l'utilisateur en vidant les variables de session.
+        /// </summary>
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
 
-        // --- Création de compte ---
-
+        /// <summary>
+        /// Affiche la page de création de compte pour un participant standard.
+        /// </summary>
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
+        /// <summary>
+        /// Gère l'inscription d'un nouveau participant.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            // Validation automatique des contraintes du modèle
             if (!ModelState.IsValid)
                 return View(model);
 
+            // Vérification de l'unicité de l'email
             var utilisateurExistant = _context.Utilisateurs.FirstOrDefault(u => u.Email == model.Email);
             if (utilisateurExistant != null)
             {
@@ -95,6 +119,7 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View(model);
             }
 
+            // Création de l'objet utilisateur avec hachage du mot de passe pour la sécurité
             var utilisateur = new Utilisateur
             {
                 Email = model.Email,
@@ -108,10 +133,10 @@ namespace croupe_06_TournoiGolf.Controllers
             _context.Utilisateurs.Add(utilisateur);
             _context.SaveChanges();
 
-            // Connecter l'utilisateur après création du compte
+            // Connexion automatique immédiate après l'inscription
             SetUserSession(utilisateur);
 
-            // Envoyer l'email de bienvenue (en arrière-plan, on ignore les erreurs smtp pour ne pas bloquer l'inscription)
+            // Tente d'envoyer un email de bienvenue (sans bloquer si le service email échoue)
             try
             {
                 var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
@@ -119,21 +144,24 @@ namespace croupe_06_TournoiGolf.Controllers
             }
             catch (Exception ex)
             {
-                // Log silencieux : l'inscription réussit même si l'email échoue
-                Console.WriteLine($"[EmailService] Erreur envoi bienvenue : {ex.Message}");
+                Console.WriteLine($"Erreur envoi email bienvenue : {ex.Message}");
             }
 
             return RedirectToAction("Index", "Tournoi");
         }
 
-        // --- Création de compte Commanditaire ---
-
+        /// <summary>
+        /// Affiche le formulaire d'inscription dédié aux commanditaires.
+        /// </summary>
         [HttpGet]
         public IActionResult InscriptionCommanditaire()
         {
             return View();
         }
 
+        /// <summary>
+        /// Gère l'inscription d'un compte COMMANDITAIRE (entreprise).
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> InscriptionCommanditaire(InscriptionCommanditaireViewModel model)
         {
@@ -164,7 +192,6 @@ namespace croupe_06_TournoiGolf.Controllers
 
             SetUserSession(utilisateur);
 
-            // Email de bienvenue commanditaire
             try
             {
                 var fullName = $"{utilisateur.Prenom} {utilisateur.Nom}".Trim();
@@ -172,16 +199,20 @@ namespace croupe_06_TournoiGolf.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[EmailService] Erreur envoi bienvenue commanditaire : {ex.Message}");
+                Console.WriteLine($"Erreur envoi bienvenue commanditaire : {ex.Message}");
             }
 
             return RedirectToAction("ConfirmationInscriptionCommanditaire", "Auth");
         }
 
+        /// <summary>
+        /// Page de succès après l'inscription d'un commanditaire.
+        /// </summary>
         public IActionResult ConfirmationInscriptionCommanditaire()
         {
             return View();
         }
+
 
         // --- Mot de passe oublié (GOLF-131) ---
 
