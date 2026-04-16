@@ -1,12 +1,15 @@
-name: Deploy to Azure App Service
+name: CI Build
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,13 +26,3 @@ jobs:
 
       - name: Build
         run: dotnet build "croupe 06 TournoiGolf.csproj" --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish "croupe 06 TournoiGolf.csproj" --configuration Release --no-build --output ./publish
-
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./publish
