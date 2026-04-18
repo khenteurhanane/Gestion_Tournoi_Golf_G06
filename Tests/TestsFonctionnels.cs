@@ -28,7 +28,7 @@ namespace GolfTournoi.Tests
 
         private InscriptionController CreerControllerInscription(GolfDbContext context, int userId = 1)
         {
-            var controller = new InscriptionController(context);
+            var controller = new InscriptionController(context, new croupe_06_TournoiGolf.Services.TicketService());
             var httpContext = new DefaultHttpContext();
             httpContext.Session = new TestSession();
             httpContext.Session.SetString("IsLoggedIn", "true");
