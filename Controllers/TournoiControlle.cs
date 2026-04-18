@@ -47,9 +47,9 @@ namespace croupe_06_TournoiGolf.Controllers
             // Groupement des participants par tournoi pour afficher le taux de remplissage
             var nbInscritsParTournoi = _context.Participants
                 .AsNoTracking()
-                .AsEnumerable()
                 .GroupBy(p => p.TournoiId)
-                .ToDictionary(g => g.Key, g => g.Count());
+                .Select(g => new { TournoiId = g.Key, Count = g.Count() })
+                .ToDictionary(g => g.TournoiId, g => g.Count);
             ViewBag.NbInscrits = nbInscritsParTournoi;
 
             return View(listeTournois);

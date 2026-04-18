@@ -50,7 +50,7 @@ namespace GolfTournoi.Tests
         }
 
         [Fact]
-        public async Task Register_ModeleValide_EnvoieEmailBienvenue()
+        public async Task Register_ModeleValide_EnvoieCodeVerificationEtRedirige()
         {
             using var context = CreerContexte();
             var emailService = new FakeEmailService();
@@ -67,12 +67,13 @@ namespace GolfTournoi.Tests
 
             var redirection = Assert.IsType<RedirectToActionResult>(resultat);
             var utilisateur = Assert.Single(context.Utilisateurs);
-            var email = Assert.Single(emailService.WelcomeEmails);
+            var verificationEmail = Assert.Single(emailService.VerificationEmails);
 
-            Assert.Equal("Index", redirection.ActionName);
-            Assert.Equal("Tournoi", redirection.ControllerName);
-            Assert.Equal(utilisateur.Email, email.ToEmail);
-            Assert.Equal("Jean Dupont", email.ToName);
+            Assert.Equal("VerifierEmail", redirection.ActionName);
+            Assert.False(utilisateur.EmailVerifie);
+            Assert.NotNull(utilisateur.CodeVerification);
+            Assert.Equal(utilisateur.Email, verificationEmail.ToEmail);
+            Assert.Equal("Jean Dupont", verificationEmail.ToName);
         }
 
         [Fact]
@@ -177,6 +178,14 @@ namespace GolfTournoi.Tests
             public Task SendWelcomeEmailAsync(string toEmail, string toName)
             {
                 WelcomeEmails.Add((toEmail, toName));
+                return Task.CompletedTask;
+            }
+
+            public List<(string ToEmail, string ToName, string Code)> VerificationEmails { get; } = new();
+
+            public Task SendVerificationCodeAsync(string toEmail, string toName, string code)
+            {
+                VerificationEmails.Add((toEmail, toName, code));
                 return Task.CompletedTask;
             }
         }

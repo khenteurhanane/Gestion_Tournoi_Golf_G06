@@ -373,8 +373,12 @@ namespace croupe_06_TournoiGolf.Controllers
             var autresEquipes = _context.Equipes
                 .AsNoTracking()
                 .Where(e => e.TournoiId == equipe.TournoiId && e.EquipeId != equipeId)
-                .ToList()
-                .Where(e => _context.Participants.Count(p => p.EquipeId == e.EquipeId) < e.NbJoueursMax)
+                .Select(e => new {
+                    Equipe = e,
+                    NbMembres = _context.Participants.Count(p => p.EquipeId == e.EquipeId)
+                })
+                .Where(x => x.NbMembres < x.Equipe.NbJoueursMax)
+                .Select(x => x.Equipe)
                 .ToList();
 
             ViewBag.AutresEquipes = autresEquipes;

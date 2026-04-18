@@ -138,8 +138,8 @@ namespace croupe_06_TournoiGolf.Controllers
                 }
             }
 
-            // Générer un code de vérification à 6 chiffres
-            var code = new Random().Next(100000, 999999).ToString();
+            // Générer un code de vérification à 6 chiffres (cryptographiquement sûr)
+            var code = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
 
             // Création de l'objet utilisateur avec hachage du mot de passe pour la sécurité
             var utilisateur = new Utilisateur
@@ -257,7 +257,7 @@ namespace croupe_06_TournoiGolf.Controllers
             if (utilisateur == null)
                 return RedirectToAction("Register");
 
-            var code = new Random().Next(100000, 999999).ToString();
+            var code = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
             utilisateur.CodeVerification = code;
             utilisateur.CodeVerificationExpiry = DateTime.Now.AddMinutes(15);
             _context.SaveChanges();

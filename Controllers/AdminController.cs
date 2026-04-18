@@ -46,9 +46,9 @@ namespace croupe_06_TournoiGolf.Controllers
             var nbMembres = _context.Participants
                 .AsNoTracking()
                 .Where(p => p.EquipeId != null)
-                .AsEnumerable()
                 .GroupBy(p => p.EquipeId)
-                .ToDictionary(g => g.Key ?? 0, g => g.Count());
+                .Select(g => new { EquipeId = g.Key ?? 0, Count = g.Count() })
+                .ToDictionary(g => g.EquipeId, g => g.Count);
 
             int nbIncompletes = equipes.Count(e => !nbMembres.ContainsKey(e.EquipeId) || nbMembres[e.EquipeId] < e.NbJoueursMax);
             int nbCompletes = equipes.Count(e => nbMembres.ContainsKey(e.EquipeId) && nbMembres[e.EquipeId] >= e.NbJoueursMax);
@@ -186,9 +186,9 @@ namespace croupe_06_TournoiGolf.Controllers
             var nbMembres = _context.Participants
                 .AsNoTracking()
                 .Where(p => p.EquipeId != null)
-                .AsEnumerable()
                 .GroupBy(p => p.EquipeId)
-                .ToDictionary(g => g.Key ?? 0, g => g.Count());
+                .Select(g => new { EquipeId = g.Key ?? 0, Count = g.Count() })
+                .ToDictionary(g => g.EquipeId, g => g.Count);
             ViewBag.NbMembres = nbMembres;
 
             return View(equipes);

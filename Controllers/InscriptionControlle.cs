@@ -8,9 +8,10 @@ using croupe_06_TournoiGolf.Services;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    public class InscriptionController(croupe_06_TournoiGolf.Data.GolfDbContext context) : BaseController
+    public class InscriptionController(croupe_06_TournoiGolf.Data.GolfDbContext context, croupe_06_TournoiGolf.Services.TicketService ticketService) : BaseController
     {
         private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
+        private readonly croupe_06_TournoiGolf.Services.TicketService _ticketService = ticketService;
 
         /// <summary>
         /// Affiche le formulaire d'inscription pour un tournoi spécifique.
@@ -100,7 +101,10 @@ namespace croupe_06_TournoiGolf.Controllers
             // Validation des champs obligatoires définis dans le ViewModel
             if (!ModelState.IsValid)
             {
-                ViewBag.NomTournoi = _context.Tournois.Find(model.TournoiId)?.Nom;
+                var t = _context.Tournois.Find(model.TournoiId);
+                ViewBag.NomTournoi = t?.Nom;
+                ViewBag.DateTournoi = t?.DateTournoi.ToShortDateString();
+                ViewBag.LieuTournoi = t?.Lieu;
                 return View(model);
             }
 
@@ -226,11 +230,13 @@ namespace croupe_06_TournoiGolf.Controllers
                     tx.Commit();
                     return RedirectToAction("Paiement", new { participantId = participant.ParticipantId });
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // En cas d'erreur SQL, on annule tous les changements de la transaction
                     tx.Rollback();
-                    ViewBag.Error = "Erreur technique lors de l'enregistrement. Veuillez réessayer.";
+                    // TempData survit aux redirections (contrairement à ViewBag)
+                    TempData["Error"] = "Erreur technique lors de l'enregistrement. Veuillez réessayer.";
+                    TempData["ErrorDetail"] = ex.Message; // pour diagnostiquer l'erreur
                     return RedirectToAction("Index", new { tournoiId = model.TournoiId });
                 }
             }
@@ -274,13 +280,13 @@ namespace croupe_06_TournoiGolf.Controllers
             await _context.SaveChangesAsync();
 
             // Passer la méthode de paiement à la vue
-ViewBag.MethodePaiement = methodePaiement;
+            ViewBag.MethodePaiement = methodePaiement;
 
-// Préparer les infos pour la confirmation
-ViewBag.NomTournoi = participant.Tournoi?.Nom;
-ViewBag.ParticipantId = participant.ParticipantId;
+            // Préparer les infos pour la confirmation
+            ViewBag.NomTournoi = participant.Tournoi?.Nom;
+            ViewBag.ParticipantId = participant.ParticipantId;
 
-if (participant.EquipeId != null)
+            if (participant.EquipeId != null)
             {
                 var eq = await _context.Equipes.FindAsync(participant.EquipeId);
                 if (eq != null)
@@ -293,42 +299,33 @@ if (participant.EquipeId != null)
             return View("Confirmation");
         }
 
-        // Page de confirmation
-[HttpGet]
-public IActionResult TelechargerBillet(int participantId)
-{
-int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
-if (userId == 0)
-{
-return Unauthorized();
-}
+        // Téléchargement du billet PDF
+        [HttpGet]
+        public IActionResult TelechargerBillet(int participantId)
+        {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId == 0)
+                return Unauthorized();
 
-var participant = _context.Participants
-.Include(p => p.Tournoi)
-.Include(p => p.Utilisateur)
-.FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
+            var participant = _context.Participants
+                .Include(p => p.Tournoi)
+                .Include(p => p.Utilisateur)
+                .FirstOrDefault(p => p.ParticipantId == participantId && p.UtilisateurId == userId);
 
-if (participant == null)
-{
-return NotFound();
-}
+            if (participant == null)
+                return NotFound();
 
-if (!string.Equals(participant.StatutInscription, "CONFIRMEE", StringComparison.OrdinalIgnoreCase))
-{
-return RedirectToAction("Paiement", new { participantId });
-}
+            if (!string.Equals(participant.StatutInscription, "CONFIRMEE", StringComparison.OrdinalIgnoreCase))
+                return RedirectToAction("Paiement", new { participantId });
 
-var ticketService = new croupe_06_TournoiGolf.Services.TicketService();
-var pdfBytes = ticketService.GenererBilletPdf(participant);
-var nomParticipant = $"{participant.Utilisateur?.Prenom ?? participant.Prenom} {participant.Utilisateur?.Nom ?? participant.Nom}".Trim();
-if (string.IsNullOrWhiteSpace(nomParticipant))
-{
-nomParticipant = $"participant-{participant.ParticipantId}";
-}
+            var pdfBytes = _ticketService.GenererBilletPdf(participant);
+            var nomParticipant = $"{participant.Utilisateur?.Prenom ?? participant.Prenom} {participant.Utilisateur?.Nom ?? participant.Nom}".Trim();
+            if (string.IsNullOrWhiteSpace(nomParticipant))
+                nomParticipant = $"participant-{participant.ParticipantId}";
 
-var nomFichier = $"billet-{nomParticipant.Replace(' ', '-').ToLowerInvariant()}-{participant.ParticipantId}.pdf";
-return File(pdfBytes, "application/pdf", nomFichier);
-}
+            var nomFichier = $"billet-{nomParticipant.Replace(' ', '-').ToLowerInvariant()}-{participant.ParticipantId}.pdf";
+            return File(pdfBytes, "application/pdf", nomFichier);
+        }
 
 public IActionResult Confirmation()
         {

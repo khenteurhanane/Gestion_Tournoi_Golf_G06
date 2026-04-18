@@ -146,3 +146,6 @@ using (var scope = app.Services.CreateScope())
 // Route du hub SignalR
 app.MapHub<ScoreHub>("/scorehub");
 app.Run();
+
+// Rend la classe Program accessible depuis le projet de tests E2E
+public partial class Program { }

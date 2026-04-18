@@ -22,6 +22,14 @@
                 {
                     <div class="error">@ViewBag.Error</div>
                 }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="error">@TempData["Error"]</div>
+                    @if (TempData["ErrorDetail"] != null)
+                    {
+                        <div class="error" style="font-size:.85em; opacity:.8;">Détail : @TempData["ErrorDetail"]</div>
+                    }
+                }
 
                 <div class="form-group">
                     <label>Prénom</label>
