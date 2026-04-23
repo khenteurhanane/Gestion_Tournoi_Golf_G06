@@ -5,7 +5,6 @@
 
 @{
     ViewData["Title"] = "Liste des Tournois";
-    ViewData["UsePublicShell"] = true;
 
     var tournoisAVenir = Model.Where(t => t.DateTournoi >= DateTime.Today).OrderBy(t => t.DateTournoi).ToList();
     var tournoisPasses = Model.Where(t => t.DateTournoi < DateTime.Today).OrderByDescending(t => t.DateTournoi).ToList();

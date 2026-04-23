@@ -2,8 +2,13 @@
 
 Plateforme web de gestion de tournois de golf developpee en ASP.NET Core MVC (.NET 8). Permet aux joueurs de s'inscrire a des tournois, de former des equipes, aux commanditaires de financer des evenements, et aux administrateurs de gerer l'ensemble via un tableau de bord.
 
-## Fonctionnalites principales
+## 🎥 Vidéo de présentation
+**[Cliquez ici pour visionner la démonstration complète du projet (Google Drive)](https://drive.google.com/file/d/1wIAjxL9amTVIdJ9uYilYWiyaYzR2-2Ai/view?usp=sharing)**
 
+## Fonctionnalités principales
+
+- **Design System "Academic Green"** : Une interface moderne, responsive et haut de gamme conçue pour une expérience utilisateur fluide.
+- **Navigation Optimisée** : Barre latérale (sidebar) intégrée sur l'ensemble des pages pour un accès rapide aux fonctionnalités clés.
 - **Inscription et paiement** : Les participants s'inscrivent a un tournoi, choisissent leur type (employe/retraite), et paient en ligne (simulation).
 - **Gestion d'equipes** : Creation d'equipes avec code secret, invitation de membres, limite de 4 joueurs par equipe.
 - **Commandites** : Les commanditaires (Bronze/Argent/Or) financent des tournois et inscrivent leurs propres joueurs.

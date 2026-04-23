@@ -28,11 +28,13 @@
         string controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
         string actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
         bool isPublicShell = ViewData["UsePublicShell"] as bool? ?? false;
-        if (!isPublicShell && controllerName == "Home" && actionName == "Index")
-        {
-            isPublicShell = true;
-        }
         bool estConnecte = HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true";
+
+        // Si l'utilisateur est connecté, on utilise TOUJOURS le shell d'application avec barre latérale
+        if (estConnecte)
+        {
+            isPublicShell = false;
+        }
         bool hideTopbarPageInfo = ViewData["HideTopbarPageInfo"] as bool? ?? false;
         string compactTopbarTitle = ViewData["CompactTopbarTitle"]?.ToString() ?? (ViewData["Title"]?.ToString() ?? "Tournoi de Golf G06");
         string compactTopbarSubtitle = ViewData["CompactTopbarSubtitle"]?.ToString() ?? "Espace interne";

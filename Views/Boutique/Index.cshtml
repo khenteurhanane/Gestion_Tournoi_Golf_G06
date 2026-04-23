@@ -1,7 +1,6 @@
 @using croupe_06_TournoiGolf.Models.ViewModels
 @{
     ViewData["Title"] = "Boutique du tournoi";
-    ViewData["UsePublicShell"] = true;
     var catalogue = ViewBag.Catalogue as List<ArticleBoutique> ?? [];
     var nbElements = ViewBag.NbElementsPanier ?? 0;
 }
