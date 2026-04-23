@@ -1,93 +1,79 @@
-@using croupe_06_TournoiGolf.Models
 @{
-    ViewData["Title"] = "Paliers de Commandite";
+    ViewData["Title"] = "Paliers de commandite";
+    ViewData["UsePublicShell"] = true;
+    var hero = new croupe_06_TournoiGolf.Models.ViewModels.PublicPageHeroViewModel
+    {
+        EyebrowIcon = "fas fa-handshake",
+        EyebrowText = "Partenariat",
+        Title = "Devenir commanditaire",
+        Description = "Soutenez le tournoi annuel du College La Cite et associez votre organisation a un evenement bien structure, visible et utile pour la communaute etudiante."
+    };
+    var bronze = new croupe_06_TournoiGolf.Models.ViewModels.SponsorTierViewModel
+    {
+        TierCssClass = "tier-card--bronze",
+        TierLabel = "Bronze",
+        Icon = "fas fa-award",
+        Title = "Presence essentielle",
+        Price = "500 $",
+        CtaLabel = "Choisir Bronze",
+        CtaHref = "/Auth/InscriptionCommanditaire",
+        Features =
+        [
+            "<strong>1 place</strong> de joueur incluse",
+            "Logo sur le site web",
+            "Mention lors de la remise des prix"
+        ]
+    };
+    var gold = new croupe_06_TournoiGolf.Models.ViewModels.SponsorTierViewModel
+    {
+        TierCssClass = "tier-card--gold tier-card--featured",
+        TierLabel = "Or",
+        Icon = "fas fa-trophy",
+        Title = "Visibilite maximale",
+        Price = "3 000 $",
+        CtaLabel = "Choisir Or",
+        CtaHref = "/Auth/InscriptionCommanditaire",
+        CtaCssClass = "btn",
+        Features =
+        [
+            "<strong>4 places</strong> de joueurs incluses",
+            "Logo premium sur le site et les affiches",
+            "Pancarte personnalisee sur un trou",
+            "Espace kiosque au club-house"
+        ]
+    };
+    var silver = new croupe_06_TournoiGolf.Models.ViewModels.SponsorTierViewModel
+    {
+        TierCssClass = "tier-card--silver",
+        TierLabel = "Argent",
+        Icon = "fas fa-star",
+        Title = "Visibilite renforcee",
+        Price = "1 500 $",
+        CtaLabel = "Choisir Argent",
+        CtaHref = "/Auth/InscriptionCommanditaire",
+        Features =
+        [
+            "<strong>2 places</strong> de joueurs incluses",
+            "Logo sur le site web et les affiches",
+            "Mention speciale au coup d'envoi"
+        ]
+    };
 }
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Devenir Commanditaire</h1>
-        <p class="lead text-muted">Soutenez le tournoi annuel du Collège La Cité et profitez d'une visibilité exceptionnelle.</p>
-        <hr class="mx-auto" style="width: 100px; height: 3px; background-color: var(--accent); opacity: 1;">
-    </div>
+<div class="public-page">
+    <partial name="_PublicPageHero" model="hero" />
 
-    <div class="row justify-content-center g-4 mt-4">
-        <!-- Bronze -->
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm text-center sponsor-card bronze">
-                <div class="card-header bg-transparent pt-4">
-                    <div class="sponsor-icon mx-auto mb-3" style="background-color: #cd7f32;">
-                        <i class="bi bi-award-fill text-white fs-1"></i>
-                    </div>
-                    <h2 class="card-title h4 fw-bold">Bronze</h2>
-                </div>
-                <div class="card-body">
-                    <div class="h2 fw-bold mb-4">500 $ <span class="fs-6 text-muted font-normal">/ tournoi</span></div>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i><strong>1 place</strong> de joueur incluse</li>
-                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Logo sur notre site web</li>
-                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Mention lors de la remise des prix</li>
-                        <li class="text-muted"><i class="bi bi-check2-circle me-2 opacity-50"></i>Pancarte personnalisée (N/A)</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0 pb-4">
-                    <a href="/Auth/InscriptionCommanditaire" class="btn btn-outline-dark w-100 py-2">Choisir Bronze</a>
-                </div>
-            </div>
+    <section class="tier-grid">
+        <partial name="_SponsorTierCard" model="bronze" />
+        <partial name="_SponsorTierCard" model="gold" />
+        <partial name="_SponsorTierCard" model="silver" />
+    </section>
+
+    <section class="public-section-card public-callout">
+        <h3>Besoin d'une commandite sur mesure ?</h3>
+        <p>Notre equipe peut preparer une proposition adaptee a votre entreprise, vos objectifs de visibilite et votre budget.</p>
+        <div class="auth-actions justify-content-center">
+            <a href="/Home/Contact" class="btn btn-secondary">Nous contacter</a>
         </div>
-
-        <!-- Or (Mis en avant) -->
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-lg text-center sponsor-card gold-premium transform-scale">
-                <div class="ribbon">TOP VENTE</div>
-                <div class="card-header bg-transparent pt-4">
-                    <div class="sponsor-icon mx-auto mb-3" style="background-color: var(--gold);">
-                        <i class="bi bi-trophy-fill text-white fs-1"></i>
-                    </div>
-                    <h2 class="card-title h3 fw-bold">Or</h2>
-                </div>
-                <div class="card-body">
-                    <div class="h2 fw-bold mb-4">3 000 $ <span class="fs-6 text-muted font-normal">/ tournoi</span></div>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i><strong>4 places</strong> de joueurs incluses (Équipe complète)</li>
-                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i>Logo premium sur le site & affiches</li>
-                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i>Pancarte personnalisée sur un trou</li>
-                        <li class="mb-2"><i class="bi bi-check2-all text-warning me-2"></i>Espace kiosque au club-house</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0 pb-4">
-                    <a href="/Auth/InscriptionCommanditaire" class="btn btn-warning w-100 py-2 fw-bold shadow-sm">Choisir Or</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Argent -->
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm text-center sponsor-card silver">
-                <div class="card-header bg-transparent pt-4">
-                    <div class="sponsor-icon mx-auto mb-3" style="background-color: #c0c0c0;">
-                        <i class="bi bi-star-fill text-white fs-1"></i>
-                    </div>
-                    <h2 class="card-title h4 fw-bold">Argent</h2>
-                </div>
-                <div class="card-body">
-                    <div class="h2 fw-bold mb-4">1 500 $ <span class="fs-6 text-muted font-normal">/ tournoi</span></div>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i><strong>2 places</strong> de joueurs incluses</li>
-                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Logo sur notre site web & affiches</li>
-                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Mention spéciale au coup d'envoi</li>
-                        <li class="text-muted"><i class="bi bi-check2-circle me-2 opacity-50"></i>Espace kiosque (N/A)</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0 pb-4">
-                    <a href="/Auth/InscriptionCommanditaire" class="btn btn-outline-dark w-100 py-2">Choisir Argent</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-5 p-4 bg-light rounded text-center border">
-        <h4>Intéressé par une commandite sur mesure ?</h4>
-        <p class="mb-0">Contactez notre équipe pour discuter de solutions personnalisées adaptées à vos besoins.</p>
-        <a href="/Home/Contact" class="btn btn-link text-success fw-bold">Nous contacter <i class="bi bi-arrow-right"></i></a>
-    </div>
+    </section>
 </div>

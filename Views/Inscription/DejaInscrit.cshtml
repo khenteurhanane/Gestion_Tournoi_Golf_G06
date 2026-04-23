@@ -1,19 +1,26 @@
 @{
-    ViewData["Title"] = "Déjà inscrit";
+    ViewData["Title"] = "Deja inscrit";
+    ViewData["HideTopbarPageInfo"] = true;
+    var header = new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-circle-info",
+        Eyebrow = "Inscription",
+        Title = "Vous etes deja inscrit",
+        Description = "Votre participation a ce tournoi existe deja. Vous ne pouvez pas soumettre une seconde inscription pour le meme evenement."
+    };
+    var state = new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+    {
+        Icon = "fas fa-badge-check",
+        Title = "Inscription deja enregistree",
+        Description = "Consultez vos inscriptions existantes ou retournez a la liste des tournois pour explorer un autre evenement.",
+        PrimaryLabel = "Retour aux tournois",
+        PrimaryHref = "/Tournoi/Index",
+        SecondaryLabel = "Mes inscriptions",
+        SecondaryHref = "/Auth/MesInscriptions"
+    };
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card text-center">
-            <h2>Déjà inscrit</h2>
-            
-            <div class="error">
-                Vous êtes déjà inscrit à ce tournoi.
-            </div>
-
-            <p>Vous ne pouvez pas vous inscrire deux fois au même tournoi.</p>
-
-            <a class="btn" href="/Tournoi/Index">Retour à la liste des tournois</a>
-        </div>
-    </div>
+<div class="app-page">
+    <partial name="_AppSectionHeader" model="header" />
+    <partial name="_EmptyState" model="state" />
 </div>

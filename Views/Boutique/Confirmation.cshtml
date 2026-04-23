@@ -1,48 +1,44 @@
 @{
-    ViewData["Title"] = "Confirmation de Commande";
+    ViewData["Title"] = "Confirmation de commande";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Confirmation boutique";
     var montantPaye = TempData["MontantPaye"];
     var modePaiement = TempData["ModePaiement"];
     var commandeId = TempData["CommandeId"];
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-8 text-center">
-        <div class="card border-0 shadow text-center p-5 rounded-4">
-            <div class="mb-4">
-                <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
-            </div>
-            
-            <h1 class="display-5 fw-bold text-success mb-3">Paiement Réussi !</h1>
-            <p class="lead text-muted mb-4">
-                Merci pour votre commande. Votre réservation de matériel de golf et/ou votre commande de restauration a bien été enregistrée.
-            </p>
-            
-            <div class="bg-light p-4 rounded-3 d-inline-block text-start mb-5 shadow-sm">
-                <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-receipt me-2"></i> Reçu de commande #@Guid.NewGuid().ToString().Substring(0, 8).ToUpper()</h5>
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted pe-4">Montant payé :</span>
-                    <span class="fw-bold">@montantPaye $</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted pe-4">Mode de paiement :</span>
-                    <span class="fw-bold text-uppercase">@modePaiement</span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span class="text-muted pe-4">Date de la transaction :</span>
-                    <span class="fw-bold">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
-                </div>
-            </div>
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-bag-shopping",
+        Eyebrow = "Commande confirmée",
+        Title = "Paiement réussi",
+        Description = "Votre réservation de matériel et de restauration a bien été enregistrée."
+    })
 
-            <div>
-                @if (commandeId != null)
-                {
-                    <a href="/Boutique/TelechargerRecu?commandeId=@commandeId" class="btn btn-warning me-2">
-                        <i class="fas fa-file-pdf me-2"></i> Télécharger mon reçu
-                    </a>
-                }
-                <a href="/Boutique/Index" class="btn btn-outline-primary me-2">Retourner à la boutique</a>
-                <a href="/" class="btn btn-primary">Retourner à l'accueil</a>
+    <section class="app-surface-card app-receipt-card">
+        <div class="app-receipt-grid">
+            <div class="app-detail-row">
+                <strong>Montant payé</strong>
+                <span>@montantPaye $</span>
+            </div>
+            <div class="app-detail-row">
+                <strong>Mode de paiement</strong>
+                <span>@modePaiement</span>
+            </div>
+            <div class="app-detail-row">
+                <strong>Date</strong>
+                <span>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
             </div>
         </div>
-    </div>
-</div>
+
+        <div class="app-actions mt-4">
+            @if (commandeId != null)
+            {
+                <a href="/Boutique/TelechargerRecu?commandeId=@commandeId" class="btn">Télécharger mon reçu</a>
+            }
+            <a href="/Boutique/Index" class="btn btn-secondary">Retour à la boutique</a>
+            <a href="/" class="btn btn-secondary">Retour à l'accueil</a>
+        </div>
+    </section>
+</section>

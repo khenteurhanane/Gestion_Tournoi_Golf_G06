@@ -1,54 +1,51 @@
 @{
     ViewData["Title"] = "Classement en direct";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Classement";
     var tournoi = (croupe_06_TournoiGolf.Models.Tournoi)ViewBag.Tournoi;
     int tournoiId = (int)ViewBag.TournoiId;
 }
 
-<div class="container mt-4">
-    <div class="text-center mb-4">
-        <h1 class="fw-bold">
-            <i class="fas fa-golf-ball text-success me-2"></i>
-            Classement en direct
-        </h1>
-        <p class="text-muted">@tournoi.Nom — @tournoi.Lieu</p>
-        <span class="badge bg-success" id="statut-connexion">
-            <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i> Connecté en direct
-        </span>
-    </div>
+<section class="app-page-shell app-page-shell--medium">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-golf-ball-tee",
+        Eyebrow = "Scores en direct",
+        Title = "Classement en direct",
+        Description = $"{tournoi.Nom} · {tournoi.Lieu}"
+    })
 
-    <!-- Tableau de classement -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0" id="tableau-classement">
-                <thead class="table-dark">
+    <section class="app-surface-card app-table-card">
+        <div class="app-table-card__header">
+            <div>
+                <h2>Classement</h2>
+                <p class="app-muted-note"><span class="app-status-badge app-status-badge--success" id="statut-connexion">Connecté en direct</span></p>
+            </div>
+        </div>
+
+        <div class="app-table-wrap">
+            <table id="tableau-classement" class="app-data-table">
+                <thead>
                     <tr>
-                        <th style="width: 80px;" class="text-center">Position</th>
+                        <th>Position</th>
                         <th>Équipe</th>
-                        <th class="text-center">Trous joués</th>
-                        <th class="text-center">Total coups</th>
+                        <th>Trous joués</th>
+                        <th>Total coups</th>
                     </tr>
                 </thead>
                 <tbody id="corps-classement">
-                    <!-- Rempli par scoreboard.js au chargement puis mis à jour par SignalR -->
                     <tr>
-                        <td colspan="4" class="text-center text-muted py-4">Chargement du classement...</td>
+                        <td colspan="4" class="text-center">Chargement du classement...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
-    <p class="text-muted text-center mt-3" style="font-size: 0.85rem;">
-        <i class="fas fa-sync-alt me-1"></i>
-        Le classement se met à jour automatiquement dès qu'un score est saisi.
-    </p>
-</div>
-
-<!-- Passer l'id du tournoi au JS -->
-<input type="hidden" id="tournoi-id" value="@tournoiId" />
+    <input type="hidden" id="tournoi-id" value="@tournoiId" />
+</section>
 
 @section Scripts {
-    <!-- Client SignalR (inclus dans ASP.NET Core) -->
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/js/scoreboard.js"></script>
 }

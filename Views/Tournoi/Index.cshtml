@@ -1,245 +1,260 @@
 @model List<croupe_06_TournoiGolf.Models.Tournoi>
 
-@{
-    ViewData["Title"] = "Liste des Tournois";
-    var tournoisAVenir = Model.Where(t => t.DateTournoi >= DateTime.Today).OrderBy(t => t.DateTournoi).ToList();
-    var tournoisPasses = Model.Where(t => t.DateTournoi < DateTime.Today).OrderByDescending(t => t.DateTournoi).ToList();
-}
-
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
+    ViewData["Title"] = "Liste des Tournois";
+    ViewData["UsePublicShell"] = true;
+
+    var tournoisAVenir = Model.Where(t => t.DateTournoi >= DateTime.Today).OrderBy(t => t.DateTournoi).ToList();
+    var tournoisPasses = Model.Where(t => t.DateTournoi < DateTime.Today).OrderByDescending(t => t.DateTournoi).ToList();
+    var hero = new croupe_06_TournoiGolf.Models.ViewModels.PublicPageHeroViewModel
+    {
+        EyebrowIcon = "fas fa-calendar-days",
+        EyebrowText = "Programmation",
+        Title = "Tournois de golf",
+        Description = "Consultez les evenements a venir, verifiez les places restantes et inscrivez-vous des que les inscriptions sont ouvertes."
+    };
+
     bool estAdmin = HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "ADMIN";
     bool estConnecte = HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true";
     var nbInscrits = ViewBag.NbInscrits as Dictionary<int, int> ?? new Dictionary<int, int>();
     var tournoiInscrits = ViewBag.TournoiInscrits as List<int> ?? new List<int>();
 }
 
-<!-- En-tête -->
-<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px;">
-    <div>
-        <h1 style="margin-bottom:4px;">Tournois de Golf</h1>
-        <p class="text-muted" style="margin:0;">@tournoisAVenir.Count tournoi(s) à venir · @tournoisPasses.Count dans l'historique</p>
-    </div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-        <input type="text" id="rechercheTournoi" placeholder="🔍 Rechercher..."
-               style="max-width:220px;" onkeyup="filtrerCartes()" />
-        @if (estAdmin)
-        {
-            <a class="btn" href="/Tournoi/Create">+ Nouveau tournoi</a>
-        }
-    </div>
-</div>
+<div class="public-page">
+    <partial name="_PublicPageHero" model="hero" />
 
-<!-- Onglets -->
-<div style="display:flex; gap:10px; margin-bottom:24px; border-bottom:2px solid rgba(45,106,46,.15); padding-bottom:12px;">
-    <button class="btn onglet-actif" id="btnAVenir" onclick="afficherOnglet('avenir')" style="border-radius:999px;">
-        ⛳ À venir (@tournoisAVenir.Count)
-    </button>
-    <button class="btn btn-secondary" id="btnPasses" onclick="afficherOnglet('passes')" style="border-radius:999px;">
-        🏅 Historique (@tournoisPasses.Count)
-    </button>
-</div>
-
-<!-- ======== GRILLE À VENIR ======== -->
-<div id="sectionAVenir">
-    @if (tournoisAVenir.Count == 0)
-    {
-        <div class="card" style="text-align:center; padding:40px; color:var(--muted);">
-            <p style="font-size:2.5rem; margin-bottom:8px;">⛳</p>
-            <p>Aucun tournoi à venir pour le moment.</p>
+    <section class="app-toolbar">
+        <div class="inline-note">
+            <i class="fas fa-flag-checkered"></i>
+            <span>@tournoisAVenir.Count tournoi(s) a venir | @tournoisPasses.Count dans l'historique</span>
+        </div>
+        <div class="app-toolbar__actions">
+            <div class="app-toolbar__search">
+                <input type="text" id="rechercheTournoi" placeholder="Rechercher un tournoi..." class="search-field-sm" onkeyup="filtrerCartes()" />
+            </div>
             @if (estAdmin)
             {
-                <a class="btn" href="/Tournoi/Create" style="margin-top:10px;">+ Créer le premier tournoi</a>
+                <a class="btn" href="/Tournoi/Create">+ Nouveau tournoi</a>
             }
         </div>
-    }
-    else
-    {
-        <div class="tournois-grid" id="grilleAVenir">
-            @foreach (var tournoi in tournoisAVenir)
+    </section>
+
+    <div class="app-chip-tabs tournoi-tabs">
+        <button class="btn onglet-actif pill-btn" id="btnAVenir" onclick="afficherOnglet('avenir')">
+            A venir (@tournoisAVenir.Count)
+        </button>
+        <button class="btn btn-secondary pill-btn" id="btnPasses" onclick="afficherOnglet('passes')">
+            Historique (@tournoisPasses.Count)
+        </button>
+    </div>
+
+    <section id="sectionAVenir" class="tournoi-section">
+        <div class="tournoi-section__header">
+            <h2 class="tournoi-section__title">Tournois ouverts et a venir</h2>
+            <span class="tournoi-section__meta">Inscription, capacite et date limite en un coup d'oeil</span>
+        </div>
+
+        @if (tournoisAVenir.Count == 0)
+        {
+            var emptyState = new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
             {
-                var nb = nbInscrits.ContainsKey(tournoi.TournoiId) ? nbInscrits[tournoi.TournoiId] : 0;
-                var placesRestantes = tournoi.PlacesParticipantsMax - nb;
-                var pct = (int)Math.Min(100, nb * 100.0 / Math.Max(1, tournoi.PlacesParticipantsMax));
-                var dejaInscrit = tournoiInscrits.Contains(tournoi.TournoiId);
-                
-                // Images par défaut rotatives (US-06-T10)
-                string[] defaultImages = { 
-                    "/images/tournois/tournament_summer.png", 
-                    "/images/tournois/tournament_classic.png", 
-                    "/images/tournois/tournament_competition.png" 
-                };
-                var imgSrc = string.IsNullOrEmpty(tournoi.ImageUrl) 
-                    ? defaultImages[tournoi.TournoiId % defaultImages.Length] 
-                    : tournoi.ImageUrl;
+                Icon = "fas fa-calendar-xmark",
+                Title = "Aucun tournoi a venir",
+                Description = "Aucun evenement n'est programme pour le moment. Revenez bientot pour consulter la prochaine ouverture des inscriptions.",
+                PrimaryLabel = estAdmin ? "Creer un tournoi" : null,
+                PrimaryHref = estAdmin ? "/Tournoi/Create" : null
+            };
+            <partial name="_EmptyState" model="emptyState" />
+        }
+        else
+        {
+            <div class="tournois-grid" id="grilleAVenir">
+                @foreach (var tournoi in tournoisAVenir)
+                {
+                    var nb = nbInscrits.ContainsKey(tournoi.TournoiId) ? nbInscrits[tournoi.TournoiId] : 0;
+                    var placesRestantes = tournoi.PlacesParticipantsMax - nb;
+                    var pct = (int)Math.Min(100, nb * 100.0 / Math.Max(1, tournoi.PlacesParticipantsMax));
+                    var dejaInscrit = tournoiInscrits.Contains(tournoi.TournoiId);
 
-                <!-- Compteur : jours avant le tournoi -->
-                var joursRestants = (tournoi.DateTournoi - DateTime.Today).Days;
-                string badgeDelai = joursRestants == 0 ? "Aujourd'hui !" :
-                                    joursRestants == 1 ? "Demain !" :
-                                    $"Dans {joursRestants} jours";
+                    string[] defaultImages = {
+                        "/images/tournois/tournament_summer.png",
+                        "/images/tournois/tournament_classic.png",
+                        "/images/tournois/tournament_competition.png"
+                    };
+                    var imgSrc = string.IsNullOrEmpty(tournoi.ImageUrl)
+                        ? defaultImages[tournoi.TournoiId % defaultImages.Length]
+                        : tournoi.ImageUrl;
 
-                <div class="tournoi-card carte-tournoi">
-                    <!-- Image -->
-                    <div class="tournoi-card-img" style="background-image:url('@imgSrc');">
-                        <div class="tournoi-card-badge-status">
-                            @if (tournoi.InscriptionsOuvertes)
-                            {
-                                <span class="badge badge-ouvert">✅ Inscriptions ouvertes</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-ferme">🔒 Inscriptions fermées</span>
-                            }
-                        </div>
-                        <div class="tournoi-card-badge-delai">⏱ @badgeDelai</div>
-                    </div>
+                    var joursRestants = (tournoi.DateTournoi - DateTime.Today).Days;
+                    string badgeDelai = joursRestants == 0 ? "Aujourd'hui" :
+                                        joursRestants == 1 ? "Demain" :
+                                        $"Dans {joursRestants} jours";
 
-                    <!-- Corps -->
-                    <div class="tournoi-card-body">
-                        <h3 class="tournoi-card-titre">@tournoi.Nom</h3>
-
-                        <div class="tournoi-card-meta">
-                            <span>📅 @tournoi.DateTournoi.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("fr-CA"))</span>
-                            <span>📍 @tournoi.Lieu</span>
-                        </div>
-
-                        @if (!string.IsNullOrWhiteSpace(tournoi.Description))
-                        {
-                            <p class="tournoi-card-desc">@tournoi.Description</p>
-                        }
-
-                        <!-- Barre de progression inscrits -->
-                        <div style="margin:12px 0 6px;">
-                            <div style="display:flex; justify-content:space-between; font-size:.82rem; color:var(--muted); margin-bottom:4px;">
-                                <span><strong>@nb</strong> / @tournoi.PlacesParticipantsMax participants</span>
-                                @if (placesRestantes <= 5 && placesRestantes > 0)
-                                {
-                                    <span style="color:var(--warning); font-weight:600;">⚠️ @placesRestantes place(s)!</span>
-                                }
-                                else if (placesRestantes <= 0)
-                                {
-                                    <span style="color:var(--danger); font-weight:600;">Complet</span>
-                                }
-                            </div>
-                            <div style="background:rgba(45,106,46,.12); border-radius:999px; height:7px; overflow:hidden;">
-                                <div style="background:@(pct >= 90 ? "var(--danger)" : pct >= 70 ? "var(--warning)" : "var(--accent)"); height:100%; width:@(pct)%; transition:width .5s;"></div>
-                            </div>
-                        </div>
-
-                        @if (tournoi.DateLimiteInscription.HasValue)
-                        {
-                            <p style="font-size:.8rem; color:var(--muted); margin-bottom:8px;">
-                                🗓 Date limite : @tournoi.DateLimiteInscription.Value.ToShortDateString()
-                            </p>
-                        }
-
-                        <!-- Boutons -->
-                        <div class="tournoi-card-actions">
-                            @if (estAdmin)
-                            {
-                                <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary" style="font-size:.85rem;">Détails</a>
-                                <a href="/Tournoi/Edit/@tournoi.TournoiId" class="btn btn-secondary" style="font-size:.85rem;">✏️ Modifier</a>
+                    <div class="tournoi-card carte-tournoi">
+                        <div class="tournoi-card-img" style="background-image:url('@imgSrc');">
+                            <div class="tournoi-card-badge-status">
                                 @if (tournoi.InscriptionsOuvertes)
                                 {
-                                    <form action="/Tournoi/FermerInscriptions" method="post" style="display:inline;">
-                                        @Html.AntiForgeryToken()
-
-                                        <input type="hidden" name="id" value="@tournoi.TournoiId" />
-                                        <button type="submit" class="btn btn-secondary" style="font-size:.85rem;">🔒 Fermer</button>
-                                    </form>
+                                    <span class="badge badge-ouvert">Inscriptions ouvertes</span>
                                 }
                                 else
                                 {
-                                    <form action="/Tournoi/OuvrirInscriptions" method="post" style="display:inline;">
-                                        @Html.AntiForgeryToken()
-
-                                        <input type="hidden" name="id" value="@tournoi.TournoiId" />
-                                        <button type="submit" class="btn" style="font-size:.85rem;">✅ Ouvrir</button>
-                                    </form>
+                                    <span class="badge badge-ferme">Inscriptions fermees</span>
                                 }
-                            }
-                            else if (estConnecte)
-                            {
-                                @if (dejaInscrit)
-                                {
-                                    <span class="btn btn-secondary" style="opacity:.7; cursor:default; font-size:.85rem;">✔ Déjà inscrit</span>
-                                }
-                                else if (tournoi.InscriptionsOuvertes && placesRestantes > 0)
-                                {
-                                    <a href="/Inscription/Index?tournoiId=@tournoi.TournoiId" class="btn" style="font-size:.85rem;">S'inscrire</a>
-                                }
-                                else if (placesRestantes <= 0)
-                                {
-                                    <span class="btn btn-secondary" style="opacity:.6; cursor:default; font-size:.85rem;">Complet</span>
-                                }
-                            }
-                            else if (tournoi.InscriptionsOuvertes)
-                            {
-                                <a href="/Auth/Login" class="btn" style="font-size:.85rem;">Se connecter pour s'inscrire</a>
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-</div>
-
-<!-- ======== GRILLE HISTORIQUE ======== -->
-<div id="sectionPasses" style="display:none;">
-    @if (tournoisPasses.Count == 0)
-    {
-        <p class="text-muted">Aucun tournoi passé dans l'historique.</p>
-    }
-    else
-    {
-        <div class="tournois-grid" id="grillePasses">
-            @foreach (var tournoi in tournoisPasses)
-            {
-                var nb = nbInscrits.ContainsKey(tournoi.TournoiId) ? nbInscrits[tournoi.TournoiId] : 0;
-                var imgSrc = string.IsNullOrEmpty(tournoi.ImageUrl) ? "/images/golf-hero.png" : tournoi.ImageUrl;
-
-                <div class="tournoi-card carte-tournoi" style="opacity:.75;">
-                    <div class="tournoi-card-img" style="background-image:url('@imgSrc'); filter:grayscale(40%);">
-                        <div class="tournoi-card-badge-status">
-                            <span class="badge" style="background:rgba(0,0,0,.55); color:#ddd;">🏁 Terminé</span>
-                        </div>
-                    </div>
-                    <div class="tournoi-card-body">
-                        <h3 class="tournoi-card-titre">@tournoi.Nom</h3>
-                        <div class="tournoi-card-meta">
-                            <span>📅 @tournoi.DateTournoi.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("fr-CA"))</span>
-                            <span>📍 @tournoi.Lieu</span>
-                        </div>
-                        <p style="font-size:.85rem; color:var(--muted); margin:8px 0 12px;">
-                            👥 @nb participant(s)
-                        </p>
-                        @if (estAdmin)
-                        {
-                            <div class="tournoi-card-actions">
-                                <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary" style="font-size:.85rem;">Détails</a>
                             </div>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-    }
-</div>
+                            <div class="tournoi-card-badge-delai">@badgeDelai</div>
+                        </div>
 
+                        <div class="tournoi-card-body">
+                            <h3 class="tournoi-card-titre">@tournoi.Nom</h3>
+
+                            <div class="tournoi-card-meta">
+                                <span>Date : @tournoi.DateTournoi.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("fr-CA"))</span>
+                                <span>Lieu : @tournoi.Lieu</span>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(tournoi.Description))
+                            {
+                                <p class="tournoi-card-desc">@tournoi.Description</p>
+                            }
+
+                            <div class="tournoi-progress-block">
+                                <div class="tournoi-progress-row">
+                                    <span><strong>@nb</strong> / @tournoi.PlacesParticipantsMax participants</span>
+                                    @if (placesRestantes <= 5 && placesRestantes > 0)
+                                    {
+                                        <span class="tournoi-progress-warning">@placesRestantes place(s) restante(s)</span>
+                                    }
+                                    else if (placesRestantes <= 0)
+                                    {
+                                        <span class="tournoi-progress-danger">Complet</span>
+                                    }
+                                </div>
+                                <div class="tournoi-progress-track">
+                                    <div class="tournoi-progress-fill" style="background:@(pct >= 90 ? "var(--danger)" : pct >= 70 ? "var(--warning)" : "var(--accent)"); width:@(pct)%;"></div>
+                                </div>
+                            </div>
+
+                            @if (tournoi.DateLimiteInscription.HasValue)
+                            {
+                                <p class="tournoi-date-limit">
+                                    Date limite : @tournoi.DateLimiteInscription.Value.ToShortDateString()
+                                </p>
+                            }
+
+                            <div class="tournoi-card-actions">
+                                @if (estAdmin)
+                                {
+                                    <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary btn-sm">Details</a>
+                                    <a href="/Tournoi/Edit/@tournoi.TournoiId" class="btn btn-secondary btn-sm">Modifier</a>
+                                    @if (tournoi.InscriptionsOuvertes)
+                                    {
+                                        <form action="/Tournoi/FermerInscriptions" method="post" class="inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                                            <button type="submit" class="btn btn-secondary btn-sm">Fermer</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form action="/Tournoi/OuvrirInscriptions" method="post" class="inline-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                                            <button type="submit" class="btn btn-sm">Ouvrir</button>
+                                        </form>
+                                    }
+                                }
+                                else if (estConnecte)
+                                {
+                                    @if (dejaInscrit)
+                                    {
+                                        <span class="btn btn-secondary btn-sm btn-static">Deja inscrit</span>
+                                    }
+                                    else if (tournoi.InscriptionsOuvertes && placesRestantes > 0)
+                                    {
+                                        <a href="/Inscription/Index?tournoiId=@tournoi.TournoiId" class="btn btn-sm">S'inscrire</a>
+                                    }
+                                    else if (placesRestantes <= 0)
+                                    {
+                                        <span class="btn btn-secondary btn-sm btn-static">Complet</span>
+                                    }
+                                }
+                                else if (tournoi.InscriptionsOuvertes)
+                                {
+                                    <a href="/Auth/Login" class="btn btn-sm">Se connecter pour s'inscrire</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <section id="sectionPasses" class="tournoi-section d-none">
+        <div class="tournoi-section__header">
+            <h2 class="tournoi-section__title">Historique des tournois</h2>
+            <span class="tournoi-section__meta">Consultez les editions deja tenues</span>
+        </div>
+
+        @if (tournoisPasses.Count == 0)
+        {
+            var emptyState = new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+            {
+                Icon = "fas fa-clock-rotate-left",
+                Title = "Aucun tournoi dans l'historique",
+                Description = "L'historique n'affiche encore aucun evenement passe."
+            };
+            <partial name="_EmptyState" model="emptyState" />
+        }
+        else
+        {
+            <div class="tournois-grid" id="grillePasses">
+                @foreach (var tournoi in tournoisPasses)
+                {
+                    var nb = nbInscrits.ContainsKey(tournoi.TournoiId) ? nbInscrits[tournoi.TournoiId] : 0;
+                    var imgSrc = string.IsNullOrEmpty(tournoi.ImageUrl) ? "/images/golf-hero.png" : tournoi.ImageUrl;
+
+                    <div class="tournoi-card carte-tournoi tournoi-card--past">
+                        <div class="tournoi-card-img tournoi-card-img--muted" style="background-image:url('@imgSrc');">
+                            <div class="tournoi-card-badge-status">
+                                <span class="badge badge-muted">Termine</span>
+                            </div>
+                        </div>
+                        <div class="tournoi-card-body">
+                            <h3 class="tournoi-card-titre">@tournoi.Nom</h3>
+                            <div class="tournoi-card-meta">
+                                <span>Date : @tournoi.DateTournoi.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("fr-CA"))</span>
+                                <span>Lieu : @tournoi.Lieu</span>
+                            </div>
+                            <p class="text-muted text-sm mb-2">
+                                @nb participant(s)
+                            </p>
+                            @if (estAdmin)
+                            {
+                                <div class="tournoi-card-actions">
+                                    <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary btn-sm">Details</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+</div>
 
 <script>
 function afficherOnglet(onglet) {
-    document.getElementById('sectionAVenir').style.display = onglet === 'avenir' ? '' : 'none';
-    document.getElementById('sectionPasses').style.display = onglet === 'passes' ? '' : 'none';
-    document.getElementById('btnAVenir').className = onglet === 'avenir' ? 'btn onglet-actif' : 'btn btn-secondary';
-    document.getElementById('btnPasses').className = onglet === 'passes' ? 'btn onglet-actif' : 'btn btn-secondary';
-    document.getElementById('btnAVenir').style.borderRadius = '999px';
-    document.getElementById('btnPasses').style.borderRadius = '999px';
+    document.getElementById('sectionAVenir').classList.toggle('d-none', onglet !== 'avenir');
+    document.getElementById('sectionPasses').classList.toggle('d-none', onglet !== 'passes');
+    document.getElementById('btnAVenir').className = onglet === 'avenir' ? 'btn onglet-actif pill-btn' : 'btn btn-secondary pill-btn';
+    document.getElementById('btnPasses').className = onglet === 'passes' ? 'btn onglet-actif pill-btn' : 'btn btn-secondary pill-btn';
 }
+
 function filtrerCartes() {
     var filtre = document.getElementById('rechercheTournoi').value.toLowerCase();
     document.querySelectorAll('.carte-tournoi').forEach(function(c) {

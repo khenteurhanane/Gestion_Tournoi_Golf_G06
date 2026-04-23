@@ -1,97 +1,108 @@
 @model croupe_06_TournoiGolf.Models.Equipe
 @{
-    ViewData["Title"] = "Détails de l'équipe";
+    ViewData["Title"] = "Details de l'equipe";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Detail equipe";
+    ViewData["CompactTopbarSubtitle"] = "Administration";
     var membres = (List<Participant>)ViewBag.Membres;
 }
 
-<div class="admin-header">
-    <h1><i class="fas fa-edit"></i> Équipe : @Model.NomEquipe</h1>
-    <a href="/Admin/Equipes" class="btn btn-secondary">Retour à la liste</a>
-</div>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-edit",
+        Eyebrow = "Administration equipe",
+        Title = Model.NomEquipe,
+        Description = "Modifiez les parametres de l'equipe et gerez la liste des membres."
+    })
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
 
-<div class="row">
-    <!-- Formulaire de modification -->
-    <div class="col-md-5">
-        <div class="card">
-            <h3>Paramètres de l'équipe</h3>
-            <form action="/Admin/ModifierEquipe" method="post">
+    <div class="app-grid-sidebar admin-team-detail-grid">
+        <section class="app-surface-card app-form-card">
+            <form action="/Admin/ModifierEquipe" method="post" class="app-form-card">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
-                
+
                 <div class="form-group">
-                    <label>Nom de l'équipe</label>
+                    <label>Nom de l'equipe</label>
                     <input type="text" name="NomEquipe" value="@Model.NomEquipe" required />
                 </div>
 
                 <div class="form-group">
-                    <label>Code Secret</label>
-                    <input type="text" name="CodeSecret" value="@Model.CodeSecret" style="text-transform: uppercase; font-weight: bold; letter-spacing: 2px;" required />
+                    <label>Code secret</label>
+                    <input type="text" name="CodeSecret" value="@Model.CodeSecret" required />
                 </div>
 
                 <div class="form-group">
                     <label>Tournoi</label>
-                    <input type="text" value="@Model.Tournoi?.Nom" readonly style="background: #f1f1f1; color: #666;" />
+                    <input type="text" value="@Model.Tournoi?.Nom" readonly />
                 </div>
 
                 <div class="form-group">
-                    <label>Date de création</label>
-                    <input type="text" value="@Model.CreeLe.ToShortDateString()" readonly style="background: #f1f1f1; color: #666;" />
+                    <label>Date de creation</label>
+                    <input type="text" value="@Model.CreeLe.ToShortDateString()" readonly />
                 </div>
 
-                <button type="submit" class="btn" style="width: 100%;">Enregistrer les modifications</button>
+                <div class="app-actions">
+                    <button type="submit" class="btn">Enregistrer les modifications</button>
+                    <a href="/Admin/Equipes" class="btn btn-secondary">Retour a la liste</a>
+                </div>
             </form>
-        </div>
-    </div>
+        </section>
 
-    <!-- Gestion des membres -->
-    <div class="col-md-7">
-        <div class="card">
-            <h3>Membres (@membres.Count / @Model.NbJoueursMax)</h3>
-            
+        <section class="app-surface-card app-table-card admin-team-members-card">
+            <div class="app-table-card__header">
+                <div>
+                    <h2>Membres</h2>
+                    <p class="app-muted-note">@membres.Count / @Model.NbJoueursMax joueur(s)</p>
+                </div>
+            </div>
+
             @if (membres.Count == 0)
             {
-                <p class="text-muted">Aucun membre dans cette équipe pour le moment.</p>
+                <div class="app-empty-inline">Aucun membre dans cette equipe pour le moment.</div>
             }
             else
             {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var m in membres)
-                        {
+                <div class="app-table-wrap">
+                    <table class="app-data-table admin-team-members-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    @if (m.UtilisateurId == Model.CreeParUtilisateurId)
-                                    {
-                                        <span class="badge-capitaine"><i class="fas fa-crown"></i> Capitaine</span>
-                                    }
-                                    @m.Utilisateur?.Prenom @m.Utilisateur?.Nom
-                                </td>
-                                <td>@m.Utilisateur?.Email</td>
-                                <td>
-                                    <form action="/Admin/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce participant de l\'équipe ?');">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="participantId" value="@m.ParticipantId" />
-                                        <input type="hidden" name="equipeId" value="@Model.EquipeId" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
-                                    </form>
-                                </td>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Action</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var membre in membres)
+                            {
+                                <tr>
+                                    <td class="admin-team-members-table__name">
+                                        <strong>@membre.Utilisateur?.Prenom @membre.Utilisateur?.Nom</strong>
+                                        @if (membre.UtilisateurId == Model.CreeParUtilisateurId)
+                                        {
+                                            <div class="app-muted-note">Capitaine</div>
+                                        }
+                                    </td>
+                                    <td class="admin-team-members-table__email">@membre.Utilisateur?.Email</td>
+                                    <td class="admin-team-members-table__action">
+                                        <form action="/Admin/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce participant de l\\'equipe ?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="participantId" value="@membre.ParticipantId" />
+                                            <input type="hidden" name="equipeId" value="@Model.EquipeId" />
+                                            <button type="submit" class="btn btn-danger">Retirer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
-        </div>
+        </section>
     </div>
-</div>
+</section>

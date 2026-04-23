@@ -1,37 +1,41 @@
 @{
-    ViewData["Title"] = "Inscription Confirmée";
+    ViewData["Title"] = "Inscription commanditaire confirmee";
+    ViewData["UsePublicShell"] = true;
+    var hero = new croupe_06_TournoiGolf.Models.ViewModels.PublicPageHeroViewModel
+    {
+        EyebrowIcon = "fas fa-circle-check",
+        EyebrowText = "Compte actif",
+        Title = "Inscription commanditaire confirmee",
+        Description = "Votre acces commanditaire est pret. Vous pouvez maintenant parcourir les tournois et choisir votre niveau d'engagement."
+    };
 }
 
-<div class="confirmation-container">
-    <div class="dashboard-card status-summary-card mb-4 text-center py-5">
-        <div class="card-body">
-            <div class="confirmation-icon mb-4">
-                <div class="icon-circle bg-success-subtle text-success mx-auto d-flex align-items-center justify-content-center shadow-lg" style="width: 100px; height: 100px; border-radius: 50%;">
-                    <i class="fas fa-check fa-4x"></i>
-                </div>
+<div class="public-page auth-shell">
+    <partial name="_PublicPageHero" model="hero" />
+
+    <section class="public-section-card confirmation-panel">
+        <div class="confirmation-panel__icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h2 class="confirmation-panel__title">Compte cree avec succes</h2>
+        <p class="confirmation-panel__text">
+            Votre profil commanditaire est maintenant actif. Vous pouvez choisir un tournoi, suivre vos commandites et gerer vos informations depuis votre espace.
+        </p>
+
+        <div class="confirmation-panel__details">
+            <div class="confirmation-panel__detail">
+                <span>Prochaine etape</span>
+                <strong>Choisir un tournoi a commanditer</strong>
             </div>
-            
-            <h1 class="display-5 fw-bold text-dark mb-3">Félicitations !</h1>
-            <p class="lead text-muted mb-4">Votre compte commanditaire a été créé avec succès.</p>
-            
-            <div class="alert alert-info border-0 shadow-sm rounded-4 text-start d-inline-block mx-auto mb-5" style="max-width: 600px;">
-                <div class="d-flex align-items-start p-2">
-                    <i class="fas fa-info-circle fa-2x me-3 mt-1 text-primary-green"></i>
-                    <div>
-                        <h6 class="fw-bold mb-1">Prochaine étape : Devenir commanditaire d'un tournoi</h6>
-                        <p class="small mb-0">Vous pouvez maintenant parcourir la liste des tournois ouverts et choisir d'en commanditer un pour augmenter la visibilité de votre entreprise.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                <a href="/Tournoi/Index" class="btn btn-success btn-lg px-5 rounded-pill shadow-sm py-3 fw-bold">
-                    <i class="fas fa-search me-2"></i> Parcourir les tournois
-                </a>
-                <a href="/Commandite/Index" class="btn btn-outline-success btn-lg px-5 rounded-pill py-3 fw-bold">
-                    <i class="fas fa-handshake me-2"></i> Mes commandites
-                </a>
+            <div class="confirmation-panel__detail">
+                <span>Acces disponible</span>
+                <strong>Mes commandites et mon profil</strong>
             </div>
         </div>
-    </div>
+
+        <div class="confirmation-panel__actions">
+            <a href="/Tournoi/Index" class="btn">Parcourir les tournois</a>
+            <a href="/Commandite/Index" class="btn btn-secondary">Mes commandites</a>
+        </div>
+    </section>
 </div>

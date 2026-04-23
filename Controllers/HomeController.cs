@@ -1,37 +1,24 @@
 using System.Diagnostics;
-using croupe_06_TournoiGolf.Models;
-using croupe_06_TournoiGolf.Services;
-using croupe_06_TournoiGolf.Services;
 using croupe_06_TournoiGolf.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using croupe_06_TournoiGolf.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    /// <summary>
-    /// CONTRÔLEUR D'ACCUEIL (FRONT-END)
-    /// Gère la page principale, les statistiques publiques et le changement de langue.
-    /// </summary>
-    public class HomeController(Microsoft.Extensions.Logging.ILogger<HomeController> logger, croupe_06_TournoiGolf.Data.GolfDbContext context, croupe_06_TournoiGolf.Services.WeatherService weatherService) : Controller
+    public class HomeController(ILogger<HomeController> logger, GolfDbContext context) : Controller
     {
-        private readonly Microsoft.Extensions.Logging.ILogger<HomeController> _logger = logger;
-        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
-        private readonly croupe_06_TournoiGolf.Services.WeatherService _weatherService = weatherService;
+        private readonly ILogger<HomeController> _logger = logger;
+        private readonly GolfDbContext _context = context;
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             try
             {
-                // Météo en temps réel (via le service backend pour plus de fiabilité)
-                ViewBag.Weather = await _weatherService.GetCurrentWeatherAsync();
-                // RÉCUPÉRATION DES STATISTIQUES (BACKENDparlant à la BDD via Entity Framework)
                 ViewBag.NbTournois = _context.Tournois.Count();
                 ViewBag.NbParticipants = _context.Participants.Count();
                 ViewBag.NbEquipes = _context.Equipes.Count();
                 ViewBag.NbTournoisOuverts = _context.Tournois.Count(t => t.InscriptionsOuvertes);
-
-                // AFFICHAGE DU PROCHAIN TOURNOI À VENIR
                 ViewBag.ProchainTournoi = _context.Tournois
                     .Where(t => t.DateTournoi >= DateTime.Today)
                     .OrderBy(t => t.DateTournoi)
@@ -64,7 +51,7 @@ namespace croupe_06_TournoiGolf.Controllers
         {
             var validLangs = new[] { "FR", "EN", "NL", "DE", "ES", "IT", "SV" };
             string code = (lang ?? "FR").ToUpper();
-            if (!System.Linq.Enumerable.Contains(validLangs, code)) code = "FR";
+            if (!validLangs.Contains(code)) code = "FR";
 
             string culture = code switch
             {
@@ -74,17 +61,15 @@ namespace croupe_06_TournoiGolf.Controllers
                 "ES" => "es",
                 "IT" => "it",
                 "SV" => "sv",
-                _    => "fr"
+                _ => "fr"
             };
 
-            // Cookie de culture
             Response.Cookies.Append(
                 Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.DefaultCookieName,
                 Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
-                new Microsoft.AspNetCore.Http.CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
             );
 
-            // Session pour compatibilité vues
             HttpContext.Session.SetString("Lang", code);
 
             string? returnUrl = Request.Headers["Referer"].ToString();

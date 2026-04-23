@@ -1,63 +1,58 @@
 @{
-    ViewData["Title"] = "Vérification de votre email";
+    ViewData["Title"] = "Verification de votre email";
+    ViewData["UsePublicShell"] = true;
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-5">
-
-        <div class="card mb-4">
-            <h2>Vérification de votre email</h2>
-            <p class="sub">Un code de vérification a été envoyé à <strong>@ViewBag.Email</strong>.</p>
-            <p class="sub">Veuillez saisir le code reçu pour activer votre compte.</p>
-
-            @if (ViewBag.Error != null)
-            {
-                <div class="error">@ViewBag.Error</div>
-            }
-
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">@TempData["Success"]</div>
-            }
-
-            @if (TempData["Error"] != null)
-            {
-                <div class="error">@TempData["Error"]</div>
-            }
-
-            @if (TempData["CodeAffiche"] != null)
-            {
-                <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:16px; margin-bottom:20px; text-align:center;">
-                    <p style="margin:0 0 8px 0; font-weight:600; color:#856404;">
-                        Le service email n'est pas configuré. Voici votre code :
-                    </p>
-                    <span style="font-size:1.8rem; font-weight:bold; letter-spacing:8px; color:#1a3c2a;">@TempData["CodeAffiche"]</span>
-                </div>
-            }
-
-            <form action="/Auth/VerifierEmail" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="@ViewBag.Email" />
-
-                <div class="form-group">
-                    <label for="code">Code de vérification (6 chiffres)</label>
-                    <input id="code" name="code" type="text" placeholder="000000"
-                           maxlength="6" pattern="[0-9]{6}" required
-                           style="text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:bold;" />
-                </div>
-
-                <button class="btn" type="submit">Vérifier mon compte</button>
-            </form>
-
-            <div class="card-footer" style="margin-top: 20px;">
-                <p style="margin-bottom: 10px;">Vous n'avez pas reçu le code ?</p>
-                <form action="/Auth/RenvoyerCode" method="post" style="display:inline;">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="email" value="@ViewBag.Email" />
-                    <button type="submit" class="btn btn-secondary">Renvoyer le code</button>
-                </form>
-            </div>
+<section class="auth-shell">
+    <article class="auth-card">
+        <div class="auth-card__header">
+            <span class="auth-card__eyebrow"><i class="fas fa-envelope-open-text"></i> Activation</span>
+            <h1 class="auth-card__title">Vérifiez votre adresse courriel</h1>
+            <p class="auth-card__text">Un code de vérification a été envoyé à <strong>@ViewBag.Email</strong>. Saisissez-le pour activer votre compte.</p>
         </div>
 
-    </div>
-</div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="surface-alert surface-alert--danger">@ViewBag.Error</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="surface-alert surface-alert--success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="surface-alert surface-alert--danger">@TempData["Error"]</div>
+        }
+
+        @if (TempData["CodeAffiche"] != null)
+        {
+            <div class="warning-callout">
+                <p class="warning-callout-text">Le service email n'est pas configuré. Voici votre code :</p>
+                <span class="code-display">@TempData["CodeAffiche"]</span>
+            </div>
+        }
+
+        <form action="/Auth/VerifierEmail" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="email" value="@ViewBag.Email" />
+
+            <div class="form-group">
+                <label for="code">Code de vérification (6 chiffres)</label>
+                <input id="code" name="code" type="text" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required class="verification-input" />
+            </div>
+
+            <div class="auth-actions">
+                <button class="btn" type="submit">Vérifier mon compte</button>
+            </div>
+        </form>
+
+        <div class="card-footer verification-footer">
+            <p class="mb-2">Vous n'avez pas reçu le code ?</p>
+            <form action="/Auth/RenvoyerCode" method="post" class="inline-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="email" value="@ViewBag.Email" />
+                <button type="submit" class="btn btn-secondary">Renvoyer le code</button>
+            </form>
+        </div>
+    </article>
+</section>

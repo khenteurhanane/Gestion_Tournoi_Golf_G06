@@ -1,26 +1,29 @@
 @{
     ViewData["Title"] = "Inscription non disponible";
+    ViewData["HideTopbarPageInfo"] = true;
+    var header = new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-lock",
+        Eyebrow = "Inscription",
+        Title = "Inscriptions non disponibles",
+        Description = "Ce tournoi n'accepte pas de nouvelles inscriptions pour le moment."
+    };
+    var message = ViewBag.Message != null
+        ? ViewBag.Message.ToString()
+        : "Les inscriptions pour ce tournoi sont actuellement fermees.";
+    var state = new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+    {
+        Icon = "fas fa-door-closed",
+        Title = "Acces temporairement ferme",
+        Description = message + " Vous pouvez reessayer plus tard ou contacter l'administrateur si necessaire.",
+        PrimaryLabel = "Retour aux tournois",
+        PrimaryHref = "/Tournoi/Index",
+        SecondaryLabel = "Contacter l'equipe",
+        SecondaryHref = "/Home/Contact"
+    };
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card text-center">
-            <h2>Inscription non disponible</h2>
-            
-            <div class="error">
-                @if (ViewBag.Message != null)
-                {
-                    @ViewBag.Message
-                }
-                else
-                {
-                    <text>Les inscriptions pour ce tournoi sont actuellement fermées.</text>
-                }
-            </div>
-
-            <p>Veuillez réessayer plus tard ou <a href="/Home/Contact">contacter l'administrateur</a>.</p>
-
-            <a class="btn" href="/Tournoi/Index">Retour à la liste des tournois</a>
-        </div>
-    </div>
+<div class="app-page">
+    <partial name="_AppSectionHeader" model="header" />
+    <partial name="_EmptyState" model="state" />
 </div>

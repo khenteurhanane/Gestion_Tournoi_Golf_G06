@@ -1,71 +1,79 @@
 @model List<croupe_06_TournoiGolf.Models.Equipe>
 @{
-    ViewData["Title"] = "Gestion des Équipes";
+    ViewData["Title"] = "Gestion des Equipes";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Équipes";
     var nbMembres = ViewBag.NbMembres as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
-<div class="admin-header">
-    <h1><i class="fas fa-users-cog"></i> Gestion des Équipes</h1>
-    <div>
-        <a href="/Tournoi/Index" class="btn btn-primary">+ Créer une équipe</a>
-        <a href="/Admin/Index" class="btn btn-secondary">Retour au Dashboard</a>
-    </div>
-</div>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-user-friends",
+        Eyebrow = "Administration",
+        Title = "Gestion des équipes",
+        Description = "Pilotez les équipes, surveillez leur capacité et ouvrez le détail pour les ajustements avancés."
+    })
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
 
-<div class="card mt-4">
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>Nom de l'équipe</th>
-                    <th>Tournoi</th>
-                    <th>Créateur</th>
-                    <th>Membres</th>
-                    <th>Code Secret</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var eq in Model)
-                {
-                    int count = nbMembres.ContainsKey(eq.EquipeId) ? nbMembres[eq.EquipeId] : 0;
+    <section class="app-surface-card app-table-card">
+        <div class="app-table-card__header">
+            <div>
+                <h2>Équipes enregistrées</h2>
+                <p class="app-muted-note">@Model.Count équipe(s)</p>
+            </div>
+            <a href="/Tournoi/Index" class="btn btn-secondary">Voir les tournois</a>
+        </div>
+
+        <div class="app-table-wrap">
+            <table class="app-data-table">
+                <thead>
                     <tr>
-                        <td><strong>@eq.NomEquipe</strong></td>
-                        <td>@eq.Tournoi?.Nom</td>
-                        <td>
-                            <span class="badge-capitaine"><i class="fas fa-crown"></i></span>
-                            @eq.Createur?.Prenom @eq.Createur?.Nom
-                        </td>
-                        <td>
-                            <span class="badge @(count >= eq.NbJoueursMax ? "badge-ferme" : "badge-ouvert")">
-                                @count / @eq.NbJoueursMax
-                            </span>
-                            @if (count < eq.NbJoueursMax)
-                            {
-                                <small class="text-warning ms-1" title="Incomplète">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                </small>
-                            }
-                        </td>
-                        <td><code>@eq.CodeSecret</code></td>
-                        <td>
-                            <div style="display: flex; gap: 5px;">
-                                <a href="/Admin/DetailsEquipe/@eq.EquipeId" class="btn btn-sm">Gérer</a>
-                                <form action="/Admin/SupprimerEquipe" method="post" onsubmit="return confirm('Supprimer cette équipe ? Les membres deviendront des participants individuels.');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@eq.EquipeId" />
-                                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
-                                </form>
-                            </div>
-                        </td>
+                        <th>Nom de l'équipe</th>
+                        <th>Tournoi</th>
+                        <th>Créateur</th>
+                        <th>Membres</th>
+                        <th>Code secret</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+                </thead>
+                <tbody>
+                    @foreach (var eq in Model)
+                    {
+                        int count = nbMembres.ContainsKey(eq.EquipeId) ? nbMembres[eq.EquipeId] : 0;
+                        <tr>
+                            <td><strong>@eq.NomEquipe</strong></td>
+                            <td>@eq.Tournoi?.Nom</td>
+                            <td>@eq.Createur?.Prenom @eq.Createur?.Nom</td>
+                            <td>
+                                @if (count >= eq.NbJoueursMax)
+                                {
+                                    <span class="app-status-badge app-status-badge--success">@count / @eq.NbJoueursMax</span>
+                                }
+                                else
+                                {
+                                    <span class="app-status-badge app-status-badge--warning">@count / @eq.NbJoueursMax</span>
+                                }
+                            </td>
+                            <td><span class="table-emphasis-code">@eq.CodeSecret</span></td>
+                            <td>
+                                <div class="app-inline-actions">
+                                    <a href="/Admin/DetailsEquipe/@eq.EquipeId" class="btn btn-secondary">Gérer</a>
+                                    <form action="/Admin/SupprimerEquipe" method="post" onsubmit="return confirm('Supprimer cette equipe ? Les membres deviendront des participants individuels.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@eq.EquipeId" />
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>

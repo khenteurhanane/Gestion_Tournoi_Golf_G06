@@ -1,262 +1,260 @@
+@model croupe_06_TournoiGolf.Models.ViewModels.AdminDashboardViewModel
+
 @{
     ViewData["Title"] = "Espace Administrateur";
-    var prochains = ViewBag.ProchainsTournois as List<croupe_06_TournoiGolf.Models.Tournoi>;
-    var inscriptionsRecentes = ViewBag.InscriptionsRecentes as List<croupe_06_TournoiGolf.Models.Participant>;
-    var tournoiStatus = ViewBag.TournoiStatus as List<croupe_06_TournoiGolf.Models.TournoiStatusViewModel>;
-    var commanditaires = ViewBag.Commanditaires as List<croupe_06_TournoiGolf.Models.Commandite>;
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Administration";
+    ViewData["CompactTopbarSubtitle"] = "Pilotage global";
+    var header = new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-chart-pie",
+        Eyebrow = "Administration",
+        Title = "Tableau de bord admin",
+        Description = "Suivez les tournois, les inscriptions, les equipes et les revenus depuis une vue centrale coherente avec le reste de l'application."
+    };
 }
 
-<div class="dashboard-header mb-4">
-    <div>
-        <h1 class="fw-bold">Tableau de bord <span class="text-success">Admin</span></h1>
-        <p class="text-muted">Vue d'ensemble de l'activité des tournois</p>
-    </div>
-    </div>
-</div>
+<section class="admin-dashboard-shell">
+    @await Html.PartialAsync("_AppSectionHeader", header)
 
-@if (ViewBag.NbEquipesIncompletes > 0)
-{
-    <div class="alert alert-warning border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center p-3 animate__animated animate__fadeInDown" style="background: rgba(243, 156, 18, 0.1); border-left: 5px solid #f39c12 !important;">
-        <div class="alert-icon me-3 bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="flex-grow-1">
-            <h5 class="mb-0 fw-bold text-dark">Équipes incomplètes détectées</h5>
-            <p class="mb-0 text-muted small">Il y a actuellement <strong>@ViewBag.NbEquipesIncompletes</strong> équipes qui n'ont pas encore atteint leur nombre maximal de joueurs.</p>
-        </div>
-        <div>
-            <a href="/Admin/Equipes" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold">Gérer</a>
-        </div>
-    </div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-warning">@TempData["Info"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
 
-    <!-- Statistiques -->
-    <div class="stats-grid">
-        <div class="stat-premium-card">
-            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-            <div class="stat-info">
-                <h3>@ViewBag.NbTournois</h3>
-                <p>Tournois Totaux</p>
-            </div>
-            <div class="stat-trend">+@ViewBag.NbTournoisOuverts actifs</div>
+    <section class="app-surface-card">
+        <div class="app-actions">
+            <a href="/Tournoi/Index" class="btn">Gerer les tournois</a>
+            <a href="/Admin/Utilisateurs" class="btn btn-secondary">Utilisateurs</a>
+            <a href="/Admin/Participants" class="btn btn-secondary">Participants</a>
+            <a href="/Admin/Equipes" class="btn btn-secondary">Equipes</a>
+            @if (Model.TournoiScoreActifId.HasValue)
+            {
+                <a href="/Score/Saisie/@Model.TournoiScoreActifId.Value" class="btn btn-secondary">Saisir les scores</a>
+                <a href="/Score/Tableau/@Model.TournoiScoreActifId.Value" class="btn btn-secondary">Classement live</a>
+            }
         </div>
-        <div class="stat-premium-card">
-            <div class="stat-icon"><i class="fas fa-users"></i></div>
-            <div class="stat-info">
-                <h3>@ViewBag.NbParticipants</h3>
-                <p>Inscriptions</p>
-            </div>
-        </div>
-        <div class="stat-premium-card">
-            <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
-            <div class="stat-info">
-                <h3>@ViewBag.NbUtilisateurs</h3>
-                <p>Utilisateurs</p>
-            </div>
-        </div>
-        <div class="stat-premium-card">
-            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-            <div class="stat-info">
-                <h3>@(((decimal)ViewBag.RevenuTotal).ToString("C"))</h3>
-                <p>Revenus</p>
-            </div>
-        </div>
-        <div class="stat-premium-card">
-            <div class="stat-icon" style="background: rgba(46,204,113,0.1); color: #27ae60;"><i class="fas fa-users"></i></div>
-            <div class="stat-info">
-                <h3>@ViewBag.NbEquipes</h3>
-                <p>Équipes</p>
-                <div class="stat-equipes-detail mt-1">
-                    <span class="badge-completes me-2">
-                        <i class="fas fa-check-circle"></i> @ViewBag.NbEquipesCompletes complètes
-                    </span>
-                    <span class="badge-incompletes">
-                        <i class="fas fa-exclamation-circle"></i> @ViewBag.NbEquipesIncompletes incomplètes
-                    </span>
+    </section>
+
+    @if (Model.TournoisAvecEquipesIncompletes.Any())
+    {
+        <section class="app-surface-card app-table-card">
+            <div class="app-table-card__header">
+                <div>
+                    <h2>Completer les equipes</h2>
+                    <p class="app-muted-note">Le matchmaking admin est maintenant branche pour les tournois qui ont des equipes incompletes ou des joueurs solos regroupables.</p>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="dashboard-main-grid">
-        <!-- Section Gauche -->
-        <div class="grid-col-8">
-            <!-- Prochains Tournois et Occupation -->
-            <div class="premium-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-calendar-alt"></i> État des Tournois</h3>
-                </div>
-                <div class="occupation-list">
-                    @if (tournoiStatus != null && tournoiStatus.Any())
+            <div class="admin-list admin-list--carded">
+                @foreach (var tournoi in Model.TournoisAvecEquipesIncompletes)
+                {
+                    <div class="admin-list__item admin-list__item--stack">
+                        <div class="admin-list__meta">
+                            <strong>@tournoi.NomTournoi</strong>
+                            <span>@tournoi.EquipesIncompletes equipe(s) incomplete(s) - @tournoi.JoueursSoloDisponibles joueur(s) solo regroupable(s)</span>
+                            @if (!tournoi.PeutCompleterAutomatiquement)
+                            {
+                                <span class="app-muted-note">@tournoi.MessageDisponibilite</span>
+                            }
+                        </div>
+                        <div class="app-inline-actions">
+                            <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary">Voir le tournoi</a>
+                            @if (tournoi.PeutCompleterAutomatiquement)
+                            {
+                                <form action="/Admin/CompleterEquipes" method="post" class="inline-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="tournoiId" value="@tournoi.TournoiId" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit" class="btn">Completer automatiquement</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="admin-kpi-grid">
+        <article class="admin-kpi-card">
+            <span class="admin-kpi-card__icon"><i class="fas fa-trophy"></i></span>
+            <div class="admin-kpi-card__value">@Model.NbTournois</div>
+            <span class="admin-kpi-card__label">Tournois</span>
+        </article>
+        <article class="admin-kpi-card">
+            <span class="admin-kpi-card__icon"><i class="fas fa-users"></i></span>
+            <div class="admin-kpi-card__value">@Model.NbParticipants</div>
+            <span class="admin-kpi-card__label">Inscriptions</span>
+        </article>
+        <article class="admin-kpi-card">
+            <span class="admin-kpi-card__icon"><i class="fas fa-user-friends"></i></span>
+            <div class="admin-kpi-card__value">@Model.NbEquipes</div>
+            <span class="admin-kpi-card__label">Equipes</span>
+        </article>
+        <article class="admin-kpi-card">
+            <span class="admin-kpi-card__icon"><i class="fas fa-dollar-sign"></i></span>
+            <div class="admin-kpi-card__value">@Model.RevenuTotal.ToString("C")</div>
+            <span class="admin-kpi-card__label">Revenus</span>
+        </article>
+    </section>
+
+    <div class="admin-dashboard-grid">
+        <div class="app-page-shell">
+            <section class="app-surface-card">
+                <span class="app-section-eyebrow"><i class="fas fa-wave-square"></i> Etat des tournois</span>
+                <div class="admin-list">
+                    @if (Model.TournoiStatus.Any())
                     {
-                        @foreach (var ts in tournoiStatus)
+                        @foreach (var ts in Model.TournoiStatus)
                         {
                             var percentage = ts.PlacesParticipantsMax > 0 ? (ts.NbInscrits * 100) / ts.PlacesParticipantsMax : 0;
-                            <div class="occupation-item">
-                                <div class="occ-info">
-                                    <span class="occ-name">@ts.Nom</span>
-                                    <span class="occ-count">@ts.NbInscrits / @ts.PlacesParticipantsMax</span>
+                            <div class="admin-list__item">
+                                <div class="admin-list__meta">
+                                    <strong>@ts.Nom</strong>
+                                    <span>@ts.NbInscrits / @ts.PlacesParticipantsMax inscrit(s)</span>
                                 </div>
-                                <div class="progress-bar-bg">
-                                    <div class="progress-bar-fill" style="width: @(percentage)%"></div>
-                                </div>
+                                <div class="app-progress" style="width: 180px;"><span style="width:@percentage%"></span></div>
                             </div>
                         }
                     }
                     else
                     {
-                        <p class="text-muted">Aucun tournoi actif.</p>
+                        <p class="app-muted-note">Aucun tournoi actif.</p>
                     }
                 </div>
-            </div>
+            </section>
 
-            <div class="premium-card mt-20">
-                <div class="card-header">
-                    <h3><i class="fas fa-list"></i> Liste des Prochains Tournois</h3>
+            <section class="app-surface-card app-table-card">
+                <div class="app-table-card__header">
+                    <div>
+                        <h2>Prochains tournois</h2>
+                        <p class="app-muted-note">Pilotage et actions rapides</p>
+                    </div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Date</th>
-                            <th>Lieu</th>
-                            <th>Statut</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (prochains != null && prochains.Any())
-                        {
-                            @foreach (var t in prochains)
+
+                <div class="app-table-wrap">
+                    <table class="app-data-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date</th>
+                                <th>Lieu</th>
+                                <th>Statut</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.ProchainsTournois.Any())
                             {
-                                <tr>
-                                    <td class="font-bold">@t.Nom</td>
-                                    <td>@t.DateTournoi.ToShortDateString()</td>
-                                    <td>@t.Lieu</td>
-                                    <td>
-                                        @if (t.EstEnCours)
-                                        {
-                                            <span class="badge badge-en-cours">En cours</span>
-                                        }
-                                        else if (t.InscriptionsOuvertes)
-                                        {
-                                            <span class="badge badge-ouvert">Ouvert</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge badge-ferme">Fermé</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <a href="/Tournoi/Edit/@t.TournoiId" class="btn-icon" title="Modifier"><i class="fas fa-edit"></i></a>
-                                        <a href="/Tournoi/Details/@t.TournoiId" class="btn-icon" title="Détails"><i class="fas fa-eye"></i></a>
-                                        
-                                        <form asp-action="CompleterEquipes" asp-controller="Admin" method="post" style="display:inline;">
-                                            <input type="hidden" name="tournoiId" value="@t.TournoiId" />
-                                            <button type="submit" class="btn-icon text-warning border-0 bg-transparent" style="cursor: pointer;" title="Affectation auto des équipes" onclick="return confirm('Voulez-vous répartir tous les étudiants sans équipe du tournoi ?');">
-                                                <i class="fas fa-magic"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                @foreach (var tournoi in Model.ProchainsTournois)
+                                {
+                                    <tr>
+                                        <td><strong>@tournoi.Nom</strong></td>
+                                        <td>@tournoi.DateTournoi.ToShortDateString()</td>
+                                        <td>@tournoi.Lieu</td>
+                                        <td>
+                                            @if (tournoi.EstEnCours)
+                                            {
+                                                <span class="app-status-badge app-status-badge--warning">En cours</span>
+                                            }
+                                            else if (tournoi.InscriptionsOuvertes)
+                                            {
+                                                <span class="app-status-badge app-status-badge--success">Ouvert</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="app-status-badge app-status-badge--danger">Ferme</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="app-inline-actions">
+                                                <a href="/Tournoi/Edit/@tournoi.TournoiId" class="btn btn-secondary">Modifier</a>
+                                                <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary">Details</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                        else
-                        {
-                            <tr><td colspan="5" class="text-center">Aucun tournoi à venir.</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                            else
+                            {
+                                <tr><td colspan="5">Aucun tournoi a venir.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
 
-        <!-- Section Droite -->
-        <div class="grid-col-4">
-            <!-- Actions Rapides -->
-            <div class="premium-card accent">
-                <div class="card-header">
-                    <h3><i class="fas fa-bolt"></i> Actions Rapides</h3>
-                </div>
-                <div class="quick-actions">
-                    <a href="/Tournoi/Index" class="qa-item">
-                        <i class="fas fa-cog"></i> Gérer les tournois
-                    </a>
-                    <a href="/Admin/Utilisateurs" class="qa-item">
-                        <i class="fas fa-user-shield"></i> Gérer les utilisateurs
-                    </a>
-                    <a href="/Admin/Participants" class="qa-item">
-                        <i class="fas fa-id-card"></i> Gérer les participants
-                    </a>
-                    <a href="/Admin/Equipes" class="qa-item">
-                        <i class="fas fa-flag"></i> Gérer les équipes
-                    </a>
-                    <a href="/Commandite/Index" class="qa-item">
-                        <i class="fas fa-handshake"></i> Commandites
-                    </a>
-                    <a href="/Score/Tableau" class="qa-item">
-                        <i class="fas fa-golf-ball"></i> Tableau des scores
-                    </a>
-                </div>
-            </div>
-
-            <!-- Inscriptions Récentes -->
-            <div class="premium-card mt-20">
-                <div class="card-header">
-                    <h3><i class="fas fa-history"></i> Inscriptions Récentes</h3>
-                </div>
-                <div class="recent-list">
-                    @if (inscriptionsRecentes != null && inscriptionsRecentes.Any())
+        <div class="app-page-shell">
+            <section class="app-surface-card">
+                <span class="app-section-eyebrow"><i class="fas fa-bolt"></i> Actions rapides</span>
+                <div class="app-actions">
+                    <a href="/Tournoi/Index" class="btn btn-secondary">Tournois</a>
+                    <a href="/Admin/Utilisateurs" class="btn btn-secondary">Utilisateurs</a>
+                    <a href="/Admin/Participants" class="btn btn-secondary">Participants</a>
+                    <a href="/Admin/Equipes" class="btn btn-secondary">Equipes</a>
+                    <a href="/Commandite/Index" class="btn btn-secondary">Commandites</a>
+                    @if (Model.TournoiScoreActifId.HasValue)
                     {
-                        @foreach (var ins in inscriptionsRecentes)
+                        <a href="/Score/Saisie/@Model.TournoiScoreActifId.Value" class="btn btn-secondary">Scores</a>
+                    }
+                </div>
+            </section>
+
+            <section class="app-surface-card">
+                <span class="app-section-eyebrow"><i class="fas fa-history"></i> Inscriptions recentes</span>
+                <div class="admin-list">
+                    @if (Model.InscriptionsRecentes.Any())
+                    {
+                        @foreach (var inscription in Model.InscriptionsRecentes)
                         {
-                            <div class="recent-item">
-                                <div class="recent-icon"><i class="fas fa-user-plus"></i></div>
-                                <div class="recent-details">
-                                    <span class="recent-user">@(ins.Utilisateur?.Prenom ?? ins.Prenom) @(ins.Utilisateur?.Nom ?? ins.Nom)</span>
-                                    <span class="recent-tournoi">@ins.Tournoi.Nom</span>
-                                    <span class="recent-time">@ins.CreeLe.ToShortDateString()</span>
+                            <div class="admin-list__item">
+                                <div class="admin-list__meta">
+                                    <strong>@(inscription.Utilisateur?.Prenom ?? inscription.Prenom) @(inscription.Utilisateur?.Nom ?? inscription.Nom)</strong>
+                                    <span>@inscription.Tournoi?.Nom</span>
                                 </div>
+                                <span>@inscription.CreeLe.ToShortDateString()</span>
                             </div>
                         }
                     }
                     else
                     {
-                        <p class="text-muted">Aucune inscription récente.</p>
+                        <p class="app-muted-note">Aucune inscription recente.</p>
                     }
                 </div>
-            </div>
+            </section>
 
-            <!-- Commanditaires (US-13) -->
-            <div class="premium-card mt-20">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3><i class="fas fa-handshake"></i> Commanditaires</h3>
-                    <a href="/Commandite/Index" class="btn btn-sm btn-outline-success rounded-pill px-3" style="font-size:0.75rem;">Voir tout</a>
-                </div>
-                <div class="commanditaires-list">
-                    @if (commanditaires != null && commanditaires.Any())
+            <section class="app-surface-card">
+                <span class="app-section-eyebrow"><i class="fas fa-handshake"></i> Commanditaires</span>
+                <div class="admin-list">
+                    @if (Model.Commanditaires.Any())
                     {
-                        @foreach (var c in commanditaires)
+                        @foreach (var commandite in Model.Commanditaires)
                         {
-                            <div class="commanditaire-item">
-                                <div class="commanditaire-badge @c.TypeCommandite.ToLower()">
-                                    @c.TypeCommandite.Substring(0, 1)
+                            <div class="admin-list__item">
+                                <div class="admin-list__meta">
+                                    <strong>@commandite.Utilisateur?.Prenom @commandite.Utilisateur?.Nom</strong>
+                                    <span>@commandite.TypeCommandite - @commandite.Tournoi?.Nom</span>
                                 </div>
-                                <div class="commanditaire-details">
-                                    <span class="commanditaire-nom">@c.Utilisateur?.Prenom @c.Utilisateur?.Nom</span>
-                                    <span class="commanditaire-meta">@c.TypeCommandite · @c.Tournoi?.Nom</span>
-                                </div>
-                                <span class="commanditaire-montant">@c.Montant.ToString("C")</span>
+                                <span>@commandite.Montant.ToString("C")</span>
                             </div>
                         }
                     }
                     else
                     {
-                        <p class="text-muted">Aucun commanditaire enregistré.</p>
+                        <p class="app-muted-note">Aucun commanditaire enregistre.</p>
                     }
                 </div>
-            </div>
+            </section>
         </div>
     </div>
-    </div>
-</div>
-
+</section>

@@ -1,144 +1,173 @@
 @model croupe_06_TournoiGolf.Models.Participant
 @{
     ViewData["Title"] = "Paiement";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Paiement";
+    var participantNomComplet = $"{Model.Utilisateur?.Prenom ?? Model.Prenom} {Model.Utilisateur?.Nom ?? Model.Nom}".Trim();
 }
 
-<div class="payment-container">
-    <div class="payment-card">
-        <h1 class="payment-title">Finalisez votre inscription</h1>
-        <p class="payment-subtitle">Tournoi : <strong>@Model.Tournoi.Nom</strong></p>
-        
-        <div class="payment-details">
-            <div class="detail-row">
-                <span>Type de participant:</span>
-                <span class="detail-value">@Model.TypeParticipant.ToUpper()</span>
-            </div>
-            <hr />
-            <div class="detail-row total-row">
-                <span>Total à payer:</span>
-                <span class="total-amount">@Model.MontantPaye.ToString("C")</span>
-            </div>
-        </div>
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-credit-card",
+        Eyebrow = "Paiement",
+        Title = "Finalisez votre inscription",
+        Description = $"Vous etes a un clic de confirmer votre place pour {Model.Tournoi.Nom}."
+    })
 
-        <div class="payment-form-section mt-4">
-            <h3 class="section-title">Mode de paiement</h3>
-            
-            <div class="payment-methods-tabs mb-4">
-                <button type="button" class="method-tab active" onclick="switchPaymentMethod('card')">
-                    <i class="fas fa-credit-card"></i> Carte Débit/Crédit
-                </button>
-                <button type="button" class="method-tab" onclick="switchPaymentMethod('interac')">
-                    <i class="fas fa-exchange-alt"></i> Virement Interac
-                </button>
+    <div class="app-grid-sidebar">
+        <section class="app-surface-card app-form-card">
+            <div>
+                <span class="app-section-eyebrow"><i class="fas fa-lock"></i> Paiement securise</span>
+                <h2 class="app-form-title">Choisissez votre mode de paiement</h2>
+                <p class="app-lead">La transaction est simulee pour le projet G06, mais le flux doit rester propre et credible.</p>
             </div>
 
-<form asp-action="SimulerPaiement" asp-route-participantId="@Model.ParticipantId" method="post" id="paymentForm">
+            <div class="app-kpi-strip">
+                <article class="app-kpi-card">
+                    <span class="app-kpi-card__label">Tournoi</span>
+                    <span class="app-kpi-card__value">@Model.Tournoi.Nom</span>
+                </article>
+                <article class="app-kpi-card">
+                    <span class="app-kpi-card__label">Type</span>
+                    <span class="app-kpi-card__value">@Model.TypeParticipant.ToUpper()</span>
+                </article>
+                <article class="app-kpi-card">
+                    <span class="app-kpi-card__label">Total à payer</span>
+                    <span class="app-kpi-card__value">@Model.MontantPaye.ToString("C")</span>
+                </article>
+            </div>
+
+            <form asp-action="SimulerPaiement" asp-route-participantId="@Model.ParticipantId" method="post" id="paymentForm" class="app-form-card">
+                @Html.AntiForgeryToken()
                 <input type="hidden" name="participantId" value="@Model.ParticipantId" />
-                <input type="hidden" name="methodePaiement" id="methodePaiement" value="Carte de Crédit/Débit" />
-                
-                <!-- Section Carte -->
-                <div id="cardSection">
+                <input type="hidden" name="methodePaiement" id="methodePaiement" value="Carte de Credit/Debit" />
+
+                <div class="app-actions">
+                    <button type="button" class="btn method-tab active" data-method="card" onclick="switchPaymentMethod('card')">
+                        <i class="fas fa-credit-card"></i> Carte debit/credit
+                    </button>
+                    <button type="button" class="btn btn-secondary method-tab" data-method="interac" onclick="switchPaymentMethod('interac')">
+                        <i class="fas fa-exchange-alt"></i> Virement Interac
+                    </button>
+                </div>
+
+                <div id="cardSection" class="app-form-grid">
                     <div class="form-group">
                         <label>Nom sur la carte</label>
-                        <input type="text" value="@($"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}")" required />
+                        <input type="text" value="@participantNomComplet" required />
                     </div>
-                    
+
                     <div class="form-group">
-                        <label>Numéro de carte</label>
-                        <div class="card-input-wrapper">
-                            <input type="text" value="4540 1234 5678 9012" required />
-                            <span class="card-type-icon">VISA</span>
-                        </div>
+                        <label>Numero de carte</label>
+                        <input type="text" value="4540 1234 5678 9012" required />
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group col-half">
-                            <label>Expiration</label>
-                            <input type="text" value="12/28" required />
-                        </div>
-                        <div class="form-group col-half">
-                            <label>CVV</label>
-                            <input type="text" value="***" required />
-                        </div>
+
+                    <div class="form-group">
+                        <label>Expiration</label>
+                        <input type="text" value="12/28" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" value="***" required />
                     </div>
                 </div>
 
-                <!-- Section Interac (Cachée par défaut) -->
-                <div id="interacSection" style="display:none;">
-                    <div class="interac-instructions">
-                        <p class="mb-3">Pour finaliser votre inscription, veuillez effectuer un virement Interac aux coordonnées suivantes :</p>
-                        <div class="interac-detail">
-                            <strong>Courriel :</strong> <span>paiement@golfg06.com</span>
+                <div id="interacSection" class="app-surface-card d-none">
+                    <span class="app-section-eyebrow"><i class="fas fa-university"></i> Instructions Interac</span>
+                    <div class="app-detail-list">
+                        <div class="app-detail-row">
+                            <strong>Courriel</strong>
+                            <span>paiement@golfg06.com</span>
                         </div>
-                        <div class="interac-detail">
-                            <strong>Question :</strong> <span>Numéro de Tournoi</span>
+                        <div class="app-detail-row">
+                            <strong>Question</strong>
+                            <span>Numero de tournoi</span>
                         </div>
-                        <div class="interac-detail">
-                            <strong>Réponse :</strong> <span>Golf2024</span>
+                        <div class="app-detail-row">
+                            <strong>Reponse</strong>
+                            <span>Golf2024</span>
                         </div>
-                        <p class="mt-3 small text-muted">Note : Votre inscription sera confirmée une fois le virement reçu.</p>
                     </div>
+                    <p class="app-muted-note mt-3">Votre inscription sera marquee comme payee des la confirmation du transfert.</p>
                 </div>
 
-                <p class="text-muted small mb-3 text-start mt-3">
-                    <i class="fas fa-lock"></i> Ceci est une simulation sécurisée pour le projet G06.
+                <p class="app-muted-note">
+                    <i class="fas fa-shield-alt"></i> Ceci est une simulation securisee pour le projet G06.
                 </p>
-                
-                <button type="submit" class="btn btn-payment-simulate" id="submitBtn">
-                    <span class="btn-text" id="btnText">Confirmer le paiement</span>
-                    <span class="btn-icon">💳</span>
-                    <div id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display:none;">
-                      <span class="visually-hidden">Chargement...</span>
-                    </div>
-                </button>
+
+                <div class="app-actions">
+                    <button type="submit" class="btn" id="submitBtn">
+                        <span id="btnText">Confirmer le paiement</span>
+                        <span id="spinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                    </button>
+                    <a href="/Inscription/Index?tournoiId=@Model.TournoiId" class="btn btn-secondary">Retour a l'inscription</a>
+                </div>
             </form>
+        </section>
 
-            <script>
-                function switchPaymentMethod(method) {
-                    const cardSection = document.getElementById('cardSection');
-                    const interacSection = document.getElementById('interacSection');
-                    const methodInput = document.getElementById('methodePaiement');
-                    const tabs = document.querySelectorAll('.method-tab');
-                    const btnIcon = document.querySelector('.btn-icon');
-                    
-                    tabs.forEach(tab => tab.classList.remove('active'));
-                    
-                    if (method === 'card') {
-                        cardSection.style.display = 'block';
-                        interacSection.style.display = 'none';
-                        methodInput.value = "Carte de Crédit/Débit";
-                        tabs[0].classList.add('active');
-                        btnIcon.innerText = "💳";
-                        // Re-ajouter les attributs 'required'
-                        cardSection.querySelectorAll('input').forEach(i => i.required = true);
-                    } else {
-                        cardSection.style.display = 'none';
-                        interacSection.style.display = 'block';
-                        methodInput.value = "Virement Interac";
-                        tabs[1].classList.add('active');
-                        btnIcon.innerText = "📲";
-                        // Enlever les attributs 'required' pour ne pas bloquer le formulaire
-                        cardSection.querySelectorAll('input').forEach(i => i.required = false);
-                    }
-                }
-
-                document.getElementById('paymentForm').addEventListener('submit', function(e) {
-                    const btn = document.getElementById('submitBtn');
-                    const text = document.getElementById('btnText');
-                    const spinner = document.getElementById('spinner');
-                    
-                    e.preventDefault(); 
-                    
-                    btn.disabled = true;
-                    text.innerText = "Déjà payé";
-                    spinner.style.display = "inline-block";
-                    btn.style.filter = "grayscale(0.5)";
-                    
-                    setTimeout(() => {
-                        this.submit(); 
-                    }, 1500);
-                });
-            </script>
-        </div>
+        <aside class="app-surface-card app-progress-card">
+            <span class="app-section-eyebrow"><i class="fas fa-receipt"></i> Resume</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Participant</strong>
+                    <span>@participantNomComplet</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Tournoi</strong>
+                    <span>@Model.Tournoi.Nom</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Date</strong>
+                    <span>@Model.Tournoi.DateTournoi.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Total à payer</strong>
+                    <span>@Model.MontantPaye.ToString("C")</span>
+                </div>
+            </div>
+        </aside>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script>
+        function switchPaymentMethod(method) {
+            const cardSection = document.getElementById('cardSection');
+            const interacSection = document.getElementById('interacSection');
+            const methodInput = document.getElementById('methodePaiement');
+            const tabs = document.querySelectorAll('.method-tab');
+
+            tabs.forEach(tab => {
+                tab.classList.toggle('btn-secondary', tab.dataset.method !== method);
+                tab.classList.toggle('active', tab.dataset.method === method);
+            });
+
+            if (method === 'card') {
+                cardSection.classList.remove('d-none');
+                interacSection.classList.add('d-none');
+                methodInput.value = 'Carte de Credit/Debit';
+                cardSection.querySelectorAll('input').forEach(i => i.required = true);
+            } else {
+                cardSection.classList.add('d-none');
+                interacSection.classList.remove('d-none');
+                methodInput.value = 'Virement Interac';
+                cardSection.querySelectorAll('input').forEach(i => i.required = false);
+            }
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', function (e) {
+            const btn = document.getElementById('submitBtn');
+            const text = document.getElementById('btnText');
+            const spinner = document.getElementById('spinner');
+
+            e.preventDefault();
+            btn.disabled = true;
+            text.innerText = 'Paiement en cours';
+            spinner.classList.remove('d-none');
+
+            setTimeout(() => this.submit(), 1200);
+        });
+    </script>
+}

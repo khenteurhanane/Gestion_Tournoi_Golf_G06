@@ -1,19 +1,20 @@
 @using croupe_06_TournoiGolf.Models.ViewModels
 @{
-    ViewData["Title"] = "Boutique Pro-Shop";
-    var catalogue = ViewBag.Catalogue as List<ArticleBoutique>;
+    ViewData["Title"] = "Boutique du tournoi";
+    ViewData["UsePublicShell"] = true;
+    var catalogue = ViewBag.Catalogue as List<ArticleBoutique> ?? [];
     var nbElements = ViewBag.NbElementsPanier ?? 0;
 }
 
 <div class="pro-shop-header d-flex justify-content-between align-items-center">
     <div>
-        <p class="text-uppercase mb-2 text-white-50 fw-bold" style="letter-spacing: 2px;"><i class="fas fa-crown text-warning"></i> Expérience Premium</p>
-        <h1>Pro-Shop & Restauration</h1>
-        <p class="lead mb-0 text-light" style="opacity: 0.9;">Réservez votre équipement et commandez votre repas pour la partie.</p>
+        <p class="text-uppercase mb-2 text-white-50 fw-bold pro-shop-kicker"><i class="fas fa-store"></i> Services du tournoi</p>
+        <h1>Boutique &amp; restauration</h1>
+        <p class="lead mb-0 text-light text-soft-light">Reservez votre equipement et commandez votre repas pour la journee de tournoi.</p>
     </div>
-    
+
     <a href="/Boutique/Panier" class="btn btn-cart-floating text-decoration-none d-none d-md-block">
-        <i class="fas fa-shopping-bag me-2"></i> Mon Panier 
+        <i class="fas fa-shopping-bag me-2"></i> Mon Panier
         @if (nbElements > 0)
         {
             <span class="badge bg-danger rounded-pill ms-2">@nbElements</span>
@@ -23,7 +24,7 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" style="border-radius: 15px;" role="alert">
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm alert-rounded" role="alert">
         <i class="fas fa-check-circle me-2"></i> <strong>@TempData["SuccessMessage"]</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -32,16 +33,15 @@
 <div class="text-center mb-5">
     <ul class="nav nav-pills boutique-nav-pills" id="boutique-tab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="materiel-tab" data-bs-toggle="pill" data-bs-target="#materiel" type="button" role="tab"><i class="fas fa-golf-club me-2"></i> Location Équipement</button>
+            <button class="nav-link active" id="materiel-tab" data-bs-toggle="pill" data-bs-target="#materiel" type="button" role="tab"><i class="fas fa-golf-club me-2"></i> Location &eacute;quipement</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="resto-tab" data-bs-toggle="pill" data-bs-target="#resto" type="button" role="tab"><i class="fas fa-utensils me-2"></i> Restauration Gourmet</button>
+            <button class="nav-link" id="resto-tab" data-bs-toggle="pill" data-bs-target="#resto" type="button" role="tab"><i class="fas fa-utensils me-2"></i> Restauration</button>
         </li>
     </ul>
 </div>
 
 <div class="tab-content" id="boutique-tabContent">
-    <!-- ONGLET MATÉRIEL -->
     <div class="tab-pane fade show active" id="materiel" role="tabpanel">
         <div class="row g-4 justify-content-center">
             @foreach (var article in catalogue.Where(a => a.Categorie == "Materiel"))
@@ -49,22 +49,22 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="card premium-card h-100 pb-3">
                         <div class="card-body text-center d-flex flex-column pt-4 px-4">
-                            <div class="premium-card-icon">
-                                <i class="fas @article.ImageIcon" style="font-size: 2.5rem; color: var(--primary-navy);"></i>
+                            <div class="premium-card-icon premium-icon-primary">
+                                <i class="fas @article.ImageIcon"></i>
                             </div>
                             <h5 class="fw-bold mb-2">@article.Nom</h5>
                             <p class="text-muted small mb-4 flex-grow-1">@article.Description</p>
-                            <h3 class="fw-bolder mb-4" style="color: var(--primary-navy);">@article.Prix.ToString("C")</h3>
-                            
+                            <h3 class="fw-bolder mb-4 premium-price">@article.Prix.ToString("C")</h3>
+
                             <form action="/Boutique/AjouterAuPanier" method="post" class="mt-auto">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@article.Id" />
                                 <div class="d-flex align-items-center justify-content-between mb-3 bg-light rounded-3 p-2">
-                                    <span class="text-muted fw-bold small text-uppercase ms-2">Quantité</span>
+                                    <span class="text-muted fw-bold small text-uppercase ms-2">Quantit&eacute;</span>
                                     <input type="number" name="quantite" class="form-control form-control-sm w-50 border-0 bg-transparent fw-bold text-end" value="1" min="1" max="10" />
                                 </div>
                                 <button type="submit" class="btn btn-premium w-100">
-                                    <i class="fas fa-plus me-2"></i> Réserver
+                                    <i class="fas fa-plus me-2"></i> R&eacute;server
                                 </button>
                             </form>
                         </div>
@@ -74,7 +74,6 @@
         </div>
     </div>
 
-    <!-- ONGLET RESTAURATION -->
     <div class="tab-pane fade" id="resto" role="tabpanel">
         <div class="row g-4 justify-content-center">
             @foreach (var article in catalogue.Where(a => a.Categorie == "Restauration"))
@@ -82,21 +81,21 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="card premium-card h-100 pb-3">
                         <div class="card-body text-center d-flex flex-column pt-4 px-4">
-                            <div class="premium-card-icon">
-                                <i class="fas @article.ImageIcon" style="font-size: 2.5rem; color: #f59e0b;"></i>
+                            <div class="premium-card-icon premium-icon-gold">
+                                <i class="fas @article.ImageIcon"></i>
                             </div>
                             <h5 class="fw-bold mb-2">@article.Nom</h5>
                             <p class="text-muted small mb-4 flex-grow-1">@article.Description</p>
-                            <h3 class="fw-bolder mb-4" style="color: var(--primary-navy);">@article.Prix.ToString("C")</h3>
-                            
+                            <h3 class="fw-bolder mb-4 premium-price">@article.Prix.ToString("C")</h3>
+
                             <form action="/Boutique/AjouterAuPanier" method="post" class="mt-auto">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@article.Id" />
                                 <div class="d-flex align-items-center justify-content-between mb-3 bg-light rounded-3 p-2">
-                                    <span class="text-muted fw-bold small text-uppercase ms-2">Menu/Qté</span>
+                                    <span class="text-muted fw-bold small text-uppercase ms-2">Menu/Qt&eacute;</span>
                                     <input type="number" name="quantite" class="form-control form-control-sm w-50 border-0 bg-transparent fw-bold text-end" value="1" min="1" max="10" />
                                 </div>
-                                <button type="submit" class="btn btn-premium w-100" style="background: #f59e0b;">
+                                <button type="submit" class="btn btn-premium btn-premium-gold w-100">
                                     <i class="fas fa-utensils me-2"></i> Commander
                                 </button>
                             </form>
@@ -107,4 +106,3 @@
         </div>
     </div>
 </div>
-

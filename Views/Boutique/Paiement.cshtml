@@ -1,118 +1,119 @@
 @model croupe_06_TournoiGolf.Models.ViewModels.PaiementBoutiqueViewModel
 @{
     ViewData["Title"] = "Paiement - Boutique";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Paiement boutique";
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-lg border-0 rounded-3">
-            <div class="card-header bg-primary text-white text-center py-4">
-                <i class="fas fa-credit-card fa-3x mb-2"></i>
-                <h3 class="mb-0">Paiement Sécurisé</h3>
-                <p class="mb-0 text-white-50">Boutique & Restauration Golf G06</p>
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-credit-card",
+        Eyebrow = "Boutique",
+        Title = "Paiement sécurisé",
+        Description = "Finalisez votre commande de matériel et de restauration avec un parcours de paiement simple et cohérent."
+    })
+
+    <div class="app-grid-sidebar">
+        <section class="app-surface-card app-form-card">
+            <div class="app-kpi-card">
+                <span class="app-kpi-card__label">Total à payer</span>
+                <span class="app-kpi-card__value">@Model.Panier.TotalFinal.ToString("C")</span>
             </div>
-            
-            <div class="card-body p-5">
-                <div class="text-center mb-5">
-                    <h5 class="text-muted">Total à payer</h5>
-                    <h1 class="display-4 fw-bold text-primary">@Model.Panier.TotalFinal.ToString("C")</h1>
+
+            <form action="/Boutique/ConfirmerPaiement" method="post" class="app-form-card">
+                @Html.AntiForgeryToken()
+
+                <div class="app-actions">
+                    <label class="app-pill">
+                        <input type="radio" name="ModePaiement" value="carte" checked>
+                        Carte de crédit / débit
+                    </label>
+                    <label class="app-pill">
+                        <input type="radio" name="ModePaiement" value="interac">
+                        Virement Interac
+                    </label>
                 </div>
 
-                <form action="/Boutique/ConfirmerPaiement" method="post">
-                    @Html.AntiForgeryToken()
-                    <h5 class="mb-3 border-bottom pb-2">Sélectionnez votre mode de paiement</h5>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <input type="radio" class="btn-check" name="ModePaiement" id="carte" value="carte" autocomplete="off" checked>
-                            <label class="btn btn-outline-primary w-100 p-4 h-100 d-flex flex-column align-items-center justify-content-center" for="carte">
-                                <i class="fas fa-cc-visa fa-3x mb-2"></i>
-                                <span>Carte de crédit / débit</span>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="radio" class="btn-check" name="ModePaiement" id="interac" value="interac" autocomplete="off">
-                            <label class="btn btn-outline-primary w-100 p-4 h-100 d-flex flex-column align-items-center justify-content-center" for="interac">
-                                <i class="fas fa-exchange-alt fa-3x mb-2"></i>
-                                <span>Virement Interac</span>
-                            </label>
-                        </div>
+                <div id="formCarte" class="app-form-grid">
+                    <div class="form-group">
+                        <label>Nom sur la carte</label>
+                        <input type="text" placeholder="Ex: Jean Tremblay" required>
                     </div>
+                    <div class="form-group">
+                        <label>Numéro de carte</label>
+                        <input type="text" placeholder="XXXX XXXX XXXX XXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Expiration</label>
+                        <input type="text" placeholder="MM/AA" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CVC</label>
+                        <input type="text" placeholder="123" required>
+                    </div>
+                </div>
 
-                    <!-- Champs simulés de carte -->
-                    <div id="formCarte">
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Nom sur la carte</label>
-                            <input type="text" class="form-control" placeholder="Ex: Jean Tremblay" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Numéro de carte</label>
-                            <input type="text" class="form-control" placeholder="XXXX XXXX XXXX XXXX" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label text-muted">Expiration</label>
-                                <input type="text" class="form-control" placeholder="MM/AA" required>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label text-muted">CVC</label>
-                                <input type="text" class="form-control" placeholder="123" required>
-                            </div>
-                        </div>
-                    </div>
+                <div class="app-actions">
+                    <a href="/Boutique/Panier" class="btn btn-secondary">Retour au panier</a>
+                    <button type="submit" class="btn" id="submitBtn">
+                        <span id="btnText">Payer @Model.Panier.TotalFinal.ToString("C")</span>
+                        <span id="spinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </section>
 
-                    <div class="d-flex justify-content-between mt-5">
-                        <a href="/Boutique/Panier" class="btn btn-light"><i class="fas fa-arrow-left"></i> Retour au panier</a>
-                        <button type="submit" class="btn btn-success px-5 fw-bold" id="submitBtn">
-                            <span id="btnText">Payer @Model.Panier.TotalFinal.ToString("C")</span> <i class="fas fa-lock ms-2" id="btnIcon"></i>
-                            <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display:none;"></span>
-                        </button>
+        <aside class="app-surface-card app-progress-card">
+            <span class="app-section-eyebrow"><i class="fas fa-bag-shopping"></i> Résumé de commande</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Sous-total</strong>
+                    <span>@Model.Panier.SousTotal.ToString("C")</span>
+                </div>
+                @if (Model.Panier.EstEtudiantLaCite)
+                {
+                    <div class="app-detail-row">
+                        <strong>Rabais</strong>
+                        <span>-@Model.Panier.Rabais.ToString("C")</span>
                     </div>
-                </form>
+                }
+                <div class="app-detail-row">
+                    <strong>Taxes</strong>
+                    <span>@Model.Panier.Taxes.ToString("C")</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Total</strong>
+                    <span>@Model.Panier.TotalFinal.ToString("C")</span>
+                </div>
             </div>
-        </div>
+        </aside>
     </div>
-</div>
+</section>
 
-<script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const form = this;
-        if (form.getAttribute("data-submitting") === "true") {
-            e.preventDefault();
-            return;
-        }
-        
-        // Validation check (si des champs requis ne sont pas remplis, le navigateur bloque nativement)
-        if (!form.checkValidity()) {
-            return; // Laisse le navigateur afficher ses erreurs natives
-        }
-        
-        const btn = document.getElementById('submitBtn');
-        const text = document.getElementById('btnText');
-        const spinner = document.getElementById('spinner');
-        const icon = document.getElementById('btnIcon');
-        
-        form.setAttribute("data-submitting", "true");
-        
-        setTimeout(function() {
+@section Scripts {
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
+            const text = document.getElementById('btnText');
+            const spinner = document.getElementById('spinner');
+
             btn.disabled = true;
-            if (text) text.innerText = "Déjà payé";
-            if (spinner) spinner.style.display = "inline-block";
-            if (icon) icon.style.display = "none";
-            btn.style.filter = "grayscale(0.5)";
-        }, 0);
-    });
-
-    document.querySelectorAll('input[name="ModePaiement"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            var formCarte = document.getElementById('formCarte');
-            if (this.value === 'interac') {
-                formCarte.style.display = 'none';
-                formCarte.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
-            } else {
-                formCarte.style.display = 'block';
-                formCarte.querySelectorAll('input').forEach(i => i.setAttribute('required', 'required'));
-            }
+            text.innerText = 'Paiement en cours';
+            spinner.classList.remove('d-none');
         });
-    });
-</script>
+
+        document.querySelectorAll('input[name="ModePaiement"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const formCarte = document.getElementById('formCarte');
+                if (this.value === 'interac') {
+                    formCarte.classList.add('d-none');
+                    formCarte.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
+                } else {
+                    formCarte.classList.remove('d-none');
+                    formCarte.querySelectorAll('input').forEach(i => i.setAttribute('required', 'required'));
+                }
+            });
+        });
+    </script>
+}

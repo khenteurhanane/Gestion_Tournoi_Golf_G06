@@ -1,62 +1,108 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
 using croupe_06_TournoiGolf.Data;
 using croupe_06_TournoiGolf.Models;
+using croupe_06_TournoiGolf.Models.ViewModels;
 
 namespace croupe_06_TournoiGolf.Controllers
 {
-    /// <summary>
-    /// CONTRÔLEUR ADMINISTRATION (BACK-END SÉCURISÉ)
-    /// Réservé aux utilisateurs avec le rôle "ADMIN".
-    /// Permet de gérer les tournois, les utilisateurs, les équipes et de voir les revenus.
-    /// </summary>
-    public class AdminController(croupe_06_TournoiGolf.Data.GolfDbContext context, croupe_06_TournoiGolf.Services.MatchmakingService matchmakingService) : BaseController
+    public class AdminController(GolfDbContext context, croupe_06_TournoiGolf.Services.MatchmakingService matchmakingService) : BaseController
     {
-        private readonly croupe_06_TournoiGolf.Data.GolfDbContext _context = context;
+        private readonly GolfDbContext _context = context;
         private readonly croupe_06_TournoiGolf.Services.MatchmakingService _matchmakingService = matchmakingService;
 
-        // Vérifie que l'utilisateur est admin
         private bool EstAdmin()
         {
             string role = HttpContext.Session.GetString("UserRole") ?? "";
             return role == "ADMIN";
         }
 
-        // TABLEAU DE BORD PRINCIPAL : Affiche les chiffres clés de l'application
         public IActionResult Index()
         {
             if (!EstAdmin())
             {
-                ViewBag.Error = "Accès refusé : droits insuffisants.";
+                ViewBag.Error = "Acces refuse : droits insuffisants.";
                 return View("AccesRefuse");
             }
 
-            // Statistiques globales
-            ViewBag.NbTournois = _context.Tournois.Count();
-            ViewBag.NbTournoisOuverts = _context.Tournois.Count(t => t.InscriptionsOuvertes);
-            ViewBag.NbParticipants = _context.Participants.Count();
-            ViewBag.NbUtilisateurs = _context.Utilisateurs.Count();
-            ViewBag.NbEquipes = _context.Equipes.Count();
-            ViewBag.RevenuTotal = _context.Participants.Sum(p => (decimal?)p.MontantPaye) ?? 0;
+            var model = new AdminDashboardViewModel
+            {
+                NbTournois = _context.Tournois.Count(),
+                NbTournoisOuverts = _context.Tournois.Count(t => t.InscriptionsOuvertes),
+                NbParticipants = _context.Participants.Count(),
+                NbUtilisateurs = _context.Utilisateurs.Count(),
+                NbEquipes = _context.Equipes.Count(),
+                RevenuTotal = _context.Participants.Sum(p => (decimal?)p.MontantPaye) ?? 0
+            };
 
-            // Détecter les équipes incomplètes (GOLF-146)
-            var equipes = _context.Equipes.AsNoTracking().ToList();
-            var nbMembres = _context.Participants
+            ViewBag.NbTournois = model.NbTournois;
+            ViewBag.NbTournoisOuverts = model.NbTournoisOuverts;
+            ViewBag.RevenuTotal = model.RevenuTotal;
+
+            var tournois = _context.Tournois
                 .AsNoTracking()
-                .Where(p => p.EquipeId != null)
+                .Select(t => new { t.TournoiId, t.Nom, t.EstEnCours, t.DateTournoi })
+                .ToList();
+
+            var equipes = _context.Equipes
+                .AsNoTracking()
+                .Select(e => new { e.EquipeId, e.TournoiId, e.NbJoueursMax })
+                .ToList();
+
+            var participantsConfirmes = _context.Participants
+                .AsNoTracking()
+                .Where(p => p.StatutInscription == "CONFIRMEE" && p.EquipeId != null)
+                .Select(p => new { EquipeId = p.EquipeId!.Value, p.TournoiId })
+                .ToList();
+
+            var nbMembresParEquipe = participantsConfirmes
                 .GroupBy(p => p.EquipeId)
-                .Select(g => new { EquipeId = g.Key ?? 0, Count = g.Count() })
-                .ToDictionary(g => g.EquipeId, g => g.Count);
+                .ToDictionary(g => g.Key, g => g.Count());
 
-            int nbIncompletes = equipes.Count(e => !nbMembres.ContainsKey(e.EquipeId) || nbMembres[e.EquipeId] < e.NbJoueursMax);
-            int nbCompletes = equipes.Count(e => nbMembres.ContainsKey(e.EquipeId) && nbMembres[e.EquipeId] >= e.NbJoueursMax);
-            ViewBag.NbEquipesIncompletes = nbIncompletes;
-            ViewBag.NbEquipesCompletes = nbCompletes;
+            model.NbEquipesIncompletes = equipes.Count(e => !nbMembresParEquipe.TryGetValue(e.EquipeId, out int count) || count < e.NbJoueursMax);
+            model.NbEquipesCompletes = equipes.Count(e => nbMembresParEquipe.TryGetValue(e.EquipeId, out int count) && count >= e.NbJoueursMax);
 
-            // Inscriptions récentes
-            ViewBag.InscriptionsRecentes = _context.Participants
+            model.TournoisAvecEquipesIncompletes = equipes
+                .GroupBy(e => e.TournoiId)
+                .Select(g =>
+                {
+                    int equipesIncompletes = g.Count(e =>
+                    {
+                        nbMembresParEquipe.TryGetValue(e.EquipeId, out int count);
+                        return count > 1 && count < e.NbJoueursMax;
+                    });
+
+                    int joueursSoloDisponibles = g.Count(e =>
+                    {
+                        nbMembresParEquipe.TryGetValue(e.EquipeId, out int count);
+                        return count == 1;
+                    });
+
+                    return new AdminIncompleteTeamTournamentViewModel
+                    {
+                        TournoiId = g.Key,
+                        NomTournoi = tournois.FirstOrDefault(t => t.TournoiId == g.Key)?.Nom ?? "Tournoi inconnu",
+                        EquipesIncompletes = equipesIncompletes,
+                        JoueursSoloDisponibles = joueursSoloDisponibles
+                    };
+                })
+                .Where(t => t.DoitEtreVisible)
+                .OrderByDescending(t => t.EquipesIncompletes)
+                .ThenByDescending(t => t.JoueursSoloDisponibles)
+                .ThenBy(t => t.NomTournoi)
+                .ToList();
+
+            model.TournoiScoreActifId = tournois
+                .Where(t => t.EstEnCours)
+                .OrderBy(t => t.DateTournoi)
+                .Select(t => (int?)t.TournoiId)
+                .FirstOrDefault();
+            model.TournoiScoreActifNom = model.TournoiScoreActifId.HasValue
+                ? tournois.First(t => t.TournoiId == model.TournoiScoreActifId.Value).Nom
+                : string.Empty;
+
+            model.InscriptionsRecentes = _context.Participants
                 .AsNoTracking()
                 .Include(p => p.Tournoi)
                 .Include(p => p.Utilisateur)
@@ -64,28 +110,26 @@ namespace croupe_06_TournoiGolf.Controllers
                 .Take(5)
                 .ToList();
 
-            // Taux d'occupation des tournois actifs
-            var tStatus = _context.Tournois
+            model.TournoiStatus = _context.Tournois
                 .AsNoTracking()
                 .Where(t => t.DateTournoi >= DateTime.Today)
-                .Select(t => new TournoiStatusViewModel {
+                .Select(t => new TournoiStatusViewModel
+                {
                     TournoiId = t.TournoiId,
                     Nom = t.Nom,
                     PlacesParticipantsMax = t.PlacesParticipantsMax,
                     NbInscrits = _context.Participants.Count(p => p.TournoiId == t.TournoiId)
-                }).ToList();
-            ViewBag.TournoiStatus = tStatus;
+                })
+                .ToList();
 
-            // Prochains tournois
-            ViewBag.ProchainsTournois = _context.Tournois
+            model.ProchainsTournois = _context.Tournois
                 .AsNoTracking()
                 .Where(t => t.DateTournoi >= DateTime.Today)
                 .OrderBy(t => t.DateTournoi)
                 .Take(5)
                 .ToList();
 
-            // Liste des commanditaires (US-13)
-            ViewBag.Commanditaires = _context.Commandites
+            model.Commanditaires = _context.Commandites
                 .AsNoTracking()
                 .Include(c => c.Utilisateur)
                 .Include(c => c.Tournoi)
@@ -93,21 +137,19 @@ namespace croupe_06_TournoiGolf.Controllers
                 .Take(10)
                 .ToList();
 
-            return View();
+            return View(model);
         }
 
-        // GESTION DES UTILISATEURS : Liste tous les comptes enregistrés
         public IActionResult Utilisateurs()
         {
             if (!EstAdmin())
             {
-                ViewBag.Error = "Accès refusé : droits insuffisants.";
+                ViewBag.Error = "Acces refuse : droits insuffisants.";
                 return View("AccesRefuse");
             }
 
             var utilisateurs = _context.Utilisateurs.AsNoTracking().OrderBy(u => u.Nom).ToList();
 
-            // Compter le nombre d'inscriptions par utilisateur (Optimisé GOLF-134)
             var nbInscriptions = _context.Participants
                 .Where(p => p.UtilisateurId != null)
                 .GroupBy(p => p.UtilisateurId)
@@ -118,7 +160,6 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(utilisateurs);
         }
 
-        // GESTION DES PARTICIPANTS : Liste tous les inscrits aux différents tournois
         public IActionResult Participants()
         {
             if (!EstAdmin()) return View("AccesRefuse");
@@ -135,7 +176,6 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(participants);
         }
 
-        // Supprimer un utilisateur (admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult SupprimerUtilisateur(int id)
@@ -151,26 +191,22 @@ namespace croupe_06_TournoiGolf.Controllers
                 return RedirectToAction("Utilisateurs");
             }
 
-            // Ne pas permettre de supprimer un admin
             if (utilisateur.Role == "ADMIN")
             {
                 TempData["Error"] = "Impossible de supprimer un administrateur.";
                 return RedirectToAction("Utilisateurs");
             }
 
-            // Supprimer ses inscriptions d'abord
             var inscriptions = _context.Participants.Where(p => p.UtilisateurId == id).ToList();
             _context.Participants.RemoveRange(inscriptions);
 
             _context.Utilisateurs.Remove(utilisateur);
             _context.SaveChanges();
 
-            TempData["Success"] = "Utilisateur supprimé.";
+            TempData["Success"] = "Utilisateur supprime.";
             return RedirectToAction("Utilisateurs");
         }
-        // --- US-09 : Gestion des équipes (Admin) ---
 
-        // Liste de toutes les équipes
         public IActionResult Equipes()
         {
             if (!EstAdmin()) return View("AccesRefuse");
@@ -182,7 +218,6 @@ namespace croupe_06_TournoiGolf.Controllers
                 .OrderByDescending(e => e.CreeLe)
                 .ToList();
 
-            // Compter les membres par équipe
             var nbMembres = _context.Participants
                 .AsNoTracking()
                 .Where(p => p.EquipeId != null)
@@ -194,7 +229,6 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(equipes);
         }
 
-        // Détails d'une équipe pour l'admin
         public IActionResult DetailsEquipe(int id)
         {
             if (!EstAdmin()) return View("AccesRefuse");
@@ -217,7 +251,6 @@ namespace croupe_06_TournoiGolf.Controllers
             return View(equipe);
         }
 
-        // Modifier une équipe (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ModifierEquipe(int EquipeId, string NomEquipe, string CodeSecret)
@@ -230,13 +263,12 @@ namespace croupe_06_TournoiGolf.Controllers
                 equipe.NomEquipe = NomEquipe;
                 equipe.CodeSecret = CodeSecret.ToUpper();
                 _context.SaveChanges();
-                TempData["Success"] = "Équipe mise à jour avec succès.";
+                TempData["Success"] = "Equipe mise a jour avec succes.";
             }
 
             return RedirectToAction("DetailsEquipe", new { id = EquipeId });
         }
 
-        // Retirer un membre d'une équipe
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RetirerMembre(int participantId, int equipeId)
@@ -248,15 +280,13 @@ namespace croupe_06_TournoiGolf.Controllers
 
             if (participant != null && equipe != null && participant.EquipeId == equipeId)
             {
-                bool etaitCapitaine = (equipe.CreeParUtilisateurId == participant.UtilisateurId);
+                bool etaitCapitaine = equipe.CreeParUtilisateurId == participant.UtilisateurId;
 
-                // Retirer le membre de l'équipe
                 participant.EquipeId = null;
                 _context.SaveChanges();
 
                 if (etaitCapitaine)
                 {
-                    // Trouver le prochain membre pour devenir capitaine
                     var autresMembres = _context.Participants
                         .Where(p => p.EquipeId == equipeId)
                         .Include(p => p.Utilisateur)
@@ -270,36 +300,36 @@ namespace croupe_06_TournoiGolf.Controllers
 
                         _context.Notifications.Add(new Notification
                         {
-                            Titre = "Transfert de Capitaine (Admin)",
-                            Message = $"L'administrateur a retiré le capitaine {participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom} de l'équipe '{equipe.NomEquipe}'. Le rôle a été transféré à {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.",
+                            Titre = "Transfert de capitaine (admin)",
+                            Message = $"L'administrateur a retire le capitaine {participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom} de l'equipe '{equipe.NomEquipe}'. Le role a ete transfere a {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.",
                             DateCreation = DateTime.Now
                         });
 
-                        TempData["Success"] = $"Le membre a été retiré. Nouveau capitaine : {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.";
+                        TempData["Success"] = $"Le membre a ete retire. Nouveau capitaine : {nouveauCapitaine.Utilisateur?.Prenom} {nouveauCapitaine.Utilisateur?.Nom}.";
                     }
                     else
                     {
                         _context.Equipes.Remove(equipe);
                         _context.Notifications.Add(new Notification
                         {
-                            Titre = "Équipe Supprimée (Admin)",
-                            Message = $"L'administrateur a retiré le seul membre/capitaine ({participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom}) de l'équipe '{equipe.NomEquipe}'. L'équipe a été supprimée.",
+                            Titre = "Equipe supprimee (admin)",
+                            Message = $"L'administrateur a retire le seul membre/capitaine ({participant.Utilisateur?.Prenom} {participant.Utilisateur?.Nom}) de l'equipe '{equipe.NomEquipe}'. L'equipe a ete supprimee.",
                             DateCreation = DateTime.Now
                         });
-                        TempData["Success"] = "Le capitaine a été retiré et l'équipe a été supprimée car elle était vide.";
+                        TempData["Success"] = "Le capitaine a ete retire et l'equipe a ete supprimee car elle etait vide.";
                     }
+
                     _context.SaveChanges();
                 }
                 else
                 {
-                    TempData["Success"] = "Le membre a été retiré de l'équipe.";
+                    TempData["Success"] = "Le membre a ete retire de l'equipe.";
                 }
             }
 
             return RedirectToAction("DetailsEquipe", new { id = equipeId });
         }
 
-        // Supprimer une équipe
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult SupprimerEquipe(int id)
@@ -309,39 +339,41 @@ namespace croupe_06_TournoiGolf.Controllers
             var equipe = _context.Equipes.Find(id);
             if (equipe != null)
             {
-                // Détacher tous les participants de cette équipe
                 var membres = _context.Participants.Where(p => p.EquipeId == id).ToList();
-                foreach (var m in membres)
+                foreach (var membre in membres)
                 {
-                    m.EquipeId = null;
+                    membre.EquipeId = null;
                 }
 
                 _context.Equipes.Remove(equipe);
                 _context.SaveChanges();
-                TempData["Success"] = $"L'équipe '{equipe.NomEquipe}' a été supprimée. Les membres sont désormais inscrits en individuel.";
+                TempData["Success"] = $"L'equipe '{equipe.NomEquipe}' a ete supprimee. Les membres sont desormais inscrits en individuel.";
             }
 
             return RedirectToAction("Equipes");
         }
-        // Compléter les équipes automatiquement (Algorithme)
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CompleterEquipes(int tournoiId)
+        public IActionResult CompleterEquipes(int tournoiId, string? returnUrl = null)
         {
             if (!EstAdmin()) return View("AccesRefuse");
 
-            // On récupère l'ID admin pour savoir qui a créé l'équipe
             int adminId = HttpContext.Session.GetInt32("UserId") ?? 0;
-
             int nbJoueursPlaces = _matchmakingService.CompleterEquipes(tournoiId, adminId);
 
             if (nbJoueursPlaces > 0)
             {
-                TempData["Success"] = $"Succès : L'algorithme a placé {nbJoueursPlaces} joueur(s) dans des équipes automatiquement !";
+                TempData["Success"] = $"Succes : l'algorithme a place {nbJoueursPlaces} joueur(s) dans des equipes automatiquement.";
             }
             else
             {
-                TempData["Info"] = "Aucun joueur confirmé sans équipe n'a été trouvé pour ce tournoi.";
+                TempData["Info"] = "Aucun regroupement automatique n'etait possible pour ce tournoi.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
             }
 
             return RedirectToAction("Index");

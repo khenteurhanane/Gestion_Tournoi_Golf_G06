@@ -1,134 +1,110 @@
 @model croupe_06_TournoiGolf.Models.ViewModels.PanierViewModel
 @{
     ViewData["Title"] = "Mon Panier";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Panier";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-shopping-cart text-primary"></i> Mon Panier</h1>
-    <a href="/Boutique/Index" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i> Retour à la boutique
-    </a>
-</div>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-shopping-cart",
+        Eyebrow = "Boutique",
+        Title = "Mon panier",
+        Description = "Vérifiez vos articles, ajustez votre sélection et passez au paiement."
+    })
 
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-info text-center py-5">
-        <i class="fas fa-shopping-basket fa-3x mb-3 text-muted"></i>
-        <h3>Votre panier est vide.</h3>
-        <p>Découvrez notre sélection de matériel de golf et restauration !</p>
-        <a href="/Boutique/Index" class="btn btn-primary mt-2">Magasiner</a>
-    </div>
-}
-else
-{
-    <div class="row">
-        <!-- Liste des articles -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0 fw-bold">Articles dans votre panier (@Model.Items.Sum(i => i.Quantite))</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Article</th>
-                                    <th>Prix unitaire</th>
-                                    <th>Qté</th>
-                                    <th>Total</th>
-                                    <th class="text-end pe-4">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model.Items)
-                                {
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas @item.Article.ImageIcon fa-2x me-3 text-muted"></i>
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">@item.Article.Nom</h6>
-                                                    <small class="text-muted">@item.Article.Categorie</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>@item.Article.Prix.ToString("C")</td>
-                                        <td>
-                                            <span class="badge bg-secondary p-2">@item.Quantite</span>
-                                        </td>
-                                        <td class="fw-bold text-primary">@item.Total.ToString("C")</td>
-                                        <td class="text-end pe-4">
-                                            <form action="/Boutique/RetirerDuPanier" method="post" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@item.Article.Id" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Retirer l'article">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+    @if (!Model.Items.Any())
+    {
+        @await Html.PartialAsync("_EmptyState", new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+        {
+            Icon = "fas fa-shopping-basket",
+            Title = "Votre panier est vide",
+            Description = "Ajoutez du matériel ou de la restauration depuis la boutique pour préparer votre journée de tournoi.",
+            PrimaryLabel = "Retour à la boutique",
+            PrimaryHref = "/Boutique/Index"
+        })
+    }
+    else
+    {
+        <div class="app-grid-sidebar">
+            <section class="app-surface-card app-table-card">
+                <div class="app-table-card__header">
+                    <div>
+                        <h2>Articles sélectionnés</h2>
+                        <p class="app-muted-note">@Model.Items.Sum(i => i.Quantite) article(s) dans votre panier</p>
                     </div>
-                </div>
-                <div class="card-footer bg-white text-end py-3">
-                    <form action="/Boutique/ViderPanier" method="post" class="d-inline">
+                    <form action="/Boutique/ViderPanier" method="post">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none">
-                            <i class="fas fa-times-circle"></i> Vider le panier
-                        </button>
+                        <button type="submit" class="btn btn-secondary">Vider le panier</button>
                     </form>
                 </div>
-            </div>
-        </div>
 
-        <!-- Résumé de la commande -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 100px;">
-                <div class="card-header bg-primary text-white border-bottom-0">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-receipt"></i> Résumé de commande</h5>
+                <div class="app-table-wrap">
+                    <table class="app-data-table">
+                        <thead>
+                            <tr>
+                                <th>Article</th>
+                                <th>Prix</th>
+                                <th>Quantité</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Article.Nom</strong>
+                                        <div class="app-muted-note">@item.Article.Categorie</div>
+                                    </td>
+                                    <td>@item.Article.Prix.ToString("C")</td>
+                                    <td><span class="app-pill">@item.Quantite</span></td>
+                                    <td><strong>@item.Total.ToString("C")</strong></td>
+                                    <td>
+                                        <form action="/Boutique/RetirerDuPanier" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Article.Id" />
+                                            <button type="submit" class="btn btn-danger">Retirer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Sous-total</span>
-                        <span class="fw-bold">@Model.SousTotal.ToString("C")</span>
-                    </div>
+            </section>
 
+            <aside class="app-surface-card app-progress-card">
+                <span class="app-section-eyebrow"><i class="fas fa-receipt"></i> Résumé</span>
+                <div class="app-detail-list">
+                    <div class="app-detail-row">
+                        <strong>Sous-total</strong>
+                        <span>@Model.SousTotal.ToString("C")</span>
+                    </div>
                     @if (Model.EstEtudiantLaCite)
                     {
-                        <div class="alert alert-success mt-3 py-2 px-3 d-flex align-items-center">
-                            <i class="fas fa-user-graduate fa-2x me-3"></i>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Promo Étudiant La Cité</h6>
-                                <small>20% de rabais appliqués !</small>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between text-success mb-2">
-                            <span>Rabais (20%)</span>
-                            <span class="fw-bold">-@Model.Rabais.ToString("C")</span>
+                        <div class="app-detail-row">
+                            <strong>Rabais étudiant</strong>
+                            <span>-@Model.Rabais.ToString("C")</span>
                         </div>
                     }
-
-                    <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
-                        <span class="text-muted">Taxes (TVQ + TPS)</span>
+                    <div class="app-detail-row">
+                        <strong>Taxes</strong>
                         <span>@Model.Taxes.ToString("C")</span>
                     </div>
-
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="fs-5 fw-bold">Total Final</span>
-                        <span class="fs-4 fw-bolder text-primary">@Model.TotalFinal.ToString("C")</span>
+                    <div class="app-detail-row">
+                        <strong>Total final</strong>
+                        <span>@Model.TotalFinal.ToString("C")</span>
                     </div>
+                </div>
 
-                    <a href="/Boutique/Paiement" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
-                        Procéder au paiement <i class="fas fa-arrow-right ms-2"></i>
-                    </a>
+                <div class="app-actions">
+                    <a href="/Boutique/Paiement" class="btn">Procéder au paiement</a>
+                    <a href="/Boutique/Index" class="btn btn-secondary">Continuer mes achats</a>
                 </div>
-                <div class="card-footer bg-white text-center text-muted small py-3">
-                    <i class="fas fa-lock me-1"></i> Paiement sécurisé
-                </div>
-            </div>
+            </aside>
         </div>
-    </div>
-}
+    }
+</section>

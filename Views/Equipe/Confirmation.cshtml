@@ -1,48 +1,45 @@
 @model croupe_06_TournoiGolf.Models.Equipe
 
 @{
-    ViewData["Title"] = "Équipe créée";
+    ViewData["Title"] = "Equipe creee";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Équipe créée";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-check-circle",
+        Eyebrow = "Succès",
+        Title = "Votre équipe est prête",
+        Description = "Le code secret ci-dessous peut maintenant être partagé avec les autres joueurs du groupe."
+    })
 
-        <div class="card">
-            <h2>Équipe créée avec succès !</h2>
-            <p class="sub">Partage le code secret avec tes coéquipiers.</p>
+    <section class="app-highlight-panel">
+        <h2>@Model.NomEquipe</h2>
+        <p>Utilisez ce code pour faire rejoindre vos coéquipiers rapidement et sans ambiguïté.</p>
 
-            <div class="form-group">
-                <label>Nom de l'équipe</label>
-                <p><strong>@Model.NomEquipe</strong></p>
+        <div class="app-highlight-panel__code">
+            <div>
+                <span class="app-highlight-panel__code-label">Code secret</span>
+                <div class="app-highlight-panel__code-value" id="codeEquipe">@Model.CodeSecret</div>
             </div>
-
-            <div class="form-group mb-3">
-                <label class="fw-bold">Code secret de l'équipe :</label>
-                <div class="input-group">
-                    <input type="text" id="codeEquipe" value="@Model.CodeSecret" class="form-control text-center fw-bold" readonly style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent);" />
-                    <button class="btn btn-primary" onclick="copierCode()">
-                        Copier le code
-                    </button>
-                </div>
-                <small class="text-muted">Partage ce code avec tes coéquipiers pour qu'ils rejoignent l'équipe.</small>
-            </div>
-
-            <script>
-            function copierCode() {
-                var code = document.getElementById("codeEquipe");
-                code.select();
-                code.setSelectionRange(0, 99999);
-
-                navigator.clipboard.writeText(code.value);
-
-                alert("Code copié !");
-            }
-            </script>
-
-            <div class="footer">
-                <a href="/Inscription/Index">Retour à l'accueil</a>
-            </div>
+            <button class="btn" type="button" onclick="copierCode()">Copier le code</button>
         </div>
 
-    </div>
-</div>
+        <div class="app-actions mt-4">
+            <a href="/Equipe/Index" class="btn">Voir mes équipes</a>
+            <a href="/Inscription/Index" class="btn btn-secondary">Retour à l'inscription</a>
+        </div>
+    </section>
+</section>
+
+@section Scripts {
+    <script>
+        function copierCode() {
+            const code = document.getElementById('codeEquipe');
+            if (!code) return;
+            navigator.clipboard.writeText(code.innerText.trim());
+        }
+    </script>
+}

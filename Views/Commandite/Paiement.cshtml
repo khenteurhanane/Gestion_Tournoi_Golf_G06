@@ -1,24 +1,22 @@
 @model croupe_06_TournoiGolf.Models.Commandite
 @{
-    ViewData["Title"] = "Paiement Sécurisé";
+    ViewData["Title"] = "Paiement securise";
 }
 
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <div class="premium-payment-wrapper">
-    <!-- Fond décoratif -->
     <div class="bg-blur-circle circle-1"></div>
     <div class="bg-blur-circle circle-2"></div>
 
     <div class="glass-payment-card animate__animated animate__fadeIn">
         <div class="payment-header">
-            <div class="status-badge">Transaction Sécurisée</div>
+            <div class="status-badge">Transaction s&eacute;curis&eacute;e</div>
             <h1 class="header-title">Finalisez votre engagement</h1>
             <p class="header-subtitle">Partenariat pour le <span>@Model.Tournoi.Nom</span></p>
         </div>
 
         <div class="payment-main-grid">
-            <!-- Section Gauche : Récapitulatif -->
             <div class="summary-section">
                 <div class="summary-item">
                     <span class="label">Forfait choisi</span>
@@ -26,14 +24,13 @@
                 </div>
                 <div class="summary-divider"></div>
                 <div class="total-container">
-                    <div class="total-label">Total à régler</div>
+                    <div class="total-label">Total &agrave; r&eacute;gler</div>
                     <div class="total-price">@Model.Montant.ToString("C")</div>
                 </div>
-                
-                <!-- Visualisation de la carte dynamique -->
+
                 <div class="virtual-card-preview" id="cardPreview">
                     <div class="card-chip"></div>
-                    <div class="card-number-display" id="disp-card-number">•••• •••• •••• ••••</div>
+                    <div class="card-number-display" id="disp-card-number">0000 0000 0000 0000</div>
                     <div class="card-bottom">
                         <div class="card-holder">
                             <div class="mini-label">Titulaire</div>
@@ -47,7 +44,6 @@
                 </div>
             </div>
 
-            <!-- Section Droite : Formulaire -->
             <div class="form-section">
                 <div class="method-selector">
                     <button type="button" class="method-btn active" id="btn-card" onclick="toggleMethod('card')">
@@ -61,18 +57,18 @@
                 <form asp-action="SimulerPaiement" method="post" id="paymentForm" class="mt-4">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="commanditeId" value="@Model.CommanditeId" />
-                    <input type="hidden" name="methodePaiement" id="methodePaiement" value="Carte de Crédit/Débit" />
+                    <input type="hidden" name="methodePaiement" id="methodePaiement" value="Carte de Credit/Debit" />
 
                     <div id="cardFields">
                         <div class="floating-group">
-                            <input type="text" id="cardName" class="premium-input" placeholder=" " 
+                            <input type="text" id="cardName" class="premium-input" placeholder=" "
                                    value="@(string.IsNullOrEmpty(Model.Utilisateur.NomEntreprise) ? $"{Model.Utilisateur.Prenom} {Model.Utilisateur.Nom}" : Model.Utilisateur.NomEntreprise)" required />
                             <label>Nom complet sur la carte</label>
                         </div>
 
                         <div class="floating-group">
                             <input type="text" id="cardNumber" class="premium-input" placeholder=" " maxlength="19" required />
-                            <label>Numéro de carte</label>
+                            <label>Num&eacute;ro de carte</label>
                             <i class="fas fa-credit-card input-icon"></i>
                         </div>
 
@@ -88,58 +84,58 @@
                         </div>
                     </div>
 
-                    <div id="interacFields" style="display:none;">
+                    <div id="interacFields" class="d-none">
                         <div class="interac-box">
                             <div class="interac-icon"><i class="fas fa-info-circle"></i></div>
                             <div class="interac-content">
-                                <p>Effectuez votre virement à : <strong>virement@golfg06.ca</strong></p>
+                                <p>Effectuez votre virement &agrave; : <strong>virement@golfg06.ca</strong></p>
                                 <p>Question : <strong>Commandite #@Model.CommanditeId</strong></p>
-                                <p>Réponse : <strong>Golf2024</strong></p>
+                                <p>R&eacute;ponse : <strong>Golf2024</strong></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="loader-overlay" id="paymentLoader" style="display:none;">
+                    <div class="loader-overlay d-none" id="paymentLoader">
                         <div class="spinner"></div>
-                        <p>Sécurisation en cours...</p>
+                        <p>S&eacute;curisation en cours...</p>
                     </div>
 
                     <button type="submit" class="premium-submit-btn" id="submitBtn">
                         <span id="btnText">Confirmer le paiement</span>
                         <i class="fas fa-lock" id="btnIcon"></i>
-                        <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display:none;"></span>
+                        <span id="spinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
                     </button>
                 </form>
 
                 <script>
-                    document.querySelector('form').addEventListener('submit', function(e) {
+                    document.querySelector('form').addEventListener('submit', function (e) {
                         const form = this;
-                        if (form.getAttribute("data-submitting") === "true") {
+                        if (form.getAttribute('data-submitting') === 'true') {
                             e.preventDefault();
                             return;
                         }
-                        
+
                         const btn = document.getElementById('submitBtn');
                         const text = document.getElementById('btnText');
                         const spinner = document.getElementById('spinner');
                         const icon = document.getElementById('btnIcon');
-                        
-                        form.setAttribute("data-submitting", "true");
-                        
-                        setTimeout(function() {
+
+                        form.setAttribute('data-submitting', 'true');
+
+                        setTimeout(function () {
                             btn.disabled = true;
-                            if (text) text.innerText = "Déjà payé";
-                            if (spinner) spinner.style.display = "inline-block";
-                            if (icon) icon.style.display = "none";
-                            btn.style.filter = "grayscale(0.5)";
+                            if (text) text.innerText = 'Paiement en cours';
+                            if (spinner) spinner.classList.remove('d-none');
+                            if (icon) icon.classList.add('d-none');
+                            btn.style.filter = 'grayscale(0.5)';
                         }, 0);
                     });
                 </script>
             </div>
         </div>
-        
+
         <div class="payment-footer">
-            <p><i class="fas fa-shield-alt"></i> Cryptage SSL 256 bits · PCI-DSS Compliant</p>
+            <p><i class="fas fa-shield-alt"></i> Cryptage SSL 256 bits | PCI-DSS compliant</p>
             <a asp-action="Index">Annuler la transaction</a>
         </div>
     </div>
@@ -147,29 +143,28 @@
 
 @section Scripts {
     <script>
-        // Synchronisation carte virtuelle
         const cardNameInput = document.getElementById('cardName');
         const cardNumberInput = document.getElementById('cardNumber');
         const cardExpiryInput = document.getElementById('cardExpiry');
-        
+
         cardNameInput.addEventListener('input', (e) => {
-            document.getElementById('disp-card-name').textContent = e.target.value.toUpperCase() || "VALUED SPONSOR";
+            document.getElementById('disp-card-name').textContent = e.target.value.toUpperCase() || 'VALUED SPONSOR';
         });
 
         cardNumberInput.addEventListener('input', (e) => {
             let val = e.target.value.replace(/\D/g, '');
-            let formatted = val.match(/.{1,4}/g)?.join(' ') || "";
+            let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
             if (formatted.length > 19) formatted = formatted.substring(0, 19);
             e.target.value = formatted;
-            document.getElementById('disp-card-number').textContent = formatted || "•••• •••• •••• ••••";
+            document.getElementById('disp-card-number').textContent = formatted || '0000 0000 0000 0000';
         });
 
         cardExpiryInput.addEventListener('input', (e) => {
             let val = e.target.value.replace(/\D/g, '');
             if (val.length > 4) val = val.substring(0, 4);
-            if (val.length > 2) val = val.substring(0,2) + '/' + val.substring(2,4);
+            if (val.length > 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
             e.target.value = val;
-            document.getElementById('disp-card-expiry').textContent = val || "MM/AA";
+            document.getElementById('disp-card-expiry').textContent = val || 'MM/AA';
         });
 
         function toggleMethod(m) {
@@ -180,25 +175,25 @@
             const methodePaiement = document.getElementById('methodePaiement');
 
             if (m === 'card') {
-                cardFields.style.display = 'block';
-                interacFields.style.display = 'none';
+                cardFields.classList.remove('d-none');
+                interacFields.classList.add('d-none');
                 btnCard.classList.add('active');
                 btnInterac.classList.remove('active');
-                methodePaiement.value = "Carte de Crédit/Débit";
+                methodePaiement.value = 'Carte de Credit/Debit';
             } else {
-                cardFields.style.display = 'none';
-                interacFields.style.display = 'block';
+                cardFields.classList.add('d-none');
+                interacFields.classList.remove('d-none');
                 btnCard.classList.remove('active');
                 btnInterac.classList.add('active');
-                methodePaiement.value = "Virement Interac";
+                methodePaiement.value = 'Virement Interac';
             }
         }
 
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        document.getElementById('paymentForm').addEventListener('submit', function (e) {
             document.getElementById('submitBtn').style.opacity = '0.5';
             document.getElementById('submitBtn').disabled = true;
-            document.getElementById('paymentLoader').style.display = 'flex';
-            
+            document.getElementById('paymentLoader').classList.remove('d-none');
+
             const form = this;
             setTimeout(() => { form.submit(); }, 2000);
             e.preventDefault();

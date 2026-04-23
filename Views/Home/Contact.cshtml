@@ -1,69 +1,86 @@
 @{
     ViewData["Title"] = "Contactez-nous";
+    ViewData["UsePublicShell"] = true;
+    var hero = new croupe_06_TournoiGolf.Models.ViewModels.PublicPageHeroViewModel
+    {
+        EyebrowIcon = "fas fa-envelope-open-text",
+        EyebrowText = "Contact",
+        Title = "Contactez-nous",
+        Description = "Vous avez une question sur le tournoi, les inscriptions, les equipes ou les commandites ? Notre equipe peut vous orienter rapidement."
+    };
+    var addressCard = new croupe_06_TournoiGolf.Models.ViewModels.PublicInfoCardViewModel
+    {
+        Icon = "fas fa-location-dot",
+        Title = "Adresse",
+        Lines = ["La Cite collegiale", "801, promenade de l'Aviation", "Ottawa, ON K1K 4R3"]
+    };
+    var phoneCard = new croupe_06_TournoiGolf.Models.ViewModels.PublicInfoCardViewModel
+    {
+        Icon = "fas fa-phone",
+        Title = "Telephone",
+        Lines = ["Bureau principal : (613) 742-2483", "Lundi au vendredi : 8h a 17h"]
+    };
+    var mailCard = new croupe_06_TournoiGolf.Models.ViewModels.PublicInfoCardViewModel
+    {
+        Icon = "fas fa-at",
+        Title = "Courriel",
+        Lines = ["Tournoi : tournoi@lacite.ca", "Support : support@lacite.ca"]
+    };
 }
 
-<h1>Contactez-nous</h1>
-<p class="sub">Vous avez une question sur le tournoi de golf? N'hésitez pas à nous joindre.</p>
+<div class="public-page">
+    <partial name="_PublicPageHero" model="hero" />
 
-<!-- Informations de contact -->
-<div class="grid grid-3 mt-3">
-    <div class="card">
-        <h3>Adresse</h3>
-        <p>La Cité collégiale</p>
-        <p>801, promenade de l'Aviation</p>
-        <p>Ottawa, ON K1K 4R3</p>
-    </div>
+    <section class="info-grid">
+        <partial name="_PublicInfoCard" model="addressCard" />
+        <partial name="_PublicInfoCard" model="phoneCard" />
+        <partial name="_PublicInfoCard" model="mailCard" />
+    </section>
 
-    <div class="card">
-        <h3>Téléphone</h3>
-        <p>Bureau principal : <strong>(613) 742-2483</strong></p>
-        <p>Lundi au vendredi : 8h à 17h</p>
-    </div>
+    <section class="public-section-card auth-card">
+        <div class="auth-card__header">
+            <h2 class="auth-card__title">Envoyer un message</h2>
+            <p class="auth-card__text">Ce formulaire de contact simule l'envoi d'un message et restera harmonise avec le reste des ecrans publics.</p>
+        </div>
 
-    <div class="card">
-        <h3>Courriel</h3>
-        <p>Tournoi : <strong>tournoi@lacite.ca</strong></p>
-        <p>Support : <strong>support@lacite.ca</strong></p>
-    </div>
-</div>
+        <form id="formContact" class="form-stack">
+            <div class="form-group">
+                <label for="contactNom">Votre nom</label>
+                <input type="text" id="contactNom" placeholder="Prenom et nom" required />
+            </div>
+            <div class="form-group">
+                <label for="contactEmail">Votre courriel</label>
+                <input type="email" id="contactEmail" placeholder="exemple@email.com" required />
+            </div>
+            <div class="form-group">
+                <label for="contactSujet">Sujet</label>
+                <select id="contactSujet">
+                    <option value="question">Question generale</option>
+                    <option value="inscription">Probleme d'inscription</option>
+                    <option value="equipe">Question sur les equipes</option>
+                    <option value="commandite">Devenir commanditaire</option>
+                    <option value="autre">Autre</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="contactMessage">Message</label>
+                <textarea id="contactMessage" rows="5" placeholder="Ecrivez votre message ici..." required></textarea>
+            </div>
+            <div class="auth-actions">
+                <button class="btn" type="submit">Envoyer le message</button>
+            </div>
+        </form>
 
-<!-- Formulaire de contact -->
-<div class="card mt-3">
-    <h3>Envoyer un message</h3>
-    <form id="formContact">
-        <div class="form-group">
-            <label>Votre nom</label>
-            <input type="text" id="contactNom" placeholder="Prénom et nom" required />
+        <div id="contactSuccess" class="surface-alert surface-alert--success d-none">
+            Votre message a ete envoye avec succes. Nous vous repondrons dans les plus brefs delais.
         </div>
-        <div class="form-group">
-            <label>Votre courriel</label>
-            <input type="email" id="contactEmail" placeholder="exemple@email.com" required />
-        </div>
-        <div class="form-group">
-            <label>Sujet</label>
-            <select id="contactSujet">
-                <option value="question">Question générale</option>
-                <option value="inscription">Problème d'inscription</option>
-                <option value="equipe">Question sur les équipes</option>
-                <option value="commandite">Devenir commanditaire</option>
-                <option value="autre">Autre</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Message</label>
-            <textarea id="contactMessage" rows="5" placeholder="Écrivez votre message ici..." required></textarea>
-        </div>
-        <button class="btn" type="submit">Envoyer le message</button>
-    </form>
-    <div id="contactSuccess" class="success" style="display:none;">
-        Votre message a été envoyé avec succès! Nous vous répondrons dans les plus brefs délais.
-    </div>
+    </section>
 </div>
 
 <script>
     document.getElementById('formContact').addEventListener('submit', function (e) {
         e.preventDefault();
-        this.style.display = 'none';
-        document.getElementById('contactSuccess').style.display = 'block';
+        this.classList.add('d-none');
+        document.getElementById('contactSuccess').classList.remove('d-none');
     });
 </script>

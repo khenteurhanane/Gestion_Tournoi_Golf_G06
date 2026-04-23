@@ -1,47 +1,64 @@
 @model List<croupe_06_TournoiGolf.Models.Equipe>
+
 @{
-    ViewData["Title"] = "Mes Équipes";
+    ViewData["Title"] = "Mes equipes";
+    ViewData["HideTopbarPageInfo"] = true;
+    var header = new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-users",
+        Eyebrow = "Espace equipe",
+        Title = "Mes equipes",
+        Description = "Retrouvez ici les equipes que vous avez creees ou rejointes, ainsi que leurs codes et leur tournoi de rattachement."
+    };
+    var emptyState = new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+    {
+        Icon = "fas fa-user-group",
+        Title = "Aucune equipe pour le moment",
+        Description = "Vous n'avez pas encore cree ou rejoint d'equipe. Commencez par choisir un tournoi puis constituez votre groupe.",
+        PrimaryLabel = "Voir les tournois",
+        PrimaryHref = "/Tournoi/Index"
+    };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-users"></i> Mes Équipes</h1>
-    <a href="/Tournoi/Index" class="btn btn-primary">+ Créer une nouvelle équipe</a>
-</div>
+<div class="app-page">
+    <partial name="_AppSectionHeader" model="header" />
 
-@if (Model.Count == 0)
-{
-    <div class="card text-center p-5">
-        <i class="fas fa-user-friends fa-3x mb-3" style="color:var(--muted);"></i>
-        <h3>Aucune équipe trouvée</h3>
-        <p>Vous n'avez pas encore créé ou rejoint d'équipe.</p>
-        <a href="/Tournoi/Index" class="btn">Voir les tournois pour créer une équipe</a>
+    <div class="app-toolbar">
+        <div class="inline-note">
+            <i class="fas fa-layer-group"></i>
+            <span>@Model.Count equipe(s) active(s)</span>
+        </div>
+        <div class="app-toolbar__actions">
+            <a href="/Tournoi/Index" class="btn">Trouver un tournoi</a>
+        </div>
     </div>
-}
-else
-{
-    <div class="row">
-        @foreach (var equipe in Model)
-        {
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 tournoi-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h3 class="card-title h5 mb-0">@equipe.NomEquipe</h3>
-                            <span class="badge badge-ouvert">@equipe.CodeSecret</span>
-                        </div>
-                        <p class="text-muted small mb-3">
-                            <i class="fas fa-golf-ball"></i> @equipe.Tournoi?.Nom
-                        </p>
-                        <hr />
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="small font-weight-bold">
-                                <i class="fas fa-calendar-alt"></i> @equipe.CreeLe.ToShortDateString()
-                            </span>
-                            <a href="/Equipe/Gestion/@equipe.EquipeId" class="btn btn-sm">Gérer</a>
-                        </div>
+
+    @if (Model.Count == 0)
+    {
+        <partial name="_EmptyState" model="emptyState" />
+    }
+    else
+    {
+        <section class="team-grid">
+            @foreach (var equipe in Model)
+            {
+                <article class="app-section-card team-card">
+                    <div class="team-card__top">
+                        <h2 class="team-card__title">@equipe.NomEquipe</h2>
+                        <span class="team-card__code">@equipe.CodeSecret</span>
                     </div>
-                </div>
-            </div>
-        }
-    </div>
-}
+
+                    <div class="team-card__meta">
+                        <span><i class="fas fa-golf-ball"></i> @(equipe.Tournoi?.Nom ?? "Tournoi non disponible")</span>
+                        <span><i class="fas fa-calendar-day"></i> Creee le @equipe.CreeLe.ToString("dd MMM yyyy")</span>
+                    </div>
+
+                    <div class="team-card__actions">
+                        <span class="inline-note"><i class="fas fa-user-group"></i> Code partageable avec vos coequipiers</span>
+                        <a href="/Equipe/Gestion/@equipe.EquipeId" class="btn btn-secondary btn-sm">Gerer</a>
+                    </div>
+                </article>
+            }
+        </section>
+    }
+</div>

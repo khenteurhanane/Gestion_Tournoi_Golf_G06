@@ -1,69 +1,79 @@
 @{
-    ViewData["Title"] = "Rejoindre une équipe";
+    ViewData["Title"] = "Rejoindre une equipe";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Rejoindre une équipe";
     var participantId = ViewBag.ParticipantId;
 }
 
-<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
-    <div class="col-md-10 col-lg-8">
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-users",
+        Eyebrow = "Code d'accès",
+        Title = "Rejoindre une équipe",
+        Description = "Entrez le code secret partagé par votre capitaine pour rejoindre le bon groupe."
+    })
 
-        <div class="glass-container animate-fade-in">
-            <!-- Header Premium -->
-            <div class="premium-header">
-                <div class="icon-pulse">
-                    <i class="fas fa-users"></i>
+    <div class="app-grid-sidebar">
+        <section class="app-surface-card app-form-card">
+            <form action="/Equipe/Rejoindre" method="post" id="formRejoindre" class="app-form-card">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="participantId" value="@participantId" />
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                <div class="form-group">
+                    <label>Code secret de l'équipe</label>
+                    <input name="codeSecret"
+                           type="text"
+                           placeholder="ABC123"
+                           required
+                           maxlength="6"
+                           autocomplete="off"
+                           class="text-uppercase"
+                           oninput="this.value = this.value.toUpperCase(); validateCode(this)" />
+                    <p class="app-field-hint"><span id="charCount">0/6</span> caractères alphanumériques.</p>
                 </div>
-                <h2>REJOINDRE UNE ÉQUIPE</h2>
-                <div class="header-divider"></div>
-                <p>Entrez le code secret pour rejoindre vos coéquipiers.</p>
+
+                <div class="app-actions">
+                    <button class="btn" type="submit">Rejoindre maintenant</button>
+                    <a href="/Auth/MesInscriptions" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </section>
+
+        <aside class="app-surface-card app-progress-card">
+            <span class="app-section-eyebrow"><i class="fas fa-circle-info"></i> Avant de continuer</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Demandez le code</strong>
+                    <span>Le capitaine de l'équipe doit vous le transmettre.</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Vérifiez le tournoi</strong>
+                    <span>Le code ne fonctionne que pour l'équipe liée à votre inscription.</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>En cas d'erreur</strong>
+                    <span>Revenez à vos inscriptions et reprenez le flux.</span>
+                </div>
             </div>
-
-            <div class="card-body p-5">
-                <form action="/Equipe/Rejoindre" method="post" id="formRejoindre">
-                    <input type="hidden" name="participantId" value="@participantId" />
-
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="error-toast animate-slide-up">
-                            <i class="fas fa-exclamation-triangle"></i> @ViewBag.Error
-                        </div>
-                    }
-
-                    <div class="form-group text-center">
-                        <label style="font-size: 1rem; color: var(--accent); margin-bottom: 20px; display: block; font-weight: 700; letter-spacing: 2px;">CODE SECRET DE L'ÉQUIPE</label>
-                        
-                        <div style="position: relative; max-width: 380px; margin: 0 auto;" class="input-focus-effect">
-                            <input name="codeSecret" type="text" placeholder="••••••" required maxlength="6"
-                                   autocomplete="off"
-                                   style="text-transform: uppercase; font-family: 'Outfit', 'Courier New', Courier, monospace; font-weight: 800; letter-spacing: 15px; text-align: center; font-size: 2.8rem; padding: 25px; border: 3px solid rgba(45, 106, 46, 0.3); border-radius: 20px; background: rgba(255,255,255,0.8); box-shadow: 0 10px 40px rgba(0,0,0,0.08); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); outline: none; width: 100%;"
-                                   oninput="this.value = this.value.toUpperCase(); validateCode(this)"
-                                   onfocus="this.parentElement.classList.add('active')"
-                                   onblur="this.parentElement.classList.remove('active')" />
-                            
-                            <div class="input-indicator" id="charCount">0/6</div>
-                        </div>
-                        
-                        <p style="margin-top: 15px; color: #666; font-size: 0.9rem; font-style: italic;">
-                            6 caractères alphanumériques
-                        </p>
-                    </div>
-
-                    <div style="margin-top: 40px; display: flex; flex-direction: column; gap: 15px;">
-                        <button class="btn btn-premium" type="submit">
-                            <i class="fas fa-arrow-right"></i> REJOINDRE MAINTENANT
-                        </button>
-                        <a href="/Auth/MesInscriptions" class="btn btn-outline">
-                            <i class="fas fa-times"></i> ANNULER
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
+        </aside>
     </div>
-</div>
+</section>
 
-<script>
-    function validateCode(input) {
-        document.getElementById('charCount').innerText = input.value.length + '/6';
-    }
-</script>
+@section Scripts {
+    <script>
+        function validateCode(input) {
+            document.getElementById('charCount').innerText = input.value.length + '/6';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.querySelector('input[name="codeSecret"]');
+            if (input) validateCode(input);
+        });
+    </script>
+}

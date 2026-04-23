@@ -1,192 +1,132 @@
 @{
     ViewData["Title"] = "Saisie des scores";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Saisie des scores";
     var tournoi = (croupe_06_TournoiGolf.Models.Tournoi)ViewBag.Tournoi;
     var equipes = ViewBag.Equipes as List<croupe_06_TournoiGolf.Models.Equipe>;
     var scores = ViewBag.Scores as List<croupe_06_TournoiGolf.Models.ScoreTrou>;
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold">Saisie des scores</h1>
-            <p class="text-muted mb-0">@tournoi.Nom — @tournoi.Lieu</p>
-        </div>
-        <div>
-            <a href="/Score/Tableau/@tournoi.TournoiId" class="btn btn-outline-success me-2" target="_blank">
-                <i class="fas fa-eye me-1"></i> Voir le classement
-            </a>
-            <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Retour
-            </a>
-        </div>
-    </div>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-pencil-alt",
+        Eyebrow = "Scoring",
+        Title = "Saisie des scores",
+        Description = $"{tournoi.Nom} - {tournoi.Lieu}"
+    })
 
-    <!-- Message de confirmation -->
     <div id="message-confirmation" class="alert alert-success d-none" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
         <span id="texte-confirmation"></span>
     </div>
     <div id="message-erreur" class="alert alert-danger d-none" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>
         <span id="texte-erreur"></span>
     </div>
 
     @if (equipes == null || !equipes.Any())
     {
-        <div class="alert alert-warning">
-            Aucune équipe inscrite pour ce tournoi.
-        </div>
+        @await Html.PartialAsync("_EmptyState", new croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+        {
+            Icon = "fas fa-user-slash",
+            Title = "Aucune equipe inscrite",
+            Description = "Le tournoi ne contient encore aucune equipe active.",
+            PrimaryLabel = "Retour au tournoi",
+            PrimaryHref = $"/Tournoi/Details/{tournoi.TournoiId}"
+        })
     }
     else
     {
-        <!-- Formulaire de saisie -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-pencil-alt me-2"></i> Saisir un score</h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Équipe</label>
-                        <select id="select-equipe" class="form-select">
-                            @foreach (var eq in equipes)
-                            {
-                                <option value="@eq.EquipeId">@eq.NomEquipe</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Trou</label>
-                        <select id="select-trou" class="form-select">
-                            @for (int t = 1; t <= 18; t++)
-                            {
-                                <option value="@t">Trou @t</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Nombre de coups</label>
-                        <input type="number" id="input-coups" class="form-control" min="1" max="20" value="4" />
-                    </div>
+        <section class="app-surface-card app-form-card">
+            <div class="app-actions app-actions--spread">
+                <div>
+                    <span class="app-section-eyebrow"><i class="fas fa-flag"></i> Enregistrer un score</span>
+                    <p class="app-muted-note">Saisissez les coups trou par trou puis ouvrez le classement en direct si necessaire.</p>
                 </div>
-                <div class="mt-3">
-                    <button id="btn-saisir" class="btn btn-success px-4" onclick="saisirScore()">
-                        <i class="fas fa-save me-2"></i> Enregistrer le score
-                    </button>
+                <div class="app-actions">
+                    <a href="/Score/Tableau/@tournoi.TournoiId" class="btn btn-secondary" target="_blank">Voir le classement</a>
+                    <a href="/Tournoi/Details/@tournoi.TournoiId" class="btn btn-secondary">Retour</a>
                 </div>
             </div>
-        </div>
 
-        <!-- Tableau récapitulatif des scores saisis -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-table me-2"></i> Scores saisis</h5>
+            <form id="score-entry-form" action="/Score/SaisirScore" method="post" class="app-form-card">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="tournoiId" value="@tournoi.TournoiId" />
+
+                <div class="app-form-grid">
+                    <div class="form-group">
+                        <label for="select-equipe">Equipe</label>
+                        <select id="select-equipe" name="equipeId">
+                            @foreach (var equipe in equipes)
+                            {
+                                <option value="@equipe.EquipeId">@equipe.NomEquipe</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="select-trou">Trou</label>
+                        <select id="select-trou" name="numeroTrou">
+                            @for (int trou = 1; trou <= 18; trou++)
+                            {
+                                <option value="@trou">Trou @trou</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-coups">Nombre de coups</label>
+                        <input type="number" id="input-coups" name="nbCoups" min="1" max="20" value="4" />
+                    </div>
+                </div>
+
+                <div class="app-actions">
+                    <button id="btn-saisir" class="btn" type="submit">Enregistrer le score</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="app-surface-card app-table-card">
+            <div class="app-table-card__header">
+                <div>
+                    <h2>Recapitulatif des scores</h2>
+                    <p class="app-muted-note">Tableau mis a jour au fur et a mesure des saisies.</p>
+                </div>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered mb-0" id="tableau-scores">
-                        <thead class="table-secondary">
-                            <tr>
-                                <th>Équipe</th>
-                                @for (int t = 1; t <= 18; t++)
+
+            <div class="app-table-wrap">
+                <table class="app-data-table" id="tableau-scores">
+                    <thead>
+                        <tr>
+                            <th>Equipe</th>
+                            @for (int trou = 1; trou <= 18; trou++)
+                            {
+                                <th>T@trou</th>
+                            }
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var equipe in equipes)
+                        {
+                            <tr id="ligne-equipe-@equipe.EquipeId">
+                                <td><strong>@equipe.NomEquipe</strong></td>
+                                @for (int trou = 1; trou <= 18; trou++)
                                 {
-                                    <th class="text-center" style="min-width: 50px;">T@t</th>
-                                }
-                                <th class="text-center fw-bold">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var eq in equipes)
-                            {
-                                <tr id="ligne-equipe-@eq.EquipeId">
-                                    <td class="fw-bold">@eq.NomEquipe</td>
-                                    @for (int t = 1; t <= 18; t++)
-                                    {
-                                        var score = scores?.FirstOrDefault(s => s.EquipeId == eq.EquipeId && s.NumeroTrou == t);
-                                        <td class="text-center" id="cell-@eq.EquipeId-@t">
-                                            @if (score != null)
-                                            {
-                                                <span>@score.NbCoups</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">—</span>
-                                            }
-                                        </td>
-                                    }
-                                    <td class="text-center fw-bold" id="total-@eq.EquipeId">
-                                        @(scores?.Where(s => s.EquipeId == eq.EquipeId).Sum(s => s.NbCoups) is int total && total > 0 ? total.ToString() : "—")
+                                    var score = scores?.FirstOrDefault(s => s.EquipeId == equipe.EquipeId && s.NumeroTrou == trou);
+                                    <td id="cell-@equipe.EquipeId-@trou">
+                                        @(score != null ? score.NbCoups.ToString() : "-")
                                     </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                                }
+                                <td id="total-@equipe.EquipeId">
+                                    @(scores?.Where(s => s.EquipeId == equipe.EquipeId).Sum(s => s.NbCoups) is int total && total > 0 ? total.ToString() : "-")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </section>
     }
-</div>
-
-<!-- Données pour le JS -->
-<input type="hidden" id="tournoi-id" value="@tournoi.TournoiId" />
+</section>
 
 @section Scripts {
-    <script>
-        // Envoie le score au serveur via fetch
-        function saisirScore() {
-            var equipeId = document.getElementById('select-equipe').value;
-            var trou = document.getElementById('select-trou').value;
-            var coups = document.getElementById('input-coups').value;
-            var tournoiId = document.getElementById('tournoi-id').value;
-
-            if (!coups || coups < 1 || coups > 20) {
-                afficherErreur("Le nombre de coups doit être entre 1 et 20.");
-                return;
-            }
-
-            var btn = document.getElementById('btn-saisir');
-            btn.disabled = true;
-
-            fetch('/Score/SaisirScore', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? ''
-                },
-                body: 'tournoiId=' + tournoiId + '&equipeId=' + equipeId + '&numeroTrou=' + trou + '&nbCoups=' + coups
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.succes) {
-                    // Mettre à jour la cellule dans le tableau
-                    var cellule = document.getElementById('cell-' + equipeId + '-' + trou);
-                    if (cellule) cellule.innerHTML = '<span>' + coups + '</span>';
-
-                    // Recalculer le total affiché (approximatif côté client)
-                    afficherConfirmation("Score enregistré : Trou " + trou + " — " + coups + " coups.");
-                } else {
-                    afficherErreur(data.message ?? "Erreur lors de l'enregistrement.");
-                }
-                btn.disabled = false;
-            })
-            .catch(function() {
-                afficherErreur("Erreur de connexion.");
-                btn.disabled = false;
-            });
-        }
-
-        function afficherConfirmation(texte) {
-            var el = document.getElementById('message-confirmation');
-            document.getElementById('texte-confirmation').textContent = texte;
-            el.classList.remove('d-none');
-            setTimeout(function() { el.classList.add('d-none'); }, 3000);
-        }
-
-        function afficherErreur(texte) {
-            var el = document.getElementById('message-erreur');
-            document.getElementById('texte-erreur').textContent = texte;
-            el.classList.remove('d-none');
-            setTimeout(function() { el.classList.add('d-none'); }, 4000);
-        }
-    </script>
+    <script src="~/js/score-entry.js"></script>
 }

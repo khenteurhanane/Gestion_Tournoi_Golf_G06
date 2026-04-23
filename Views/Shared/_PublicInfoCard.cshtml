@@ -1,0 +1,10 @@
+@model croupe_06_TournoiGolf.Models.ViewModels.PublicInfoCardViewModel
+
+<article class="public-section-card info-card">
+    <span class="info-card__icon"><i class="@Model.Icon"></i></span>
+    <h2 class="info-card__title">@Model.Title</h2>
+    @foreach (var line in Model.Lines)
+    {
+        <p>@line</p>
+    }
+</article>

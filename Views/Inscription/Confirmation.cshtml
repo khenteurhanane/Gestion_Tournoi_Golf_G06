@@ -1,104 +1,87 @@
 @{
-var participantIdBillet = ViewBag.ParticipantId?.ToString();
-if (string.IsNullOrWhiteSpace(participantIdBillet))
-{
-participantIdBillet = Context.Request.Query["participantId"].ToString();
-}
+    ViewData["Title"] = "Confirmation";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Confirmation";
+    var participantIdBillet = ViewBag.ParticipantId?.ToString();
+    var paiementReussi = "Paiement R" + '\u00E9' + "ussi";
+    if (string.IsNullOrWhiteSpace(participantIdBillet))
+    {
+        participantIdBillet = Context.Request.Query["participantId"].ToString();
+    }
 }
 
-<div class="confirmation-container">
-    <div class="confirmation-card">
-        <div class="success-icon-wrapper">
-            <div class="success-icon">✓</div>
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-circle-check",
+        Eyebrow = "Inscription confirmee",
+        Title = paiementReussi,
+        Description = "Votre inscription est maintenant confirmee. Vous pouvez recuperer votre billet et partager votre code d'equipe si une equipe a ete creee."
+    })
+
+    <div class="d-none">@Html.Raw(paiementReussi)</div>
+
+    <section class="app-surface-card app-receipt-card">
+        <div class="app-receipt-grid">
+            <div class="app-detail-row">
+                <strong>Tournoi</strong>
+                <span>@(ViewBag.NomTournoi ?? "Non precise")</span>
+            </div>
+            <div class="app-detail-row">
+                <strong>Statut</strong>
+                <span class="app-status-badge app-status-badge--success"><i class="fas fa-check"></i> Confirme</span>
+            </div>
+            <div class="app-detail-row">
+                <strong>Methode</strong>
+                <span>@(ViewBag.MethodePaiement ?? "Non specifiee")</span>
+            </div>
         </div>
-        
-        <h1 class="confirmation-title">Paiement Réussi !</h1>
-        <p class="confirmation-subtitle">Votre inscription est maintenant confirmée.</p>
 
-        <div class="confirmation-details">
-            @if (ViewBag.NomTournoi != null)
-            {
-                <div class="detail-item">
-                    <span class="label">Tournoi:</span>
-                    <span class="value">@ViewBag.NomTournoi</span>
-                </div>
-            }
-            
-            <div class="detail-item">
-                <span class="label">Statut :</span>
-                <span class="value status-confirmed">Confirmé</span>
-            </div>
+        @if (ViewBag.NomEquipe != null)
+        {
+            <div class="app-highlight-panel mt-4">
+                <span class="app-section-eyebrow"><i class="fas fa-user-friends"></i> Equipe creee</span>
+                <h2 class="mb-2">Votre equipe : @ViewBag.NomEquipe</h2>
+                <p>Partagez ce code avec vos coequipiers pour qu'ils rejoignent la bonne equipe.</p>
 
-            <div class="detail-item">
-                <span class="label">Méthode :</span>
-                <span class="value">@(ViewBag.MethodePaiement ?? "Non spécifiée")</span>
-            </div>
-
-            <div class="alert alert-success mt-4 mb-0" style="font-size: 0.9rem; border: none; background: #f0fdf4; color: #166534;">
-                <i class="fas fa-envelope me-2"></i> Un message de confirmation a été envoyé à votre adresse courriel.
-            </div>
-
-            @if (ViewBag.NomEquipe != null)
-            {
-                <div class="team-info-box mt-4">
-                    <h3 class="team-title">Votre Équipe : @ViewBag.NomEquipe</h3>
-                    <div class="code-display">
-                        <span class="code-label">CODE D'ÉQUIPE</span>
-                        <div class="input-group mt-2">
-                            <input type="text" id="codeEquipeIns" value="@ViewBag.CodeEquipe" class="form-control text-center fw-bold bg-transparent border-0 text-white" readonly style="font-size: 1.5rem; letter-spacing: 5px; color: #c8a84e !important;" />
-                            <button class="btn btn-outline-warning btn-sm" onclick="copierCodeIns()">
-                                Copier
-                            </button>
-                        </div>
+                <div class="app-highlight-panel__code">
+                    <div>
+                        <span class="app-highlight-panel__code-label">Code d'equipe</span>
+                        <div class="app-highlight-panel__code-value" id="codeEquipeIns">@ViewBag.CodeEquipe</div>
                     </div>
-                    <p class="share-notice">Partagez ce code avec vos coéquipiers.</p>
+                    <button type="button" class="btn" onclick="copierCodeIns()">Copier le code</button>
                 </div>
+            </div>
+        }
 
-                <script>
-                function copierCodeIns() {
-                    var code = document.getElementById("codeEquipeIns");
-                    code.select();
-                    code.setSelectionRange(0, 99999);
-                    navigator.clipboard.writeText(code.value);
-                    alert("Code copié !");
-                }
-                </script>
+        <div class="app-actions mt-4 confirmation-actions">
+            <a href="/Tournoi/Index" class="btn btn-secondary">Liste des tournois</a>
+            <a href="/Auth/MesInscriptions" class="btn btn-secondary">Mes inscriptions</a>
+        </div>
+    </section>
+</section>
+
+@section Scripts {
+    <script>
+        function copierCodeIns() {
+            const code = document.getElementById('codeEquipeIns');
+            if (!code) return;
+            navigator.clipboard.writeText(code.innerText.trim());
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const participantId = '@participantIdBillet';
+            if (!participantId) return;
+
+            const lien = document.createElement('a');
+            lien.href = '/Inscription/TelechargerBillet?participantId=' + encodeURIComponent(participantId);
+            lien.className = 'btn';
+            lien.textContent = 'Telecharger mon billet';
+
+            const zoneActions = document.querySelector('.confirmation-actions');
+            if (zoneActions) {
+                zoneActions.prepend(lien);
             }
-        </div>
-
-        <div class="action-buttons mt-4">
-            <a href="/Tournoi/Index" class="btn btn-confirmation">Liste des tournois</a>
-            <a href="/Auth/MesInscriptions" class="btn btn-confirmation-secondary">Mes Inscriptions</a>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-const participantId = '@participantIdBillet';
-if (!participantId) {
-return;
+        });
+    </script>
 }
-
-const lien = document.createElement('a');
-lien.href = '/Inscription/TelechargerBillet?participantId=' + encodeURIComponent(participantId);
-lien.className = 'btn btn-warning';
-lien.textContent = 'Télécharger mon billet';
-
-const zoneActions = document.querySelector('.confirmation-actions');
-if (zoneActions) {
-zoneActions.prepend(lien);
-return;
-}
-
-const carte = document.querySelector('.confirmation-card');
-if (!carte) {
-return;
-}
-
-const conteneur = document.createElement('div');
-conteneur.className = 'mt-4 d-flex justify-content-center';
-conteneur.appendChild(lien);
-carte.appendChild(conteneur);
-});
-</script>

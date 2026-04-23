@@ -43,7 +43,7 @@
 
                         <div class="mb-3">
                             <label asp-for="Montant" class="form-label fw-bold">Montant ($)</label>
-                            <input asp-for="Montant" id="Montant" type="number" step="10.00" class="form-control" placeholder="1000.00" required />
+                            <input asp-for="Montant" id="Montant" type="number" step="0.01" min="0.01" class="form-control" placeholder="1000.00" required />
                             <span asp-validation-for="Montant" class="text-danger"></span>
                             <small id="montantInfo" class="text-muted d-none">Ce montant est fixe pour ce type de commandite.</small>
                         </div>
@@ -95,6 +95,7 @@
             function updateDisplay() {
                 const val = parseFloat(montantInput.value) || 0;
                 displayMontant.innerText = val.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD' });
+                montantInput.setCustomValidity("");
             }
 
             typeSelect.addEventListener("change", function () {
@@ -104,10 +105,12 @@
                 if (selectedValue !== "Autre" && selectedValue !== "") {
                     // Type prédéfini
                     montantInput.readOnly = true;
+                    montantInput.step = "0.01";
                     montantInfo.classList.remove("d-none");
                 } else {
                     // Type personnalisé ou vide
                     montantInput.readOnly = false;
+                    montantInput.step = "0.01";
                     montantInfo.classList.add("d-none");
                 }
 

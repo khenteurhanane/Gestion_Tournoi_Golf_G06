@@ -1,209 +1,245 @@
 @using croupe_06_TournoiGolf.Models
 @{
-    ViewData["Title"] = "Détails du tournoi";
+    ViewData["Title"] = "Details du tournoi";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Détails du tournoi";
     var tournoi = (Tournoi)ViewBag.Tournoi;
     var participants = (List<Participant>)ViewBag.Participants;
     var equipes = (List<Equipe>)ViewBag.Equipes;
     int nbInscrits = (int)ViewBag.NbInscrits;
     int placesRestantes = (int)ViewBag.PlacesRestantes;
+    int nbEquipesIncompletes = ViewBag.NbEquipesIncompletes ?? 0;
+    int nbJoueursSoloDisponibles = ViewBag.NbJoueursSoloDisponibles ?? 0;
+    bool peutCompleterEquipes = ViewBag.PeutCompleterEquipes ?? false;
+    var nbEmployes = participants.Count(p => p.StatutInscription == "CONFIRMEE");
+    decimal totalRevenus = participants.Sum(p => p.MontantPaye);
 }
 
-<h1>@tournoi.Nom</h1>
-
-<div class="btn-group">
-    <a href="/Tournoi/Edit/@tournoi.TournoiId" class="btn">Modifier</a>
-    <form action="/Tournoi/Delete" method="post" style="display:inline;" onsubmit="return confirm('Supprimer ce tournoi et toutes ses inscriptions? Cette action est irréversible.');">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="id" value="@tournoi.TournoiId" />
-        <button type="submit" class="btn btn-danger">Supprimer</button>
-    </form>
-</div>
-
-<div class="row">
-    <!-- Infos du tournoi -->
-    <div class="col-md-6">
-        <div class="card" style="margin-bottom: 20px;">
-            <h3>Informations</h3>
-            <table>
-                <tr>
-                    <td><strong>Date</strong></td>
-                    <td>@tournoi.DateTournoi.ToShortDateString()</td>
-                </tr>
-                <tr>
-                    <td><strong>Lieu</strong></td>
-                    <td>@tournoi.Lieu</td>
-                </tr>
-                <tr>
-                    <td><strong>Inscriptions</strong></td>
-                    <td>
-                        @if (tournoi.InscriptionsOuvertes)
-                        {
-                            <span class="badge badge-ouvert">Ouvertes</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-ferme">Fermées</span>
-                        }
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>État du tournoi</strong></td>
-                    <td>
-                        @if (tournoi.EstEnCours)
-                        {
-                            <span class="badge badge-en-cours">En cours</span>
-                            <form action="/Tournoi/TerminerTournoi" method="post" style="display:inline; margin-left: 10px;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
-                                <button type="submit" class="btn btn-sm btn-danger">Terminer le tournoi</button>
-                            </form>
-                            <a href="/Score/Saisie/@tournoi.TournoiId" class="btn btn-sm btn-primary" style="margin-left: 5px;">Saisir les scores</a>
-                        }
-                        else
-                        {
-                            <span class="badge badge-ferme">Pas encore démarré</span>
-                            <form action="/Tournoi/DemarrerTournoi" method="post" style="display:inline; margin-left: 10px;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@tournoi.TournoiId" />
-                                <button type="submit" class="btn btn-sm btn-success">Démarrer le tournoi</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Inscrits</strong></td>
-                    <td>@nbInscrits / @tournoi.PlacesParticipantsMax</td>
-                </tr>
-                <tr>
-                    <td><strong>Places restantes</strong></td>
-                    <td>
-                        @if (placesRestantes > 5)
-                        {
-                            <span style="color: var(--accent);">@placesRestantes</span>
-                        }
-                        else if (placesRestantes > 0)
-                        {
-                            <span style="color: orange;">@placesRestantes (presque complet)</span>
-                        }
-                        else
-                        {
-                            <span style="color: var(--danger);">Complet</span>
-                        }
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Équipes</strong></td>
-                    <td>@equipes.Count</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Statistiques rapides -->
-    <div class="col-md-6">
-        <div class="card" style="margin-bottom: 20px;">
-            <h3>Statistiques</h3>
-            @{
-                var nbEmployes = participants.Count(p => p.StatutInscription == "CONFIRMEE");
-                decimal totalRevenus = participants.Sum(p => p.MontantPaye);
+<section class="app-page-shell app-page-shell--wide">
+    <section class="app-surface-card app-surface-card--hero">
+        <span class="app-section-eyebrow"><i class="fas fa-calendar-check"></i> Administration tournoi</span>
+        <h1 class="app-hero-title">@tournoi.Nom</h1>
+        <p class="app-lead">Consultez l'état du tournoi, les participants, les équipes et les actions de pilotage.</p>
+        <div class="app-actions">
+            <a href="/Tournoi/Edit/@tournoi.TournoiId" class="btn">Modifier</a>
+            <a href="/Tournoi/Index" class="btn btn-secondary">Retour à la liste</a>
+            @if (tournoi.EstEnCours)
+            {
+                <a href="/Score/Tableau/@tournoi.TournoiId" class="btn btn-secondary">Voir le classement live</a>
             }
-            <table>
-                <tr>
-                    <td><strong>Inscriptions confirmées</strong></td>
-                    <td>@nbEmployes</td>
-                </tr>
-                <tr>
-                    <td><strong>Revenus totaux</strong></td>
-                    <td><strong>@totalRevenus.ToString("C")</strong></td>
-                </tr>
-                <tr>
-                    <td><strong>Créé le</strong></td>
-                    <td>@tournoi.CreeLe.ToShortDateString()</td>
-                </tr>
-            </table>
         </div>
+    </section>
+
+    <div class="app-kpi-strip">
+        <article class="app-kpi-card">
+            <span class="app-kpi-card__label">Inscriptions</span>
+            <span class="app-kpi-card__value">@nbInscrits</span>
+            <span class="app-kpi-card__meta">@tournoi.PlacesParticipantsMax places max</span>
+        </article>
+        <article class="app-kpi-card">
+            <span class="app-kpi-card__label">Places restantes</span>
+            <span class="app-kpi-card__value">@placesRestantes</span>
+        </article>
+        <article class="app-kpi-card">
+            <span class="app-kpi-card__label">Équipes</span>
+            <span class="app-kpi-card__value">@equipes.Count</span>
+        </article>
+        <article class="app-kpi-card">
+            <span class="app-kpi-card__label">Revenus</span>
+            <span class="app-kpi-card__value">@totalRevenus.ToString("C")</span>
+        </article>
     </div>
-</div>
 
-<!-- Liste des participants -->
-<div class="card" style="margin-bottom: 20px;">
-    <h3>Participants inscrits (@nbInscrits)</h3>
+    <div class="app-grid-2">
+        <section class="app-surface-card">
+            <span class="app-section-eyebrow"><i class="fas fa-circle-info"></i> Informations</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Date</strong>
+                    <span>@tournoi.DateTournoi.ToShortDateString()</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Lieu</strong>
+                    <span>@tournoi.Lieu</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Inscriptions</strong>
+                    <span class="app-status-badge @(tournoi.InscriptionsOuvertes ? "app-status-badge--success" : "app-status-badge--danger")">
+                        @(tournoi.InscriptionsOuvertes ? "Ouvertes" : "Fermées")
+                    </span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>État</strong>
+                    <span class="app-status-badge @(tournoi.EstEnCours ? "app-status-badge--warning" : "app-status-badge--success")">
+                        @(tournoi.EstEnCours ? "En cours" : "Pas encore démarré")
+                    </span>
+                </div>
+            </div>
 
-    @if (participants.Count == 0)
-    {
-        <p class="text-muted">Aucun participant inscrit pour le moment.</p>
-    }
-    else
-    {
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Prénom</th>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Montant payé</th>
-                    <th>Équipe</th>
-                    <th>Date inscription</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{ int compteur = 1; }
-                @foreach (var p in participants)
+            <div class="app-actions mt-4">
+                @if (tournoi.EstEnCours)
                 {
-                    var equipeNom = equipes.FirstOrDefault(e => e.EquipeId == p.EquipeId)?.NomEquipe ?? "—";
-                    <tr>
-                        <td>@compteur</td>
-                        <td>@(p.Utilisateur?.Prenom ?? p.Prenom)</td>
-                        <td>@(p.Utilisateur?.Nom ?? p.Nom)</td>
-                        <td>@(p.Utilisateur?.Email ?? p.Email)</td>
-                        <td>@(p.CommanditeId != null ? "Sponsorisé" : p.MontantPaye.ToString("C"))</td>
-                        <td>@equipeNom</td>
-                        <td>@p.CreeLe.ToShortDateString()</td>
-                    </tr>
-                    compteur++;
+                    <form action="/Tournoi/TerminerTournoi" method="post" class="inline-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                        <button type="submit" class="btn btn-danger">Terminer</button>
+                    </form>
+                    <a href="/Score/Saisie/@tournoi.TournoiId" class="btn">Saisir les scores</a>
                 }
-            </tbody>
-        </table>
-    }
-</div>
-
-<!-- Liste des équipes -->
-@if (equipes.Count > 0)
-{
-    <div class="card" style="margin-bottom: 20px;">
-        <h3>Équipes (@equipes.Count)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nom de l'équipe</th>
-                    <th>Code secret</th>
-                    <th>Membres</th>
-                    <th>Max</th>
-                    <th>Créée le</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var eq in equipes)
+                else
                 {
-                    var nbMembres = participants.Count(p => p.EquipeId == eq.EquipeId);
-                    <tr>
-                        <td>@eq.NomEquipe</td>
-                        <td><strong style="letter-spacing: 2px;">@eq.CodeSecret</strong></td>
-                        <td>@nbMembres / @eq.NbJoueursMax</td>
-                        <td>@eq.NbJoueursMax</td>
-                        <td>@eq.CreeLe.ToShortDateString()</td>
-                    </tr>
+                    <form action="/Tournoi/DemarrerTournoi" method="post" class="inline-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                        <button type="submit" class="btn">Démarrer le tournoi</button>
+                    </form>
                 }
-            </tbody>
-        </table>
+
+                <form action="/Tournoi/Delete" method="post" class="inline-form" onsubmit="return confirm('Supprimer ce tournoi et toutes ses inscriptions ? Cette action est irreversible.');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@tournoi.TournoiId" />
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="app-surface-card">
+            <span class="app-section-eyebrow"><i class="fas fa-chart-line"></i> Statistiques</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Inscriptions confirmées</strong>
+                    <span>@nbEmployes</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Créé le</strong>
+                    <span>@tournoi.CreeLe.ToShortDateString()</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Description</strong>
+                    <span>@(string.IsNullOrWhiteSpace(tournoi.Description) ? "Aucune description" : tournoi.Description)</span>
+                </div>
+            </div>
+        </section>
     </div>
-}
 
-<div class="card-footer">
-    <a href="/Tournoi/Index" class="btn">Retour à la liste des tournois</a>
-    @if (tournoi.EstEnCours)
+    @if (nbEquipesIncompletes > 0 || nbJoueursSoloDisponibles > 0)
     {
-        <a href="/Score/Tableau/@tournoi.TournoiId" class="btn btn-info" style="margin-left: 10px;">Voir le classement live</a>
+        <section class="app-surface-card">
+            <span class="app-section-eyebrow"><i class="fas fa-people-arrows"></i> Matchmaking admin</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Equipes incompletes</strong>
+                    <span>@nbEquipesIncompletes</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Joueurs solo regroupables</strong>
+                    <span>@nbJoueursSoloDisponibles</span>
+                </div>
+            </div>
+
+            <div class="app-actions mt-4">
+                @if (peutCompleterEquipes)
+                {
+                    <form action="/Admin/CompleterEquipes" method="post" class="inline-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="tournoiId" value="@tournoi.TournoiId" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                        <button type="submit" class="btn">Completer automatiquement les equipes</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="app-muted-note">
+                        @(nbJoueursSoloDisponibles == 0
+                            ? "Aucun joueur solo regroupable pour le moment."
+                            : "Pas assez de joueurs solos pour lancer un regroupement automatique.")
+                    </span>
+                }
+            </div>
+        </section>
     }
-</div>
+
+    <section class="app-surface-card app-table-card">
+        <div class="app-table-card__header">
+            <div>
+                <h2>Participants inscrits</h2>
+                <p class="app-muted-note">@nbInscrits participant(s)</p>
+            </div>
+        </div>
+
+        @if (participants.Count == 0)
+        {
+            <div class="app-empty-inline">Aucun participant inscrit pour le moment.</div>
+        }
+        else
+        {
+            <div class="app-table-wrap">
+                <table class="app-data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Participant</th>
+                            <th>Email</th>
+                            <th>Montant</th>
+                            <th>Équipe</th>
+                            <th>Date d'inscription</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int compteur = 1; }
+                        @foreach (var p in participants)
+                        {
+                            var equipeNom = equipes.FirstOrDefault(e => e.EquipeId == p.EquipeId)?.NomEquipe ?? "-";
+                            <tr>
+                                <td>@compteur</td>
+                                <td><strong>@(p.Utilisateur?.Prenom ?? p.Prenom) @(p.Utilisateur?.Nom ?? p.Nom)</strong></td>
+                                <td>@(p.Utilisateur?.Email ?? p.Email)</td>
+                                <td>@(p.CommanditeId != null ? "Sponsorise" : p.MontantPaye.ToString("C"))</td>
+                                <td>@equipeNom</td>
+                                <td>@p.CreeLe.ToShortDateString()</td>
+                            </tr>
+                            compteur++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    @if (equipes.Count > 0)
+    {
+        <section class="app-surface-card app-table-card">
+            <div class="app-table-card__header">
+                <div>
+                    <h2>Équipes</h2>
+                    <p class="app-muted-note">@equipes.Count équipe(s)</p>
+                </div>
+            </div>
+
+            <div class="app-table-wrap">
+                <table class="app-data-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Code secret</th>
+                            <th>Membres</th>
+                            <th>Créée le</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var eq in equipes)
+                        {
+                            var nbMembres = participants.Count(p => p.EquipeId == eq.EquipeId);
+                            <tr>
+                                <td><strong>@eq.NomEquipe</strong></td>
+                                <td><span class="table-emphasis-code">@eq.CodeSecret</span></td>
+                                <td>@nbMembres / @eq.NbJoueursMax</td>
+                                <td>@eq.CreeLe.ToShortDateString()</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</section>

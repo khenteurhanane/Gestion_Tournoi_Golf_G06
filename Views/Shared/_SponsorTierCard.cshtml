@@ -1,0 +1,19 @@
+@model croupe_06_TournoiGolf.Models.ViewModels.SponsorTierViewModel
+
+<article class="public-section-card tier-card @Model.TierCssClass">
+    <div class="tier-head">
+        <div class="tier-icon"><i class="@Model.Icon"></i></div>
+        <div>
+            <span class="tier-chip">@Model.TierLabel</span>
+            <h2 class="tier-title">@Model.Title</h2>
+        </div>
+    </div>
+    <p class="tier-price">@Model.Price <small>@Model.PriceSuffix</small></p>
+    <ul class="tier-list">
+        @foreach (var feature in Model.Features)
+        {
+            <li><i class="fas fa-check-circle"></i><span>@Html.Raw(feature)</span></li>
+        }
+    </ul>
+    <a href="@Model.CtaHref" class="@Model.CtaCssClass mt-auto">@Model.CtaLabel</a>
+</article>

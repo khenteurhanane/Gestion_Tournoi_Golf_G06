@@ -1,0 +1,21 @@
+@model croupe_06_TournoiGolf.Models.ViewModels.EmptyStateViewModel
+
+<section class="app-section-card empty-state-panel">
+    <span class="empty-state-panel__icon"><i class="@Model.Icon"></i></span>
+    <h2 class="empty-state-panel__title">@Model.Title</h2>
+    <p class="empty-state-panel__description">@Model.Description</p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.PrimaryLabel) || !string.IsNullOrWhiteSpace(Model.SecondaryLabel))
+    {
+        <div class="empty-state-panel__actions">
+            @if (!string.IsNullOrWhiteSpace(Model.PrimaryLabel) && !string.IsNullOrWhiteSpace(Model.PrimaryHref))
+            {
+                <a href="@Model.PrimaryHref" class="btn">@Model.PrimaryLabel</a>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.SecondaryLabel) && !string.IsNullOrWhiteSpace(Model.SecondaryHref))
+            {
+                <a href="@Model.SecondaryHref" class="btn btn-secondary">@Model.SecondaryLabel</a>
+            }
+        </div>
+    }
+</section>

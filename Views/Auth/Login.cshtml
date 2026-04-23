@@ -1,43 +1,51 @@
 @{
     ViewData["Title"] = "Connexion";
+    ViewData["UsePublicShell"] = true;
+    var hero = new croupe_06_TournoiGolf.Models.ViewModels.PublicPageHeroViewModel
+    {
+        EyebrowIcon = "fas fa-shield-alt",
+        EyebrowText = "Acces securise",
+        Title = "Connexion",
+        Description = "Connectez-vous pour retrouver vos inscriptions, vos equipes et les outils de gestion associes a votre profil."
+    };
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        
-        <div class="card mb-4">
-            <h2>Connexion</h2>
-            <p class="sub">Connecte-toi pour accéder à ton espace.</p>
+<div class="public-page auth-shell">
+    <partial name="_PublicPageHero" model="hero" />
 
-            <form action="/Auth/Login" method="post">
-                @Html.AntiForgeryToken()
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input id="email" name="email" type="email" placeholder="exemple@email.com" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="motDePasse">Mot de passe</label>
-                    <input id="motDePasse" name="motDePasse" type="password" placeholder="••••••••" required />
-                </div>
-
-                @if (ViewBag.Error != null)
-                {
-                    <div class="error">@ViewBag.Error</div>
-                }
-
-                <button class="btn" type="submit">Se connecter</button>
-            </form>
-
-            <div class="card-footer">
-                Pas de compte ? <a href="/Auth/Register">Créer un compte</a>
-                <br />
-                Vous êtes un commanditaire ? <a href="/Auth/InscriptionCommanditaire">Devenir commanditaire</a>
-                <br />
-                <a href="/Auth/ForgotPassword" class="small">Mot de passe oublié ?</a>
-            </div>
+    <section class="public-section-card auth-card">
+        <div class="auth-card__header">
+            <h2 class="auth-card__title">Acceder a votre espace</h2>
+            <p class="auth-card__text">Utilisez votre adresse courriel et votre mot de passe pour continuer.</p>
         </div>
 
-    </div>
+        <form action="/Auth/Login" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="email">Adresse courriel</label>
+                <input id="email" name="email" type="email" placeholder="exemple@email.com" required />
+            </div>
+
+            <div class="form-group">
+                <label for="motDePasse">Mot de passe</label>
+                <input id="motDePasse" name="motDePasse" type="password" placeholder="Entrez votre mot de passe" required />
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="surface-alert surface-alert--danger">@ViewBag.Error</div>
+            }
+
+            <div class="auth-actions">
+                <button class="btn" type="submit">Se connecter</button>
+            </div>
+        </form>
+
+        <div class="auth-links">
+            <span>Pas de compte ? <a href="/Auth/Register">Creer un compte</a></span>
+            <span>Vous etes un commanditaire ? <a href="/Auth/InscriptionCommanditaire">Devenir commanditaire</a></span>
+            <span><a href="/Auth/ForgotPassword">Mot de passe oublie ?</a></span>
+        </div>
+    </section>
 </div>

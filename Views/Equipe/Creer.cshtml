@@ -1,26 +1,33 @@
 @model croupe_06_TournoiGolf.Models.Equipe
 
 @{
-    ViewData["Title"] = "Créer une équipe";
+    ViewData["Title"] = "Creer une equipe";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Créer une équipe";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-user-friends",
+        Eyebrow = "Nouvelle équipe",
+        Title = "Créez votre équipe",
+        Description = "Définissez le nom de votre groupe. Un code secret sera généré automatiquement pour permettre aux autres joueurs de vous rejoindre."
+    })
 
-        <div class="card">
-            <h2>Créer une équipe</h2>
-            <p class="sub">Ton code secret sera généré automatiquement.</p>
-
-            <form action="/Equipe/Creer" method="post">
+    <div class="app-grid-sidebar">
+        <section class="app-surface-card app-form-card">
+            <form action="/Equipe/Creer" method="post" class="app-form-card">
+                @Html.AntiForgeryToken()
                 @if (Model.TournoiId > 0)
                 {
                     <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
                 }
                 else
                 {
-                    <div class="form-group mb-3">
+                    <div class="form-group">
                         <label>Choisir un tournoi</label>
-                        <select name="TournoiId" class="form-control" required style="padding: 12px; border-radius: 8px; border: 1px solid #ddd; width: 100%;">
+                        <select name="TournoiId" required>
                             <option value="">-- Sélectionner un tournoi --</option>
                             @foreach (var t in (List<Tournoi>)ViewBag.ListeTournois)
                             {
@@ -32,45 +39,61 @@
 
                 @if (ViewBag.Error != null)
                 {
-                    <div class="error" style="color:red; margin-bottom:15px;">@ViewBag.Error</div>
+                    <div class="alert alert-danger mb-0">@ViewBag.Error</div>
                 }
 
                 <div class="form-group">
                     <label>Nom de l'équipe</label>
                     <input asp-for="NomEquipe" type="text" placeholder="Ex: Les Aigles" required />
-                    <span asp-validation-for="NomEquipe" class="text-danger" style="color:red;font-size:0.9em;display:block;"></span>
+                    <span asp-validation-for="NomEquipe" class="text-danger validation-inline"></span>
                 </div>
 
                 <div class="form-group">
                     <label>Code secret de l'équipe</label>
-                    <div class="input-group">
-                        <input name="CodeSecret" id="codeEquipe" type="text" value="@Model.CodeSecret" readonly class="form-control" style="background-color:#f0f4ec; font-weight:bold; letter-spacing:3px;" />
-                        <button type="button" class="btn btn-outline-secondary" onclick="copierCode()">Copier le code</button>
+                    <div class="app-highlight-panel app-highlight-panel--compact">
+                        <span class="app-highlight-panel__code-label">Code généré</span>
+                        <div class="app-highlight-panel__code mt-0">
+                            <div class="app-highlight-panel__code-value" id="codeEquipe">@Model.CodeSecret</div>
+                            <button type="button" class="btn" onclick="copierCode()">Copier le code</button>
+                        </div>
                     </div>
-                    <small>Ce code sera partagé avec tes coéquipiers pour rejoindre l'équipe.</small>
+                    <p class="app-field-hint mt-2">Ce code devra être partagé avec les coéquipiers qui veulent rejoindre votre groupe.</p>
                 </div>
 
-                <script>
-                function copierCode() {
-                    var code = document.getElementById("codeEquipe");
-                    code.select();
-                    code.setSelectionRange(0, 99999);
-                    navigator.clipboard.writeText(code.value);
-                    alert("Code copié !");
-                }
-                </script>
-
-                <button class="btn" type="submit">Créer l'équipe</button>
+                <div class="app-actions">
+                    <button class="btn" type="submit">Créer l'équipe</button>
+                    <a href="/Inscription/Index" class="btn btn-secondary">Retour à l'inscription</a>
+                </div>
             </form>
+        </section>
 
-            <div class="footer">
-                <a href="/Inscription/Index">Retour à l'inscription</a>
+        <aside class="app-surface-card app-progress-card">
+            <span class="app-section-eyebrow"><i class="fas fa-lightbulb"></i> Conseils</span>
+            <div class="app-detail-list">
+                <div class="app-detail-row">
+                    <strong>Capitaine</strong>
+                    <span>Le créateur devient automatiquement capitaine.</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Code</strong>
+                    <span>Il sert à rejoindre l'équipe sans erreur de tournoi.</span>
+                </div>
+                <div class="app-detail-row">
+                    <strong>Suite</strong>
+                    <span>Vous pourrez gérer ou déplacer les membres plus tard.</span>
+                </div>
             </div>
-        </div>
-
+        </aside>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function copierCode() {
+            const code = document.getElementById('codeEquipe');
+            if (!code) return;
+            navigator.clipboard.writeText(code.innerText.trim());
+        }
+    </script>
 }

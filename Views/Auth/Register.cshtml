@@ -1,65 +1,76 @@
 @model croupe_06_TournoiGolf.Models.ViewModels.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Créer un compte";
+    ViewData["Title"] = "Creer un compte";
+    ViewData["UsePublicShell"] = true;
+    var emailErrors = ViewData.ModelState["Email"]?.Errors;
+    var confirmErrors = ViewData.ModelState["ConfirmMotDePasse"]?.Errors;
+    var hero = new croupe_06_TournoiGolf.Models.ViewModels.PublicPageHeroViewModel
+    {
+        EyebrowIcon = "fas fa-user-plus",
+        EyebrowText = "Inscription",
+        Title = "Creer un compte",
+        Description = "Inscrivez-vous pour participer aux tournois, rejoindre une equipe et suivre toute votre activite dans la plateforme."
+    };
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        
-        <div class="card mb-4">
-            <h2>Créer un compte</h2>
-            <p class="sub">Inscris-toi pour participer aux tournois de golf.</p>
+<div class="public-page auth-shell">
+    <partial name="_PublicPageHero" model="hero" />
 
-            <form action="/Auth/Register" method="post" autocomplete="off">
-                @Html.AntiForgeryToken()
-
-
-                @if (ViewBag.Error != null)
-                {
-                    <div class="error">@ViewBag.Error</div>
-                }
-
-                <div class="form-group">
-                    <label for="Prenom">Prénom</label>
-                    <input id="Prenom" name="Prenom" type="text" placeholder="Entrez votre prénom" value="@Model?.Prenom" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="Nom">Nom</label>
-                    <input id="Nom" name="Nom" type="text" placeholder="Entrez votre nom" value="@Model?.Nom" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="Email">Adresse courriel</label>
-                    <input id="Email" name="Email" type="email" placeholder="exemple@email.com" value="@Model?.Email" required autocomplete="new-email" />
-                    @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["Email"].Errors[0].ErrorMessage</span>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="MotDePasse">Mot de passe</label>
-                    <input id="MotDePasse" name="MotDePasse" type="password" placeholder="Minimum 6 caractères" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="ConfirmMotDePasse">Confirmer le mot de passe</label>
-                    <input id="ConfirmMotDePasse" name="ConfirmMotDePasse" type="password" placeholder="Confirmez votre mot de passe" required />
-                    @if (ViewData.ModelState["ConfirmMotDePasse"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["ConfirmMotDePasse"].Errors[0].ErrorMessage</span>
-                    }
-                </div>
-
-                <button class="btn" type="submit">Créer mon compte</button>
-            </form>
-
-            <div class="card-footer">
-                Déjà un compte ? <a href="/Auth/Login">Se connecter</a>
-            </div>
+    <section class="public-section-card auth-card">
+        <div class="auth-card__header">
+            <h2 class="auth-card__title">Informations du participant</h2>
+            <p class="auth-card__text">Remplissez les champs ci-dessous pour activer votre acces.</p>
         </div>
 
-    </div>
+        <form action="/Auth/Register" method="post" autocomplete="off" class="form-stack">
+            @Html.AntiForgeryToken()
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="surface-alert surface-alert--danger">@ViewBag.Error</div>
+            }
+
+            <div class="form-group">
+                <label for="Prenom">Prenom</label>
+                <input id="Prenom" name="Prenom" type="text" placeholder="Entrez votre prenom" value="@Model?.Prenom" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Nom">Nom</label>
+                <input id="Nom" name="Nom" type="text" placeholder="Entrez votre nom" value="@Model?.Nom" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Adresse courriel</label>
+                <input id="Email" name="Email" type="email" placeholder="exemple@email.com" value="@Model?.Email" required autocomplete="new-email" />
+                @if (emailErrors is { Count: > 0 })
+                {
+                    <span class="field-error">@emailErrors[0].ErrorMessage</span>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="MotDePasse">Mot de passe</label>
+                <input id="MotDePasse" name="MotDePasse" type="password" placeholder="Minimum 6 caracteres" required />
+            </div>
+
+            <div class="form-group">
+                <label for="ConfirmMotDePasse">Confirmer le mot de passe</label>
+                <input id="ConfirmMotDePasse" name="ConfirmMotDePasse" type="password" placeholder="Confirmez votre mot de passe" required />
+                @if (confirmErrors is { Count: > 0 })
+                {
+                    <span class="field-error">@confirmErrors[0].ErrorMessage</span>
+                }
+            </div>
+
+            <div class="auth-actions">
+                <button class="btn" type="submit">Creer mon compte</button>
+            </div>
+        </form>
+
+        <div class="auth-links">
+            <span>Deja un compte ? <a href="/Auth/Login">Se connecter</a></span>
+        </div>
+    </section>
 </div>

@@ -2,28 +2,33 @@
 
 @{
     ViewData["Title"] = "Mon Profil";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Mon profil";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-user-circle",
+        Eyebrow = "Mon espace",
+        Title = "Mon profil",
+        Description = "Mettez à jour vos informations personnelles utilisées dans les flux d'inscription et de paiement."
+    })
 
-        <div class="card">
-            <h2>Mon Profil</h2>
-            <p class="sub">Gérez vos informations personnelles.</p>
+    <section class="app-surface-card app-form-card">
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-success">@ViewBag.Success</div>
+        }
 
-            @if (ViewBag.Success != null)
-            {
-                <div class="alert-success">@ViewBag.Success</div>
-            }
+        <form action="/Auth/Profil" method="post" class="app-form-card">
+            @Html.AntiForgeryToken()
 
-            <form action="/Auth/Profil" method="post">
-                @Html.AntiForgeryToken()
-
-
+            <div class="app-form-grid">
                 <div class="form-group">
                     <label>Adresse courriel</label>
                     <input type="email" value="@Model.Email" readonly />
-                    <small>L'email ne peut pas être modifié.</small>
+                    <p class="app-field-hint">L'adresse courriel ne peut pas être modifiée.</p>
                 </div>
 
                 <div class="form-group">
@@ -33,12 +38,12 @@
 
                 <div class="form-group">
                     <label for="Prenom">Prénom</label>
-                    <input id="Prenom" name="Prenom" type="text" value="@Model.Prenom" placeholder="Votre prénom" required />
+                    <input id="Prenom" name="Prenom" type="text" value="@Model.Prenom" required />
                 </div>
 
                 <div class="form-group">
                     <label for="Nom">Nom</label>
-                    <input id="Nom" name="Nom" type="text" value="@Model.Nom" placeholder="Votre nom" required />
+                    <input id="Nom" name="Nom" type="text" value="@Model.Nom" required />
                 </div>
 
                 <div class="form-group">
@@ -55,15 +60,13 @@
                     <label>Membre depuis</label>
                     <input type="text" value="@Model.CreeLe.ToShortDateString()" readonly />
                 </div>
-
-                <button class="btn" type="submit">Enregistrer les modifications</button>
-            </form>
-
-            <div class="card-footer">
-                <a href="/Auth/MesInscriptions">Voir mes inscriptions</a> |
-                <a href="/Auth/ForgotPassword">Changer mon mot de passe</a>
             </div>
-        </div>
 
-    </div>
-</div>
+            <div class="app-actions">
+                <button class="btn" type="submit">Enregistrer les modifications</button>
+                <a href="/Auth/MesInscriptions" class="btn btn-secondary">Mes inscriptions</a>
+                <a href="/Auth/ForgotPassword" class="btn btn-secondary">Changer le mot de passe</a>
+            </div>
+        </form>
+    </section>
+</section>

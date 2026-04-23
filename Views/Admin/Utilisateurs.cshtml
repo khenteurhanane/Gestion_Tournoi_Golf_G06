@@ -2,88 +2,101 @@
 
 @{
     ViewData["Title"] = "Gestion des utilisateurs";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Utilisateurs";
 }
 
-<h1>Gestion des utilisateurs</h1>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-users-cog",
+        Eyebrow = "Administration",
+        Title = "Gestion des utilisateurs",
+        Description = $"Surveillez les comptes actifs et intervenez rapidement sur les profils non administrateurs."
+    })
 
-<p style="color:var(--muted); margin-bottom:20px;">
-    <strong>@Model.Count</strong> utilisateurs inscrits sur la plateforme.
-</p>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert" style="background: rgba(45, 212, 191, 0.15); border: 1px solid var(--accent); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-        @TempData["Success"]
-    </div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert" style="background: rgba(251, 113, 133, 0.15); border: 1px solid var(--danger); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-        @TempData["Error"]
-    </div>
-}
+    <section class="app-surface-card app-table-card">
+        <div class="app-table-card__header">
+            <div>
+                <h2>Comptes enregistrés</h2>
+                <p class="app-muted-note">@Model.Count utilisateur(s)</p>
+            </div>
+            <input type="text" id="rechercheUtilisateur" placeholder="Rechercher un utilisateur..." class="app-search-input" onkeyup="filtrerUtilisateurs()" />
+        </div>
 
-<!-- Barre de recherche -->
-<input type="text" id="rechercheUtilisateur" placeholder="Rechercher un utilisateur..." 
-       style="margin-bottom:15px; max-width:400px;" onkeyup="filtrerUtilisateurs()" />
-
-<table>
-    <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Email</th>
-            <th>Rôle</th>
-            <th>Téléphone</th>
-            <th>Inscriptions</th>
-            <th>Membre depuis</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="tableUtilisateurs">
-        @foreach (var user in Model)
-        {
-            var nbInscDict = ViewBag.NbInscriptions as Dictionary<int, int> ?? new Dictionary<int, int>();
-            var nbInsc = nbInscDict.ContainsKey(user.UtilisateurId) ? nbInscDict[user.UtilisateurId] : 0;
-
-            <tr class="ligne-utilisateur">
-                <td>@user.Prenom @user.Nom</td>
-                <td>@user.Email</td>
-                <td>
-                    @if (user.Role == "ADMIN")
+        <div class="app-table-wrap">
+            <table class="app-data-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Téléphone</th>
+                        <th>Inscriptions</th>
+                        <th>Membre depuis</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableUtilisateurs">
+                    @foreach (var user in Model)
                     {
-                        <span class="badge badge-ouvert">Admin</span>
-                    }
-                    else
-                    {
-                        <span class="badge badge-ferme">Participant</span>
-                    }
-                </td>
-                <td>@(user.Telephone ?? "—")</td>
-                <td>@nbInsc</td>
-                <td>@user.CreeLe.ToShortDateString()</td>
-                <td>
-                    @if (user.Role != "ADMIN")
-                    {
-                        <form action="/Admin/SupprimerUtilisateur" method="post" style="display:inline;"
-                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
-                            @Html.AntiForgeryToken()
+                        var nbInscDict = ViewBag.NbInscriptions as Dictionary<int, int> ?? new Dictionary<int, int>();
+                        var nbInsc = nbInscDict.ContainsKey(user.UtilisateurId) ? nbInscDict[user.UtilisateurId] : 0;
 
-                            <input type="hidden" name="id" value="@user.UtilisateurId" />
-                            <button type="submit" class="btn btn-secondary" style="background: var(--danger); color: white; border-color: var(--danger);">
-                                Supprimer
-                            </button>
-                        </form>
+                        <tr class="ligne-utilisateur">
+                            <td><strong>@user.Prenom @user.Nom</strong></td>
+                            <td>@user.Email</td>
+                            <td>
+                                @if (user.Role == "ADMIN")
+                                {
+                                    <span class="app-status-badge app-status-badge--success">Admin</span>
+                                }
+                                else
+                                {
+                                    <span class="app-pill">Participant</span>
+                                }
+                            </td>
+                            <td>@(user.Telephone ?? "—")</td>
+                            <td>@nbInsc</td>
+                            <td>@user.CreeLe.ToShortDateString()</td>
+                            <td>
+                                @if (user.Role != "ADMIN")
+                                {
+                                    <form action="/Admin/SupprimerUtilisateur" method="post" class="inline-form" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@user.UtilisateurId" />
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="app-muted-note">Protégé</span>
+                                }
+                            </td>
+                        </tr>
                     }
-                    else
-                    {
-                        <span style="color: var(--muted); font-size: 0.85rem;">Protégé</span>
-                    }
-                </td>
-            </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+
+@section Scripts {
+    <script>
+        function filtrerUtilisateurs() {
+            const filtre = document.getElementById('rechercheUtilisateur').value.toLowerCase();
+            document.querySelectorAll('.ligne-utilisateur').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(filtre) ? '' : 'none';
+            });
         }
-    </tbody>
-</table>
-
-<div style="margin-top: 20px;">
-    <a class="btn btn-secondary" href="/Admin/Index">Retour au tableau de bord</a>
-</div>
+    </script>
+}

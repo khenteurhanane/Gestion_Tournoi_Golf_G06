@@ -10,6 +10,13 @@ namespace croupe_06_TournoiGolf.Services;
 
 public class TicketService
 {
+    private static readonly BaseColor Navy = new(63, 96, 139);
+    private static readonly BaseColor NavyDark = new(52, 86, 129);
+    private static readonly BaseColor NeutralBorder = new(193, 201, 188);
+    private static readonly BaseColor NeutralPanel = new(238, 244, 252);
+    private static readonly BaseColor NeutralText = new(0, 0, 0);
+    private static readonly BaseColor MutedText = new(80, 80, 80);
+
     public byte[] GenererBilletPdf(Participant participant)
     {
         if (participant.Tournoi is null)
@@ -28,10 +35,10 @@ public class TicketService
 
         document.Open();
 
-        var titreFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 22f, new BaseColor(0, 0, 0));
-        var sousTitreFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, new BaseColor(80, 80, 80));
-        var etiquetteFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11f, new BaseColor(26, 46, 18));
-        var valeurFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, new BaseColor(0, 0, 0));
+        var titreFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 22f, NeutralText);
+        var sousTitreFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, MutedText);
+        var etiquetteFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11f, NavyDark);
+        var valeurFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, NeutralText);
         var footerFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9f, new BaseColor(90, 90, 90));
 
         var titre = new Paragraph("Billet d'entree - Tournoi G06", titreFont)
@@ -95,8 +102,8 @@ public class TicketService
 
     private static void AjouterLigne(PdfPTable table, string etiquette, string valeur, Font etiquetteFont, Font valeurFont)
     {
-        table.AddCell(CreerCellule(etiquette, etiquetteFont, new BaseColor(245, 249, 242)));
-        table.AddCell(CreerCellule(valeur, valeurFont, new BaseColor(255, 255, 255)));
+        table.AddCell(CreerCellule(etiquette, etiquetteFont, NeutralPanel));
+        table.AddCell(CreerCellule(valeur, valeurFont, BaseColor.White));
     }
 
     private static PdfPCell CreerCellule(string contenu, Font font, BaseColor backgroundColor)
@@ -104,7 +111,7 @@ public class TicketService
         return new PdfPCell(new Phrase(contenu, font))
         {
             BackgroundColor = backgroundColor,
-            BorderColor = new BaseColor(220, 228, 214),
+            BorderColor = NeutralBorder,
             Padding = 10f,
             VerticalAlignment = Element.ALIGN_MIDDLE
         };
@@ -161,15 +168,15 @@ public class TicketService
 
         document.Open();
 
-        var titreFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 22f, new BaseColor(45, 106, 46));
-        var sousTitreFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, new BaseColor(80, 80, 80));
-        var etiquetteFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10f, new BaseColor(26, 46, 18));
-        var valeurFont = FontFactory.GetFont(FontFactory.HELVETICA, 10f, new BaseColor(0, 0, 0));
-        var itemsTableFont = FontFactory.GetFont(FontFactory.HELVETICA, 10f, new BaseColor(0, 0, 0));
-        var itemsHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10f, new BaseColor(255, 255, 255));
+        var titreFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 22f, Navy);
+        var sousTitreFont = FontFactory.GetFont(FontFactory.HELVETICA, 11f, MutedText);
+        var etiquetteFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10f, NavyDark);
+        var valeurFont = FontFactory.GetFont(FontFactory.HELVETICA, 10f, NeutralText);
+        var itemsTableFont = FontFactory.GetFont(FontFactory.HELVETICA, 10f, NeutralText);
+        var itemsHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10f, BaseColor.White);
         var footerFont = FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9f, new BaseColor(90, 90, 90));
 
-        var titre = new Paragraph("Recu de Transaction - Boutique Golf G06", titreFont)
+        var titre = new Paragraph("Recu de transaction - Boutique Golf G06", titreFont)
         {
             Alignment = Element.ALIGN_CENTER,
             SpacingAfter = 8f
@@ -185,9 +192,11 @@ public class TicketService
         };
         document.Add(sousTitre);
 
-        // Client Info
         var clientNom = $"{commande.Utilisateur?.Prenom} {commande.Utilisateur?.Nom}".Trim();
-        if (string.IsNullOrWhiteSpace(clientNom)) clientNom = commande.Utilisateur?.Email ?? "Client Boutique";
+        if (string.IsNullOrWhiteSpace(clientNom))
+        {
+            clientNom = commande.Utilisateur?.Email ?? "Client Boutique";
+        }
 
         var clientInfo = new Paragraph($"Client : {clientNom}", etiquetteFont)
         {
@@ -196,7 +205,6 @@ public class TicketService
         };
         document.Add(clientInfo);
 
-        // Items Table
         var tableItems = new PdfPTable(4)
         {
             WidthPercentage = 100,
@@ -205,11 +213,10 @@ public class TicketService
         };
         tableItems.SetWidths(new[] { 3.5f, 1f, 1f, 1f });
 
-        // Headers
-        tableItems.AddCell(CreerCellule("Article", itemsHeaderFont, new BaseColor(45, 106, 46)));
-        tableItems.AddCell(CreerCellule("Prix Unitaire", itemsHeaderFont, new BaseColor(45, 106, 46)));
-        tableItems.AddCell(CreerCellule("Qté", itemsHeaderFont, new BaseColor(45, 106, 46)));
-        tableItems.AddCell(CreerCellule("Total", itemsHeaderFont, new BaseColor(45, 106, 46)));
+        tableItems.AddCell(CreerCellule("Article", itemsHeaderFont, Navy));
+        tableItems.AddCell(CreerCellule("Prix unitaire", itemsHeaderFont, Navy));
+        tableItems.AddCell(CreerCellule("Qte", itemsHeaderFont, Navy));
+        tableItems.AddCell(CreerCellule("Total", itemsHeaderFont, Navy));
 
         foreach (var item in commande.Items)
         {
@@ -221,7 +228,6 @@ public class TicketService
 
         document.Add(tableItems);
 
-        // Totals Table
         var tableTotaux = new PdfPTable(2)
         {
             HorizontalAlignment = Element.ALIGN_RIGHT,
@@ -230,17 +236,16 @@ public class TicketService
         };
         tableTotaux.SetWidths(new[] { 2f, 1.5f });
 
-        AjouterLigneTotale(tableTotaux, "Sous-Total", $"{commande.SousTotal:F2} $", extraction: false);
+        AjouterLigneTotale(tableTotaux, "Sous-total", $"{commande.SousTotal:F2} $", extraction: false);
         if (commande.Rabais > 0)
         {
-            AjouterLigneTotale(tableTotaux, "Rabais (Etudiant)", $"-{commande.Rabais:F2} $", extraction: true);
+            AjouterLigneTotale(tableTotaux, "Rabais (etudiant)", $"-{commande.Rabais:F2} $", extraction: true);
         }
         AjouterLigneTotale(tableTotaux, "Taxes (TPS/TVQ)", $"{commande.Taxes:F2} $", extraction: false);
         AjouterLigneTotale(tableTotaux, "TOTAL FINAL", $"{commande.TotalFinal:F2} $", extraction: false, bold: true);
 
         document.Add(tableTotaux);
 
-        // QR Code for verification
         var contenuQr = $"GOLF-G06-SHOP\nID={commande.CommandeId}\nTOTAL={commande.TotalFinal:F2}\nDATE={commande.DateCommande:yyyy-MM-dd}";
         var qrCodeBytes = GenererQrCode(contenuQr);
         var qrImage = Image.GetInstance(qrCodeBytes);
@@ -264,8 +269,11 @@ public class TicketService
     private static void AjouterLigneTotale(PdfPTable table, string etiquette, string valeur, bool extraction, bool bold = false)
     {
         var font = bold ? FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10) : FontFactory.GetFont(FontFactory.HELVETICA, 10);
-        var color = extraction ? new BaseColor(185, 28, 28) : BaseColor.Black; // Red for discount
-        if (extraction) font.Color = color;
+        var color = extraction ? new BaseColor(185, 28, 28) : BaseColor.Black;
+        if (extraction)
+        {
+            font.Color = color;
+        }
 
         var cellLabel = new PdfPCell(new Phrase(etiquette, font))
         {

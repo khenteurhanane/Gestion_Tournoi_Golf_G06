@@ -1,39 +1,38 @@
 @model IEnumerable<croupe_06_TournoiGolf.Models.Participant>
 @{
     var commandite = (croupe_06_TournoiGolf.Models.Commandite)ViewBag.Commandite;
-    ViewData["Title"] = "Gestion des joueurs sponsorisés";
+    ViewData["Title"] = "Gestion des joueurs sponsorises";
     int limite = croupe_06_TournoiGolf.Models.TypesCommandite.GetLimiteJoueurs(commandite.TypeCommandite);
     int inscrits = Model.Count();
     double pourcentage = (double)inscrits / limite * 100;
 }
 
 <div class="players-management-section">
-    <!-- Header Summary Card -->
     <div class="dashboard-card status-summary-card mb-4">
         <div class="card-body p-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h4 class="mb-1 text-primary-green fw-bold">Configuration des joueurs : @commandite.Tournoi.Nom</h4>
-                    <p class="text-muted mb-3">Gérez les participants inclus dans votre forfait de commandite <strong>@commandite.TypeCommandite</strong>.</p>
-                    
+                    <p class="text-muted mb-3">G&eacute;rez les participants inclus dans votre forfait de commandite <strong>@commandite.TypeCommandite</strong>.</p>
+
                     <div class="slots-progress-wrapper mt-3">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="fw-600">Occupation des places</span>
                             <span class="fw-bold @(inscrits >= limite ? "text-danger" : "text-success")">@inscrits / @limite</span>
                         </div>
-                        <div class="progress rounded-pill shadow-sm" style="height: 12px; background: #e9ecef;">
-                            <div class="progress-bar rounded-pill @(inscrits >= limite ? "bg-danger" : "bg-success")" 
-                                 role="progressbar" 
-                                 style="width: @pourcentage%" 
-                                 aria-valuenow="@inscrits" 
-                                 aria-valuemin="0" 
+                        <div class="progress progress-thick rounded-pill shadow-sm">
+                            <div class="progress-bar rounded-pill @(inscrits >= limite ? "bg-danger" : "bg-success")"
+                                 role="progressbar"
+                                 style="width: @pourcentage%"
+                                 aria-valuenow="@inscrits"
+                                 aria-valuemin="0"
                                  aria-valuemax="@limite">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <div class="sponsor-badge p-3 rounded-4 d-inline-block text-center shadow-sm" style="background: rgba(212, 175, 55, 0.1); border: 2px solid var(--accent-gold);">
+                    <div class="sponsor-badge sponsor-badge-card p-3 rounded-4 d-inline-block text-center shadow-sm">
                         <i class="fas fa-crown fa-2x text-warning mb-2"></i>
                         <div class="small text-uppercase fw-bold text-dark">Forfait @commandite.TypeCommandite</div>
                     </div>
@@ -56,19 +55,18 @@
     }
 
     <div class="row">
-        <!-- Formulaire Panel -->
         <div class="col-lg-4 mb-4">
             @if (ViewBag.Commandite.Tournoi.PlacesParticipantsMax <= (int)ViewBag.TotalInscrits)
             {
                 <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 text-center mb-4">
                     <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
                     <h6 class="fw-bold">TOURNOI COMPLET</h6>
-                    <p class="small mb-0">La limite globale de @ViewBag.Commandite.Tournoi.PlacesParticipantsMax participants a été atteinte.</p>
+                    <p class="small mb-0">La limite globale de @ViewBag.Commandite.Tournoi.PlacesParticipantsMax participants a &eacute;t&eacute; atteinte.</p>
                 </div>
             }
             <div class="dashboard-card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
                 <div class="card-header bg-dark text-white p-4 border-0">
-                    <h5 class="mb-0"><i class="fas fa-user-plus me-2 text-warning"></i> Nouvel invité</h5>
+                    <h5 class="mb-0"><i class="fas fa-user-plus me-2 text-warning"></i> Nouvel invit&eacute;</h5>
                 </div>
                 <div class="card-body p-4">
                     @if (commandite.Statut != "PAYEE")
@@ -86,8 +84,8 @@
                     {
                         <div class="alert alert-warning border-0 rounded-4 p-4 text-center">
                             <i class="fas fa-info-circle fa-2x mb-3"></i>
-                            <h6 class="fw-bold">Capacité atteinte</h6>
-                            <p class="small mb-0">Vous avez déjà utilisé vos @limite places de joueur incluses pour ce forfait.</p>
+                            <h6 class="fw-bold">Capacit&eacute; atteinte</h6>
+                            <p class="small mb-0">Vous avez d&eacute;j&agrave; utilis&eacute; vos @limite places de joueur incluses pour ce forfait.</p>
                         </div>
                     }
                     else
@@ -95,15 +93,15 @@
                         <form asp-action="AjouterJoueur" method="post" class="needs-validation" novalidate id="addPlayerForm">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />
-                            
+
                             <div class="mb-3">
-                                <label class="form-label fw-600">Prénom</label>
+                                <label class="form-label fw-600">Pr&eacute;nom</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-user text-muted"></i></span>
                                     <input type="text" name="prenom" class="form-control border-start-0" placeholder="Ex: Jean" required />
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label fw-600">Nom</label>
                                 <div class="input-group">
@@ -111,16 +109,16 @@
                                     <input type="text" name="nom" class="form-control border-start-0" placeholder="Ex: Tremblay" required />
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4">
                                 <label class="form-label fw-600">Adresse courriel</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-envelope text-muted"></i></span>
                                     <input type="email" name="email" class="form-control border-start-0" placeholder="jean.tremblay@exemple.com" required />
                                 </div>
-                                <div class="form-text mt-1 text-muted small">Le joueur recevra son code d'accès par courriel.</div>
+                                <div class="form-text mt-1 text-muted small">Le joueur recevra son code d'acc&egrave;s par courriel.</div>
                             </div>
-                            
+
                             <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm mt-2">
                                 <i class="fas fa-plus-circle me-2"></i> Inscrire le joueur
                             </button>
@@ -130,11 +128,10 @@
             </div>
         </div>
 
-        <!-- Liste Panel -->
         <div class="col-lg-8">
             <div class="dashboard-card shadow-sm border-0 rounded-4 overflow-hidden h-100">
                 <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-list-ul me-2 text-success"></i> Joueurs Inscrits</h5>
+                    <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-list-ul me-2 text-success"></i> Joueurs inscrits</h5>
                     <span class="badge rounded-pill bg-light text-dark border p-2 px-3 fw-bold">Total: @inscrits / @limite</span>
                 </div>
                 <div class="card-body p-0">
@@ -142,10 +139,10 @@
                     {
                         <div class="text-center py-6">
                             <div class="empty-list-icon mb-4">
-                                <i class="fas fa-users-slash fa-4x text-light" style="opacity: 0.5;"></i>
+                                <i class="fas fa-users-slash fa-4x text-light empty-list-icon-muted"></i>
                             </div>
                             <h6 class="text-muted fw-bold">Aucun joueur pour le moment</h6>
-                            <p class="text-muted small">Commencez par ajouter un invité à l'aide du formulaire à gauche.</p>
+                            <p class="text-muted small">Commencez par ajouter un invit&eacute; &agrave; l'aide du formulaire &agrave; gauche.</p>
                         </div>
                     }
                     else
@@ -155,7 +152,7 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="ps-4 border-0 py-3">Joueur</th>
-                                        <th class="border-0 py-3">Coordonnées</th>
+                                        <th class="border-0 py-3">Coordonn&eacute;es</th>
                                         <th class="border-0 py-3">Statut</th>
                                         <th class="text-end pe-4 border-0 py-3">Actions</th>
                                     </tr>
@@ -179,10 +176,10 @@
                                                 <div class="small"><i class="fas fa-envelope text-muted me-2"></i>@p.Email</div>
                                             </td>
                                             <td class="py-3">
-                                                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Confirmé</span>
+                                                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Confirm&eacute;</span>
                                             </td>
                                             <td class="text-end pe-4 py-3">
-                                                <form asp-action="SupprimerJoueur" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous certain de vouloir retirer ce joueur de votre commandite ?');">
+                                                <form asp-action="SupprimerJoueur" method="post" class="d-inline" onsubmit="return confirm('Etes-vous certain de vouloir retirer ce joueur de votre commandite ?');">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="participantId" value="@p.ParticipantId" />
                                                     <input type="hidden" name="commanditeId" value="@commandite.CommanditeId" />

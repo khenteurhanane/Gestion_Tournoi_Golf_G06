@@ -5,187 +5,311 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tournoi de Golf G06</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/css/site.css?v=20260416b" />
+    <link rel="stylesheet" href="/css/site.css?v=20260423g" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
-<body class="dashboard-body">
+@{
+    string initialControllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string initialActionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    bool initialPublicShell = ViewData["UsePublicShell"] as bool? ?? false;
+    if (!initialPublicShell && initialControllerName == "Home" && initialActionName == "Index")
+    {
+        initialPublicShell = true;
+    }
+    string bodyClass = initialPublicShell ? "public-body" : "dashboard-body";
+}
+<body class="@bodyClass">
     @using Microsoft.AspNetCore.Http
     @using Microsoft.AspNetCore.Mvc.Localization
     @inject IViewLocalizer Localizer
     @inject IHttpContextAccessor HttpContextAccessor
     @{
+        string controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        string actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+        bool isPublicShell = ViewData["UsePublicShell"] as bool? ?? false;
+        if (!isPublicShell && controllerName == "Home" && actionName == "Index")
+        {
+            isPublicShell = true;
+        }
         bool estConnecte = HttpContextAccessor.HttpContext?.Session.GetString("IsLoggedIn") == "true";
+        bool hideTopbarPageInfo = ViewData["HideTopbarPageInfo"] as bool? ?? false;
+        string compactTopbarTitle = ViewData["CompactTopbarTitle"]?.ToString() ?? (ViewData["Title"]?.ToString() ?? "Tournoi de Golf G06");
+        string compactTopbarSubtitle = ViewData["CompactTopbarSubtitle"]?.ToString() ?? "Espace interne";
         string role = HttpContextAccessor.HttpContext?.Session.GetString("UserRole") ?? "";
         string prenom = HttpContextAccessor.HttpContext?.Session.GetString("UserPrenom") ?? "";
         string nom = HttpContextAccessor.HttpContext?.Session.GetString("UserNom") ?? "";
         string currentLang = HttpContextAccessor.HttpContext?.Session.GetString("Lang") ?? "FR";
+        string espaceUrl = role == "ADMIN" ? "/Admin/Index" : role == "COMMANDITAIRE" ? "/Commandite/Index" : "/Auth/Profil";
+        bool isAccueil = controllerName == "Home" && actionName == "Index";
+        bool isTournoi = controllerName == "Tournoi";
+        bool isSponsor = controllerName == "Sponsor" || controllerName == "Commandite";
+        bool isBoutique = controllerName == "Boutique";
+        bool isAuthMesInscriptions = controllerName == "Auth" && actionName == "MesInscriptions";
+        bool isAuthProfil = controllerName == "Auth" && actionName == "Profil";
+        bool isEquipe = controllerName == "Equipe";
+        bool isAdminDashboard = controllerName == "Admin" && actionName == "Index";
+        bool isAdminUtilisateurs = controllerName == "Admin" && actionName == "Utilisateurs";
+        bool isAdminParticipants = controllerName == "Admin" && actionName == "Participants";
+        bool isAdminEquipes = controllerName == "Admin" && (actionName == "Equipes" || actionName == "DetailsEquipe");
     }
 
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="app-sidebar">
-            <div class="sidebar-header">
-                <a href="/" class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-golf-ball"></i>
-                    </div>
-                    <div class="logo-text">
-                        <span class="logo-title">Golf G06</span>
-                        <span class="logo-subtitle">Tournoi Annuel</span>
-                    </div>
-                </a>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a href="/" class="@(ViewData["Title"]?.ToString() == "Accueil" ? "active" : "")">
-                    <i class="fas fa-home"></i> <span>@(currentLang == "EN" ? "Home" : "Accueil")</span>
-                </a>
-                <a href="/Tournoi/Index" class="@(ViewData["Title"]?.ToString() == "Liste des Tournois" ? "active" : "")">
-                    <i class="fas fa-calendar-alt"></i> <span>@(currentLang == "EN" ? "Tournaments" : "Tournois")</span>
-                </a>
-                <a href="/Sponsor/Index" class="@(ViewData["Title"]?.ToString() == "Paliers de Commandite" ? "active" : "")">
-                    <i class="fas fa-star text-warning"></i> <span>@(currentLang == "EN" ? "Become a Sponsor" : "Commanditer")</span>
-                </a>
-                <a href="/Boutique/Index" class="@(ViewData["Title"]?.ToString() == "Boutique" ? "active" : "")">
-                    <i class="fas fa-store text-success"></i> <span>@(currentLang == "EN" ? "Shop" : "Magasiner")</span>
-                </a>
-                
-                @if (estConnecte)
-                {
-                    <div class="nav-divider">Menu Utilisateur</div>
-                    
-                    @if (role == "ADMIN")
-                    {
-                        <a href="/Admin/Index" class="@(ViewData["Title"]?.ToString() == "Espace Administrateur" ? "index" == "active" ? "active" : "" : "")">
-                            <i class="fas fa-chart-pie"></i> <span>Dashboard Admin</span>
-                        </a>
-                        <a href="/Admin/Utilisateurs">
-                            <i class="fas fa-users-cog"></i> <span>Utilisateurs</span>
-                        </a>
-                        <a href="/Admin/Participants">
-                            <i class="fas fa-user-tag"></i> <span>Participants</span>
-                        </a>
-                    }
-                    else if (role == "COMMANDITAIRE")
-                    {
-                        <a href="/Commandite/Index">
-                            <i class="fas fa-handshake"></i> <span>Mes commandites</span>
-                        </a>
-                    }
-                    else
-                    {
-                        <a href="/Equipe/Index">
-                            <i class="fas fa-user-friends"></i> <span>Mes équipes</span>
-                        </a>
-                        <a href="/Auth/MesInscriptions">
-                            <i class="fas fa-check-circle"></i> <span>Mes inscriptions</span>
-                        </a>
-                    }
-
-                    <a href="/Auth/Profil">
-                        <i class="fas fa-user-circle"></i> <span>Mon profil</span>
+    @if (isPublicShell)
+    {
+        <div class="public-shell">
+            <header class="public-topbar">
+                <div class="public-topbar__inner">
+                    <a href="/" class="public-brand">
+                        <span class="public-brand__mark">
+                            <i class="fas fa-golf-ball"></i>
+                        </span>
+                        <span class="public-brand__text">
+                            <span class="public-brand__title">Golf G06</span>
+                            <span class="public-brand__subtitle">Tournoi annuel</span>
+                        </span>
                     </a>
-                }
-                
-                <div class="nav-bottom">
-                    <a href="/Home/Contact">
-                        <i class="fas fa-envelope"></i> <span>Contact</span>
-                    </a>
-                    @if (estConnecte)
-                    {
-                        <a href="/Auth/Logout" class="logout-link">
-                            <i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span>
-                        </a>
-                    }
-                    else
-                    {
-                        <a href="/Auth/Login" class="login-link">
-                            <i class="fas fa-sign-in-alt"></i> <span>Connexion</span>
-                        </a>
-                    }
-                </div>
-            </nav>
-        </aside>
 
-        <!-- Main Content -->
-        <main class="app-main">
-            <!-- Topbar -->
-            <header class="app-topbar">
-                <div class="topbar-left">
-                    <!-- Bouton hamburger TOUJOURS visible -->
-                    <button class="hamburger-btn" id="sidebarToggle" aria-label="Menu">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="topbar-page-info">
-                        <h2 class="page-title">@ViewData["Title"]</h2>
-                        <span class="page-subtitle">Tournoi de Golf — Cité Collégiale</span>
-                    </div>
-                </div>
-                <div class="topbar-right">
-                    <div class="lang-dropdown-wrapper me-4" id="langDropdown">
-                        <button class="lang-btn" id="langDropdownBtn" aria-haspopup="true" aria-expanded="false">
-                            <span class="lang-flag" id="langCurrentFlag">
-                                @(currentLang == "EN" ? "🇬🇧" : currentLang == "NL" ? "🇳🇱" : currentLang == "DE" ? "🇩🇪" : currentLang == "ES" ? "🇪🇸" : currentLang == "IT" ? "🇮🇹" : currentLang == "SV" ? "🇸🇪" : "🇫🇷")
-                            </span>
-                            <span class="ms-2 lang-code">@currentLang</span>
-                            <i class="fas fa-chevron-down ms-2" id="langChevron" style="font-size:0.65rem; transition: transform 0.2s;"></i>
-                        </button>
-                        <div class="lang-menu" id="langMenu" role="listbox">
-                            <a href="/Home/SetLanguage?lang=EN" class="lang-option @(currentLang == "EN" ? "active" : "")" role="option">
-                                <span>🇬🇧</span> <span>English</span>
-                            </a>
-                            <a href="/Home/SetLanguage?lang=FR" class="lang-option @(currentLang == "FR" ? "active" : "")" role="option">
-                                <span>🇫🇷</span> <span>Français</span>
-                            </a>
-                            <a href="/Home/SetLanguage?lang=NL" class="lang-option @(currentLang == "NL" ? "active" : "")" role="option">
-                                <span>🇳🇱</span> <span>Nederlands</span>
-                            </a>
-                            <a href="/Home/SetLanguage?lang=DE" class="lang-option @(currentLang == "DE" ? "active" : "")" role="option">
-                                <span>🇩🇪</span> <span>Deutsch</span>
-                            </a>
-                            <a href="/Home/SetLanguage?lang=ES" class="lang-option @(currentLang == "ES" ? "active" : "")" role="option">
-                                <span>🇪🇸</span> <span>Español</span>
-                            </a>
-                            <a href="/Home/SetLanguage?lang=IT" class="lang-option @(currentLang == "IT" ? "active" : "")" role="option">
-                                <span>🇮🇹</span> <span>Italiano</span>
-                            </a>
-                            <a href="/Home/SetLanguage?lang=SV" class="lang-option @(currentLang == "SV" ? "active" : "")" role="option">
-                                <span>🇸🇪</span> <span>Svenska</span>
-                            </a>
-                        </div>
-                    </div>
-                    @if (estConnecte)
-                    {
-                        <div class="user-profile">
-                            <div class="user-info">
-                                <span class="user-name">@prenom @nom</span>
-                                <span class="user-role">@role</span>
-                            </div>
-                            <div class="user-avatar">
-                                @prenom[0]
+                    <nav class="public-nav">
+                        <a href="/Tournoi/Index">Tournois</a>
+                        <a href="/Sponsor/Index">Commandites</a>
+                        <a href="/Boutique/Index">Boutique</a>
+                        <a href="/Home/Contact">Contact</a>
+                    </nav>
+
+                    <div class="public-topbar__actions">
+                        <div class="lang-dropdown-wrapper" id="langDropdown">
+                            <button class="lang-btn public-lang-btn" id="langDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                                <span class="lang-code">@currentLang</span>
+                                <i class="fas fa-chevron-down lang-chevron" id="langChevron"></i>
+                            </button>
+                            <div class="lang-menu" id="langMenu" role="listbox">
+                                <a href="/Home/SetLanguage?lang=EN" class="lang-option @(currentLang == "EN" ? "active" : "")" role="option">
+                                    <span>English</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=FR" class="lang-option @(currentLang == "FR" ? "active" : "")" role="option">
+                                    <span>Francais</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=NL" class="lang-option @(currentLang == "NL" ? "active" : "")" role="option">
+                                    <span>Nederlands</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=DE" class="lang-option @(currentLang == "DE" ? "active" : "")" role="option">
+                                    <span>Deutsch</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=ES" class="lang-option @(currentLang == "ES" ? "active" : "")" role="option">
+                                    <span>Espanol</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=IT" class="lang-option @(currentLang == "IT" ? "active" : "")" role="option">
+                                    <span>Italiano</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=SV" class="lang-option @(currentLang == "SV" ? "active" : "")" role="option">
+                                    <span>Svenska</span>
+                                </a>
                             </div>
                         </div>
-                    }
-                    else
-                    {
-                        <a href="/Auth/Login" class="btn btn-sm btn-login-topbar">Se connecter</a>
-                    }
+
+                        @if (estConnecte)
+                        {
+                            <a href="@espaceUrl" class="public-space-link">Mon espace</a>
+                            <a href="/Auth/Logout" class="public-auth-btn public-auth-btn--ghost">Deconnexion</a>
+                        }
+                        else
+                        {
+                            <a href="/Auth/Login" class="public-auth-btn">Se connecter</a>
+                        }
+                    </div>
                 </div>
             </header>
 
-            <div class="content-wrapper">
-                @RenderBody()
-            </div>
-        </main>
-    </div>
-    <!-- Overlay mobile -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <main class="public-main">
+                <div class="public-content-wrapper">
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+    }
+    else
+    {
+        <div class="app-container">
+            <aside class="app-sidebar">
+                <div class="sidebar-header">
+                    <a href="/" class="logo">
+                        <span class="logo-icon">
+                            <i class="fas fa-golf-ball"></i>
+                        </span>
+                        <span class="logo-text">
+                            <span class="logo-title">Golf G06</span>
+                            <span class="logo-subtitle">Tournoi Annuel</span>
+                        </span>
+                    </a>
+                </div>
 
-    <!-- Bouton hamburger flottant (mobile uniquement) -->
-    <button class="fab-hamburger" id="fabHamburger" aria-label="Ouvrir le menu">
-        <i class="fas fa-bars" id="fabIcon"></i>
-    </button>
+                <nav class="sidebar-nav">
+                    <a href="/" class="@(isAccueil ? "active" : "")">
+                        <i class="fas fa-home"></i> <span>@(currentLang == "EN" ? "Home" : "Accueil")</span>
+                    </a>
+                    <a href="/Tournoi/Index" class="@(isTournoi ? "active" : "")">
+                        <i class="fas fa-calendar-alt"></i> <span>@(currentLang == "EN" ? "Tournaments" : "Tournois")</span>
+                    </a>
+                    <a href="/Sponsor/Index" class="@(isSponsor ? "active" : "")">
+                        <i class="fas fa-star"></i> <span>@(currentLang == "EN" ? "Become a Sponsor" : "Commanditer")</span>
+                    </a>
+                    <a href="/Boutique/Index" class="@(isBoutique ? "active" : "")">
+                        <i class="fas fa-store"></i> <span>@(currentLang == "EN" ? "Shop" : "Magasiner")</span>
+                    </a>
+
+                    @if (estConnecte)
+                    {
+                        <div class="nav-divider">Menu Utilisateur</div>
+
+                        @if (role == "ADMIN")
+                        {
+                            <a href="/Admin/Index" class="@(isAdminDashboard ? "active" : "")">
+                                <i class="fas fa-chart-pie"></i> <span>Tableau de bord</span>
+                            </a>
+                            <a href="/Admin/Utilisateurs" class="@(isAdminUtilisateurs ? "active" : "")">
+                                <i class="fas fa-users-cog"></i> <span>Utilisateurs</span>
+                            </a>
+                            <a href="/Admin/Participants" class="@(isAdminParticipants ? "active" : "")">
+                                <i class="fas fa-user-tag"></i> <span>Participants</span>
+                            </a>
+                            <a href="/Admin/Equipes" class="@(isAdminEquipes ? "active" : "")">
+                                <i class="fas fa-user-friends"></i> <span>Equipes</span>
+                            </a>
+                        }
+                        else if (role == "COMMANDITAIRE")
+                        {
+                            <a href="/Commandite/Index" class="@(isSponsor ? "active" : "")">
+                                <i class="fas fa-handshake"></i> <span>Mes commandites</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Equipe/Index" class="@(isEquipe ? "active" : "")">
+                                <i class="fas fa-user-friends"></i> <span>Mes equipes</span>
+                            </a>
+                            <a href="/Auth/MesInscriptions" class="@(isAuthMesInscriptions ? "active" : "")">
+                                <i class="fas fa-check-circle"></i> <span>Mes inscriptions</span>
+                            </a>
+                        }
+
+                        <a href="/Auth/Profil" class="@(isAuthProfil ? "active" : "")">
+                            <i class="fas fa-user-circle"></i> <span>Mon profil</span>
+                        </a>
+                    }
+
+                    <div class="nav-bottom">
+                        <a href="/Home/Contact">
+                            <i class="fas fa-envelope"></i> <span>Contact</span>
+                        </a>
+                        @if (estConnecte)
+                        {
+                            <a href="/Auth/Logout" class="logout-link">
+                                <i class="fas fa-sign-out-alt"></i> <span>Deconnexion</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Auth/Login" class="login-link">
+                                <i class="fas fa-sign-in-alt"></i> <span>Connexion</span>
+                            </a>
+                        }
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="app-main">
+                <header class="app-topbar">
+                    <div class="topbar-left">
+                        <button class="hamburger-btn" id="sidebarToggle" aria-label="Menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+
+                        @if (hideTopbarPageInfo)
+                        {
+                            <a href="@espaceUrl" class="app-topbar-brand" aria-label="Mon espace">
+                                <span class="app-topbar-brand__mark">
+                                    <i class="fas fa-golf-ball"></i>
+                                </span>
+                                <span class="app-topbar-brand__title">Golf G06</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="topbar-page-info topbar-page-info--compact">
+                                <h1 class="page-title">@compactTopbarTitle</h1>
+                                @if (!string.IsNullOrWhiteSpace(compactTopbarSubtitle))
+                                {
+                                    <span class="page-subtitle">@compactTopbarSubtitle</span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="topbar-right">
+                        <div class="lang-dropdown-wrapper" id="langDropdown">
+                            <button class="lang-btn" id="langDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                                <span class="lang-code">@currentLang</span>
+                                <i class="fas fa-chevron-down lang-chevron" id="langChevron"></i>
+                            </button>
+                            <div class="lang-menu" id="langMenu" role="listbox">
+                                <a href="/Home/SetLanguage?lang=EN" class="lang-option @(currentLang == "EN" ? "active" : "")" role="option">
+                                    <span>English</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=FR" class="lang-option @(currentLang == "FR" ? "active" : "")" role="option">
+                                    <span>Francais</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=NL" class="lang-option @(currentLang == "NL" ? "active" : "")" role="option">
+                                    <span>Nederlands</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=DE" class="lang-option @(currentLang == "DE" ? "active" : "")" role="option">
+                                    <span>Deutsch</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=ES" class="lang-option @(currentLang == "ES" ? "active" : "")" role="option">
+                                    <span>Espanol</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=IT" class="lang-option @(currentLang == "IT" ? "active" : "")" role="option">
+                                    <span>Italiano</span>
+                                </a>
+                                <a href="/Home/SetLanguage?lang=SV" class="lang-option @(currentLang == "SV" ? "active" : "")" role="option">
+                                    <span>Svenska</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        @if (estConnecte)
+                        {
+                            <div class="user-profile">
+                                <div class="user-info">
+                                    <span class="user-name">@prenom @nom</span>
+                                    <span class="user-role">@role</span>
+                                </div>
+                                <a href="@espaceUrl" class="user-avatar" aria-label="Mon espace">
+                                    @((!string.IsNullOrWhiteSpace(prenom) ? prenom[0].ToString() : "U").ToUpper())
+                                </a>
+                            </div>
+                            <a href="/Auth/Logout" class="btn-login-topbar">Deconnexion</a>
+                        }
+                        else
+                        {
+                            <a href="/Auth/Login" class="btn-login-topbar">Se connecter</a>
+                        }
+                    </div>
+                </header>
+
+                <div class="content-wrapper">
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+    }
+
+    @if (!isPublicShell)
+    {
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <button class="fab-hamburger" id="fabHamburger" aria-label="Ouvrir le menu">
+            <i class="fas fa-bars" id="fabIcon"></i>
+        </button>
+    }
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -193,89 +317,94 @@
     @await RenderSectionAsync("Scripts", required: false)
     <script>
         const sidebarToggle = document.getElementById('sidebarToggle');
-        const fabHamburger  = document.getElementById('fabHamburger');
-        const fabIcon       = document.getElementById('fabIcon');
-        const sidebar       = document.querySelector('.app-sidebar');
-        const overlay       = document.getElementById('sidebarOverlay');
-        const toggleIcon    = sidebarToggle ? sidebarToggle.querySelector('i') : null;
+        const fabHamburger = document.getElementById('fabHamburger');
+        const fabIcon = document.getElementById('fabIcon');
+        const sidebar = document.querySelector('.app-sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleIcon = sidebarToggle ? sidebarToggle.querySelector('i') : null;
 
         function openSidebar() {
+            if (!sidebar || !overlay) return;
             sidebar.classList.add('open');
             overlay.classList.add('active');
-            // Topbar toggle
             if (sidebarToggle) { sidebarToggle.classList.add('open'); }
-            if (toggleIcon)    { toggleIcon.classList.replace('fa-bars', 'fa-times'); }
-            // FAB
-            if (fabHamburger)  { fabHamburger.classList.add('open'); fabHamburger.setAttribute('aria-label','Fermer le menu'); }
-            if (fabIcon)       { fabIcon.classList.replace('fa-bars', 'fa-times'); }
+            if (toggleIcon) { toggleIcon.classList.replace('fa-bars', 'fa-times'); }
+            if (fabHamburger) { fabHamburger.classList.add('open'); fabHamburger.setAttribute('aria-label', 'Fermer le menu'); }
+            if (fabIcon) { fabIcon.classList.replace('fa-bars', 'fa-times'); }
             document.body.style.overflow = 'hidden';
         }
 
         function closeSidebar() {
+            if (!sidebar || !overlay) return;
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
-            // Topbar toggle
             if (sidebarToggle) { sidebarToggle.classList.remove('open'); }
-            if (toggleIcon)    { toggleIcon.classList.replace('fa-times', 'fa-bars'); }
-            // FAB
-            if (fabHamburger)  { fabHamburger.classList.remove('open'); fabHamburger.setAttribute('aria-label','Ouvrir le menu'); }
-            if (fabIcon)       { fabIcon.classList.replace('fa-times', 'fa-bars'); }
+            if (toggleIcon) { toggleIcon.classList.replace('fa-times', 'fa-bars'); }
+            if (fabHamburger) { fabHamburger.classList.remove('open'); fabHamburger.setAttribute('aria-label', 'Ouvrir le menu'); }
+            if (fabIcon) { fabIcon.classList.replace('fa-times', 'fa-bars'); }
             document.body.style.overflow = '';
         }
 
-        // Topbar button
-        if (sidebarToggle) {
+        if (sidebarToggle && sidebar) {
             sidebarToggle.addEventListener('click', () =>
                 sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
             );
         }
-        // FAB button
-        if (fabHamburger) {
+
+        if (fabHamburger && sidebar) {
             fabHamburger.addEventListener('click', () =>
                 sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
             );
         }
-        // Overlay click closes sidebar
-        overlay.addEventListener('click', closeSidebar);
 
-        // Fermer sidebar au clic sur un lien (mobile)
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
         document.querySelectorAll('.sidebar-nav a').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 991) closeSidebar();
+                if (window.innerWidth <= 991 && sidebar) closeSidebar();
             });
         });
 
-        // Fermer avec la touche Échap
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
+            if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) closeSidebar();
         });
+
+        function syncShellMode() {
+            if (window.innerWidth >= 1200) {
+                closeSidebar();
+            }
+        }
+
+        window.addEventListener('resize', syncShellMode);
+        syncShellMode();
     </script>
 
     <script>
-        // ===== LANGUAGE DROPDOWN =====
-        const langBtn  = document.getElementById('langDropdownBtn');
+        const langBtn = document.getElementById('langDropdownBtn');
         const langMenu = document.getElementById('langMenu');
         const langChev = document.getElementById('langChevron');
 
         if (langBtn && langMenu) {
-            langBtn.addEventListener('click', function(e) {
+            langBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const isOpen = langMenu.classList.toggle('open');
                 langBtn.setAttribute('aria-expanded', isOpen);
                 if (langChev) langChev.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
             });
 
-            document.addEventListener('click', function() {
+            document.addEventListener('click', function () {
                 langMenu.classList.remove('open');
                 langBtn.setAttribute('aria-expanded', 'false');
                 if (langChev) langChev.style.transform = 'rotate(0deg)';
             });
 
-            langMenu.addEventListener('click', function(e) {
+            langMenu.addEventListener('click', function (e) {
                 e.stopPropagation();
             });
 
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     langMenu.classList.remove('open');
                     langBtn.setAttribute('aria-expanded', 'false');

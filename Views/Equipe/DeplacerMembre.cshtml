@@ -1,45 +1,64 @@
 @model croupe_06_TournoiGolf.Models.Participant
 @{
-    ViewData["Title"] = "Déplacer un membre";
+    ViewData["Title"] = "Deplacer un membre";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Déplacer un membre";
     var autresEquipes = (List<croupe_06_TournoiGolf.Models.Equipe>)ViewBag.AutresEquipes;
     var equipeActuelle = (croupe_06_TournoiGolf.Models.Equipe)ViewBag.EquipeActuelle;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-exchange-alt"></i> Déplacer un membre</h1>
-    <a href="/Equipe/Gestion/@equipeActuelle.EquipeId" class="btn btn-secondary">Retour à la gestion</a>
-</div>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-
-<div class="card">
-    <h3>Déplacer : @Model.Utilisateur?.Prenom @Model.Utilisateur?.Nom</h3>
-    <p>Équipe actuelle : <strong>@equipeActuelle.NomEquipe</strong></p>
-
-    @if (autresEquipes.Count == 0)
+<section class="app-page-shell app-page-shell--narrow">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
     {
-        <div class="alert alert-warning">Aucune autre équipe disponible avec de la place dans ce tournoi.</div>
+        Icon = "fas fa-right-left",
+        Eyebrow = "Gestion d'équipe",
+        Title = "Déplacer un membre",
+        Description = $"Déplacez {(Model.Utilisateur?.Prenom ?? Model.Prenom)} {(Model.Utilisateur?.Nom ?? Model.Nom)} vers une autre équipe du même tournoi."
+    })
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
     }
-    else
-    {
-        <form action="/Equipe/DeplacerMembre" method="post">
-            <input type="hidden" name="participantId" value="@Model.ParticipantId" />
-            <input type="hidden" name="equipeSourceId" value="@equipeActuelle.EquipeId" />
-            <div class="form-group mb-3">
-                <label>Choisir l'équipe de destination</label>
-                <select name="equipeCibleId" class="form-control" required>
-                    <option value="">-- Sélectionner une équipe --</option>
-                    @foreach (var e in autresEquipes)
-                    {
-                        var nbMembres = ViewBag.AutresEquipes != null ? 0 : 0;
-                        <option value="@e.EquipeId">@e.NomEquipe</option>
-                    }
-                </select>
+
+    <section class="app-surface-card app-form-card">
+        <div class="app-detail-list">
+            <div class="app-detail-row">
+                <strong>Équipe actuelle</strong>
+                <span>@equipeActuelle.NomEquipe</span>
             </div>
-            <button type="submit" class="btn btn-primary">Confirmer le déplacement</button>
-        </form>
-    }
-</div>
+            <div class="app-detail-row">
+                <strong>Membre</strong>
+                <span>@(Model.Utilisateur?.Prenom ?? Model.Prenom) @(Model.Utilisateur?.Nom ?? Model.Nom)</span>
+            </div>
+        </div>
+
+        @if (autresEquipes.Count == 0)
+        {
+            <div class="alert alert-warning">Aucune autre équipe disponible avec de la place dans ce tournoi.</div>
+        }
+        else
+        {
+            <form action="/Equipe/DeplacerMembre" method="post" class="app-form-card">
+                <input type="hidden" name="participantId" value="@Model.ParticipantId" />
+                <input type="hidden" name="equipeSourceId" value="@equipeActuelle.EquipeId" />
+
+                <div class="form-group">
+                    <label>Choisir l'équipe de destination</label>
+                    <select name="equipeCibleId" required>
+                        <option value="">-- Sélectionner une équipe --</option>
+                        @foreach (var e in autresEquipes)
+                        {
+                            <option value="@e.EquipeId">@e.NomEquipe</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="app-actions">
+                    <button type="submit" class="btn">Confirmer le déplacement</button>
+                    <a href="/Equipe/Gestion/@equipeActuelle.EquipeId" class="btn btn-secondary">Retour à la gestion</a>
+                </div>
+            </form>
+        }
+    </section>
+</section>

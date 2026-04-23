@@ -2,117 +2,128 @@
 
 @{
     ViewData["Title"] = "Inscription au tournoi";
+    ViewData["HideTopbarPageInfo"] = true;
+    var header = new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-clipboard-check",
+        Eyebrow = "Inscription",
+        Title = "Confirmer votre participation",
+        Description = "Verifiez vos informations, choisissez votre type de participant et decidez si vous creez ou rejoignez une equipe."
+    };
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        
-        <div class="card">
-            <h2>Inscription au tournoi</h2>
-            <p class="sub">Vous vous inscrivez au tournoi : <strong>@ViewBag.NomTournoi</strong></p>
-            <p class="sub">Date : @ViewBag.DateTournoi | Lieu : @ViewBag.LieuTournoi</p>
+<div class="app-page">
+    <partial name="_AppSectionHeader" model="header" />
 
-            <form action="/Inscription/Index" method="post">
-                @Html.AntiForgeryToken()
-
-                
-                <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
-
-                @if (ViewBag.Error != null)
-                {
-                    <div class="error">@ViewBag.Error</div>
-                }
-                @if (TempData["Error"] != null)
-                {
-                    <div class="error">@TempData["Error"]</div>
-                    @if (TempData["ErrorDetail"] != null)
-                    {
-                        <div class="error" style="font-size:.85em; opacity:.8;">Détail : @TempData["ErrorDetail"]</div>
-                    }
-                }
-
-                <div class="form-group">
-                    <label>Prénom</label>
-                    <input name="Prenom" type="text" value="@Model?.Prenom" readonly />
-                </div>
-
-                <div class="form-group">
-                    <label>Nom</label>
-                    <input name="Nom" type="text" value="@Model?.Nom" readonly />
-                </div>
-
-                <div class="form-group">
-                    <label>Adresse courriel</label>
-                    <input name="Email" type="email" value="@Model?.Email" readonly />
-                </div>
-
-                <div class="form-group">
-                    <label>Téléphone</label>
-                    <input name="Telephone" type="tel" value="@Model?.Telephone" readonly />
-                </div>
-
-                <div class="form-group">
-                    <label>Type de participant</label>
-                    <select name="TypeParticipant" id="typeParticipant" onchange="mettreAJourPrix()">
-                        <option value="employe">Employé (60,00 $)</option>
-                        <option value="retraite">Retraité (50,00 $)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Montant à payer</label>
-                    <input type="text" id="montantAffiche" value="60,00 $" readonly style="font-weight:bold;" />
-                </div>
-
-                <!-- Section équipe -->
-                <div class="form-group">
-                    <label>Équipe</label>
-                    <select name="ChoixEquipe" id="choixEquipe" onchange="afficherEquipe()">
-                        <option value="aucune">Pas d'équipe</option>
-                        <option value="creer">Créer une équipe</option>
-                        <option value="rejoindre">Rejoindre une équipe</option>
-                    </select>
-                </div>
-
-                <div id="sectionCreer" style="display:none;">
-                    <div class="form-group">
-                        <label>Nom de l'équipe</label>
-                        <input name="NomEquipe" id="NomEquipe" type="text" placeholder="Ex: Les Aigles" />
-                        <span asp-validation-for="NomEquipe" class="text-danger" style="color:red;font-size:0.9em;display:block;"></span>
-                    </div>
-                </div>
-
-                <div id="sectionRejoindre" style="display:none;">
-                    <div class="form-group">
-                        <label>Code secret de l'équipe</label>
-                        <input name="CodeEquipe" id="CodeEquipe" type="text" placeholder="Ex: ABC123" />
-                        <span asp-validation-for="CodeEquipe" class="text-danger" style="color:red;font-size:0.9em;display:block;"></span>
-                    </div>
-                </div>
-
-                <button class="btn" type="submit">Confirmer mon inscription</button>
-            </form>
-
-            <div class="card-footer">
-                <a href="/Tournoi/Index">Retour à la liste des tournois</a>
-            </div>
+    <section class="public-section-card auth-card">
+        <div class="auth-card__header">
+            <h2 class="auth-card__title">@ViewBag.NomTournoi</h2>
+            <p class="auth-card__text">Date : @ViewBag.DateTournoi | Lieu : @ViewBag.LieuTournoi</p>
         </div>
 
-    </div>
+        <form action="/Inscription/Index" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="TournoiId" value="@Model.TournoiId" />
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="surface-alert surface-alert--danger">@ViewBag.Error</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="surface-alert surface-alert--danger">
+                    <div>@TempData["Error"]</div>
+                    @if (TempData["ErrorDetail"] != null)
+                    {
+                        <div>Detail : @TempData["ErrorDetail"]</div>
+                    }
+                </div>
+            }
+
+            <div class="readonly-grid">
+                <div class="form-group readonly-field">
+                    <label for="Prenom" class="readonly-field__label">Prenom</label>
+                    <input id="Prenom" name="Prenom" type="text" value="@Model?.Prenom" readonly />
+                </div>
+                <div class="form-group readonly-field">
+                    <label for="Nom" class="readonly-field__label">Nom</label>
+                    <input id="Nom" name="Nom" type="text" value="@Model?.Nom" readonly />
+                </div>
+                <div class="form-group readonly-field">
+                    <label for="Email" class="readonly-field__label">Adresse courriel</label>
+                    <input id="Email" name="Email" type="email" value="@Model?.Email" readonly />
+                </div>
+                <div class="form-group readonly-field">
+                    <label for="Telephone" class="readonly-field__label">Telephone</label>
+                    <input id="Telephone" name="Telephone" type="tel" value="@Model?.Telephone" placeholder="Ajoutez votre numero de telephone" />
+                </div>
+            </div>
+
+            <div class="form-split">
+                <div class="form-group">
+                    <label for="typeParticipant">Type de participant</label>
+                    <select name="TypeParticipant" id="typeParticipant" onchange="mettreAJourPrix()">
+                        <option value="employe" selected="@(Model?.TypeParticipant != "retraite")">Employe (60,00 $)</option>
+                        <option value="retraite" selected="@(Model?.TypeParticipant == "retraite")">Retraite (50,00 $)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="montantAffiche">Montant a payer</label>
+                    <input type="text" id="montantAffiche" value="60,00 $" readonly class="input-strong" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="choixEquipe">Equipe</label>
+                <select name="ChoixEquipe" id="choixEquipe" onchange="afficherEquipe()">
+                    <option value="aucune" selected="@(Model?.ChoixEquipe == "aucune")">Pas d'equipe</option>
+                    <option value="creer" selected="@(Model?.ChoixEquipe == "creer")">Creer une equipe</option>
+                    <option value="rejoindre" selected="@(Model?.ChoixEquipe == "rejoindre")">Rejoindre une equipe</option>
+                </select>
+            </div>
+
+            <div id="sectionCreer" class="toggle-section">
+                <div class="form-group">
+                    <label for="NomEquipe">Nom de l'equipe</label>
+                    <input name="NomEquipe" id="NomEquipe" type="text" placeholder="Ex: Les Aigles" value="@Model?.NomEquipe" />
+                    <span asp-validation-for="NomEquipe" class="field-error"></span>
+                </div>
+            </div>
+
+            <div id="sectionRejoindre" class="toggle-section">
+                <div class="form-group">
+                    <label for="CodeEquipe">Code secret de l'equipe</label>
+                    <input name="CodeEquipe" id="CodeEquipe" type="text" placeholder="Ex: ABC123" value="@Model?.CodeEquipe" />
+                    <span asp-validation-for="CodeEquipe" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="auth-actions">
+                <button class="btn" type="submit">Confirmer mon inscription</button>
+                <a href="/Tournoi/Index" class="btn btn-secondary">Retour aux tournois</a>
+            </div>
+        </form>
+    </section>
 </div>
 
 <script>
     function afficherEquipe() {
-        var choix = document.getElementById('choixEquipe').value;
-        document.getElementById('sectionCreer').style.display = (choix === 'creer') ? 'block' : 'none';
-        document.getElementById('sectionRejoindre').style.display = (choix === 'rejoindre') ? 'block' : 'none';
+        const choix = document.getElementById('choixEquipe').value;
+        document.getElementById('sectionCreer').classList.toggle('is-visible', choix === 'creer');
+        document.getElementById('sectionRejoindre').classList.toggle('is-visible', choix === 'rejoindre');
     }
 
     function mettreAJourPrix() {
-        var type = document.getElementById('typeParticipant').value;
-        var montant = (type === 'retraite') ? '50,00 $' : '60,00 $';
+        const type = document.getElementById('typeParticipant').value;
+        const montant = type === 'retraite' ? '50,00 $' : '60,00 $';
         document.getElementById('montantAffiche').value = montant;
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        afficherEquipe();
+        mettreAJourPrix();
+    });
 </script>
 
 @section Scripts {

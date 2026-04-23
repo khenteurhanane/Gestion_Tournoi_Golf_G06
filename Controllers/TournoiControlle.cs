@@ -204,6 +204,25 @@ namespace croupe_06_TournoiGolf.Controllers
             ViewBag.Equipes = equipes;
             ViewBag.NbInscrits = participants.Count;
             ViewBag.PlacesRestantes = tournoi.PlacesParticipantsMax - participants.Count;
+            var participantsConfirmes = participants
+                .Where(p => p.StatutInscription == "CONFIRMEE" && p.EquipeId != null)
+                .ToList();
+            var nbMembresParEquipe = participantsConfirmes
+                .GroupBy(p => p.EquipeId!.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
+            int nbEquipesIncompletes = equipes.Count(e =>
+            {
+                nbMembresParEquipe.TryGetValue(e.EquipeId, out int count);
+                return count > 1 && count < e.NbJoueursMax;
+            });
+            int nbJoueursSoloDisponibles = equipes.Count(e =>
+            {
+                nbMembresParEquipe.TryGetValue(e.EquipeId, out int count);
+                return count == 1;
+            });
+            ViewBag.NbEquipesIncompletes = nbEquipesIncompletes;
+            ViewBag.NbJoueursSoloDisponibles = nbJoueursSoloDisponibles;
+            ViewBag.PeutCompleterEquipes = nbJoueursSoloDisponibles > 0 && (nbEquipesIncompletes > 0 || nbJoueursSoloDisponibles > 1);
 
             return View();
         }

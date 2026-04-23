@@ -1,103 +1,139 @@
 @model croupe_06_TournoiGolf.Models.Equipe
 @{
-    ViewData["Title"] = "Gérer l'équipe";
+    ViewData["Title"] = "Gerer l'equipe";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Gestion d'équipe";
     var membres = (List<Participant>)ViewBag.Membres;
     int currentUserId = ViewBag.CurrentUserId ?? 0;
     bool estCreateur = currentUserId == Model.CreeParUtilisateurId;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-edit"></i> Équipe : @Model.NomEquipe</h1>
-    <a href="/Equipe/Index" class="btn btn-secondary">Retour à mes équipes</a>
-</div>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-user-friends",
+        Eyebrow = "Gestion d'équipe",
+        Title = Model.NomEquipe,
+        Description = estCreateur
+            ? "Vous pilotez cette équipe. Mettez à jour son nom, partagez le code et ajustez les membres."
+            : "Consultez les membres de votre équipe et utilisez le code pour inviter d'autres joueurs."
+    })
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
 
-<div class="row">
-    <!-- Paramètres -->
-    <div class="col-md-5">
-        @if (estCreateur)
-        {
-        <div class="card mb-4">
-            <h3>Paramètres de l'équipe</h3>
-            <form action="/Equipe/ModifierNom" method="post">
-                <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
-                <div class="form-group mb-3">
-                    <label>Nom de l'équipe</label>
-                    <input type="text" name="NomEquipe" value="@Model.NomEquipe" class="form-control" required />
-                </div>
-                <div class="form-group mb-3">
-                    <label>Code Secret (Partagez ce code avec vos coéquipiers)</label>
-                    <input type="text" value="@Model.CodeSecret" class="form-control text-center font-weight-bold" readonly style="letter-spacing:3px; background:#f8f9fa;" />
-                </div>
-                <button type="submit" class="btn btn-primary w-100 mb-2">Enregistrer les modifications</button>
-            </form>
-            <form action="/Equipe/SupprimerEquipe" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe ?');">
-                <input type="hidden" name="id" value="@Model.EquipeId" />
-                <button type="submit" class="btn btn-outline-danger w-100">Supprimer l'équipe</button>
-            </form>
-        </div>
-        }
-        else
-        {
-        <div class="card mb-4">
-            <h3>Mon équipe</h3>
-            <p><strong>Code Secret :</strong> <span style="letter-spacing:3px;">@Model.CodeSecret</span></p>
-            <p class="text-muted">Seul le créateur peut modifier les paramètres de l'équipe.</p>
-        </div>
-        }
-    </div>
-
-
-    <!-- Membres -->
-    <div class="col-md-7">
-        <div class="card">
-            <h3>Membres (@membres.Count / @Model.NbJoueursMax)</h3>
-            @if (membres.Count == 0)
+    <div class="app-grid-sidebar">
+        <section class="app-surface-card app-form-card">
+            @if (estCreateur)
             {
-                <p class="text-muted">Aucun membre pour le moment.</p>
+                <span class="app-section-eyebrow"><i class="fas fa-sliders-h"></i> Paramètres</span>
+                <form action="/Equipe/ModifierNom" method="post" class="app-form-card">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="EquipeId" value="@Model.EquipeId" />
+
+                    <div class="form-group">
+                        <label>Nom de l'équipe</label>
+                        <input type="text" name="NomEquipe" value="@Model.NomEquipe" required />
+                    </div>
+
+                    <div class="app-highlight-panel">
+                        <span class="app-highlight-panel__code-label">Code secret</span>
+                        <div class="app-highlight-panel__code mt-0">
+                            <div class="app-highlight-panel__code-value">@Model.CodeSecret</div>
+                            <button type="button" class="btn" onclick="navigator.clipboard.writeText('@Model.CodeSecret')">Copier</button>
+                        </div>
+                    </div>
+
+                    <div class="app-actions">
+                        <button type="submit" class="btn">Enregistrer les modifications</button>
+                    </div>
+                </form>
+
+                <form action="/Equipe/SupprimerEquipe" method="post" onsubmit="return confirm('Etes-vous sur de vouloir supprimer cette equipe ?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.EquipeId" />
+                    <button type="submit" class="btn btn-danger">Supprimer l'équipe</button>
+                </form>
             }
             else
             {
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var m in membres)
-                        {
-                            <tr>
-                                <td>
-                                    @if (m.UtilisateurId == Model.CreeParUtilisateurId)
-                                    {
-                                        <span class="badge badge-capitaine"><i class="fas fa-crown"></i> Capitaine</span>
-                                    }
-                                    @m.Utilisateur?.Prenom @m.Utilisateur?.Nom
-                                </td>
-                                <td>
-                                    @if (m.UtilisateurId != Model.CreeParUtilisateurId && estCreateur)
-                                    {
-                                        <div class="d-flex gap-1">
-                                            <form action="/Equipe/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce membre ?');">
-                                                <input type="hidden" name="participantId" value="@m.ParticipantId" />
-                                                <input type="hidden" name="equipeId" value="@Model.EquipeId" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
-                                            </form>
-                                            <a href="/Equipe/DeplacerMembre?participantId=@m.ParticipantId&equipeId=@Model.EquipeId" class="btn btn-sm btn-outline-secondary">Déplacer</a>
-                                        </div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                <span class="app-section-eyebrow"><i class="fas fa-shield-alt"></i> Informations</span>
+                <div class="app-detail-list">
+                    <div class="app-detail-row">
+                        <strong>Code secret</strong>
+                        <span class="table-emphasis-code">@Model.CodeSecret</span>
+                    </div>
+                    <div class="app-detail-row">
+                        <strong>Rôle</strong>
+                        <span>Membre d'équipe</span>
+                    </div>
+                </div>
+                <p class="app-muted-note">Seul le capitaine peut modifier les paramètres de l'équipe.</p>
             }
-        </div>
+        </section>
+
+        <section class="app-surface-card app-table-card">
+            <div class="app-table-card__header">
+                <div>
+                    <h2>Membres</h2>
+                    <p class="app-muted-note">@membres.Count / @Model.NbJoueursMax joueurs</p>
+                </div>
+            </div>
+
+            @if (membres.Count == 0)
+            {
+                <div class="app-empty-inline">Aucun membre pour le moment.</div>
+            }
+            else
+            {
+                <div class="app-table-wrap">
+                    <table class="app-data-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Statut</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in membres)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@m.Utilisateur?.Prenom @m.Utilisateur?.Nom</strong>
+                                    </td>
+                                    <td>
+                                        @if (m.UtilisateurId == Model.CreeParUtilisateurId)
+                                        {
+                                            <span class="app-status-badge app-status-badge--success"><i class="fas fa-crown"></i> Capitaine</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="app-pill">Membre</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (m.UtilisateurId != Model.CreeParUtilisateurId && estCreateur)
+                                        {
+                                            <div class="app-inline-actions">
+                                                <form action="/Equipe/RetirerMembre" method="post" onsubmit="return confirm('Retirer ce membre ?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="participantId" value="@m.ParticipantId" />
+                                                    <input type="hidden" name="equipeId" value="@Model.EquipeId" />
+                                                    <button type="submit" class="btn btn-danger">Retirer</button>
+                                                </form>
+                                                <a href="/Equipe/DeplacerMembre?participantId=@m.ParticipantId&equipeId=@Model.EquipeId" class="btn btn-secondary">Déplacer</a>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
     </div>
-</div>
+</section>

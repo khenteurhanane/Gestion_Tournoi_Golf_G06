@@ -72,19 +72,13 @@ namespace croupe_06_TournoiGolf.Controllers
                 return View("DejaInscrit");
             }
 
-            // Préparation des données pour le formulaire d'inscription
-            var model = new InscriptionViewModel();
-            model.TournoiId = tournoiId.Value;
+            var model = new InscriptionViewModel
+            {
+                TournoiId = tournoiId.Value
+            };
 
-            // Chargement des informations de l'utilisateur depuis la session pour faciliter la saisie
-            model.Prenom = HttpContext.Session.GetString("UserPrenom") ?? "";
-            model.Nom = HttpContext.Session.GetString("UserNom") ?? "";
-            model.Email = HttpContext.Session.GetString("UserEmail") ?? "";
-            model.Telephone = HttpContext.Session.GetString("UserTelephone") ?? "";
-
-            ViewBag.NomTournoi = tournoi.Nom;
-            ViewBag.DateTournoi = tournoi.DateTournoi.ToShortDateString();
-            ViewBag.LieuTournoi = tournoi.Lieu;
+            ChargerInformationsUtilisateur(model, userId);
+            ChargerInformationsTournoi(tournoi);
 
             return View(model);
         }
@@ -98,13 +92,17 @@ namespace croupe_06_TournoiGolf.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Index(InscriptionViewModel model)
         {
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
             // Validation des champs obligatoires définis dans le ViewModel
             if (!ModelState.IsValid)
             {
                 var t = _context.Tournois.Find(model.TournoiId);
-                ViewBag.NomTournoi = t?.Nom;
-                ViewBag.DateTournoi = t?.DateTournoi.ToShortDateString();
-                ViewBag.LieuTournoi = t?.Lieu;
+                if (t != null)
+                {
+                    ChargerInformationsTournoi(t);
+                }
+                ChargerInformationsUtilisateur(model, userId);
                 return View(model);
             }
 
@@ -112,7 +110,12 @@ namespace croupe_06_TournoiGolf.Controllers
             if (model.ChoixEquipe == "creer" && string.IsNullOrWhiteSpace(model.NomEquipe))
             {
                 ModelState.AddModelError("NomEquipe", "Le nom d'équipe est obligatoire si vous choisissez de créer une équipe.");
-                ViewBag.NomTournoi = _context.Tournois.Find(model.TournoiId)?.Nom;
+                var tournoiErreur = _context.Tournois.Find(model.TournoiId);
+                if (tournoiErreur != null)
+                {
+                    ChargerInformationsTournoi(tournoiErreur);
+                }
+                ChargerInformationsUtilisateur(model, userId);
                 return View(model);
             }
 
@@ -120,12 +123,14 @@ namespace croupe_06_TournoiGolf.Controllers
             if (model.ChoixEquipe == "rejoindre" && string.IsNullOrWhiteSpace(model.CodeEquipe))
             {
                 ModelState.AddModelError("CodeEquipe", "Le code de l'équipe est obligatoire si vous choisissez de rejoindre une équipe.");
-                ViewBag.NomTournoi = _context.Tournois.Find(model.TournoiId)?.Nom;
+                var tournoiErreur = _context.Tournois.Find(model.TournoiId);
+                if (tournoiErreur != null)
+                {
+                    ChargerInformationsTournoi(tournoiErreur);
+                }
+                ChargerInformationsUtilisateur(model, userId);
                 return View(model);
             }
-
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
-
             if (model.TournoiId == null)
             {
                 return RedirectToAction("Index", "Tournoi");
@@ -166,6 +171,27 @@ namespace croupe_06_TournoiGolf.Controllers
                     // Détermination du tarif basé sur le rôle ou le statut sélectionné
                     decimal montant = (model.TypeParticipant == "retraite") ? 50.00m : 60.00m;
 
+                    if (userId != 0)
+                    {
+                        var utilisateur = _context.Utilisateurs.Find(userId);
+                        if (utilisateur != null)
+                        {
+                            var profilModifie = false;
+
+                            if (!string.Equals(utilisateur.Telephone ?? "", model.Telephone ?? "", StringComparison.Ordinal))
+                            {
+                                utilisateur.Telephone = model.Telephone;
+                                HttpContext.Session.SetString("UserTelephone", utilisateur.Telephone ?? "");
+                                profilModifie = true;
+                            }
+
+                            if (profilModifie)
+                            {
+                                _context.SaveChanges();
+                            }
+                        }
+                    }
+
                     // Création de l'objet Participant (Inscription)
                     var participant = new Participant
                     {
@@ -203,9 +229,8 @@ namespace croupe_06_TournoiGolf.Controllers
                         if (equipe == null)
                         {
                             ViewBag.Error = "Code d'équipe invalide ou introuvable pour ce tournoi.";
-                            ViewBag.NomTournoi = tournoi.Nom;
-                            ViewBag.DateTournoi = tournoi.DateTournoi.ToShortDateString();
-                            ViewBag.LieuTournoi = tournoi.Lieu;
+                            ChargerInformationsTournoi(tournoi);
+                            ChargerInformationsUtilisateur(model, userId);
                             return View(model);
                         }
 
@@ -214,9 +239,8 @@ namespace croupe_06_TournoiGolf.Controllers
                         if (nbMembres >= equipe.NbJoueursMax)
                         {
                             ViewBag.Error = "Cette équipe est déjà complète.";
-                            ViewBag.NomTournoi = tournoi.Nom;
-                            ViewBag.DateTournoi = tournoi.DateTournoi.ToShortDateString();
-                            ViewBag.LieuTournoi = tournoi.Lieu;
+                            ChargerInformationsTournoi(tournoi);
+                            ChargerInformationsUtilisateur(model, userId);
                             return View(model);
                         }
                         participant.EquipeId = equipe.EquipeId;
@@ -330,6 +354,45 @@ namespace croupe_06_TournoiGolf.Controllers
 public IActionResult Confirmation()
         {
             return View();
+        }
+
+        private void ChargerInformationsTournoi(Tournoi tournoi)
+        {
+            ViewBag.NomTournoi = tournoi.Nom;
+            ViewBag.DateTournoi = tournoi.DateTournoi.ToShortDateString();
+            ViewBag.LieuTournoi = tournoi.Lieu;
+        }
+
+        private void ChargerInformationsUtilisateur(InscriptionViewModel model, int userId)
+        {
+            model.Prenom = string.IsNullOrWhiteSpace(model.Prenom)
+                ? HttpContext.Session.GetString("UserPrenom") ?? ""
+                : model.Prenom;
+            model.Nom = string.IsNullOrWhiteSpace(model.Nom)
+                ? HttpContext.Session.GetString("UserNom") ?? ""
+                : model.Nom;
+            model.Email = string.IsNullOrWhiteSpace(model.Email)
+                ? HttpContext.Session.GetString("UserEmail") ?? ""
+                : model.Email;
+            model.Telephone = string.IsNullOrWhiteSpace(model.Telephone)
+                ? HttpContext.Session.GetString("UserTelephone") ?? ""
+                : model.Telephone;
+
+            if (userId == 0)
+            {
+                return;
+            }
+
+            var utilisateur = _context.Utilisateurs.Find(userId);
+            if (utilisateur == null)
+            {
+                return;
+            }
+
+            model.Prenom = string.IsNullOrWhiteSpace(model.Prenom) ? utilisateur.Prenom ?? "" : model.Prenom;
+            model.Nom = string.IsNullOrWhiteSpace(model.Nom) ? utilisateur.Nom ?? "" : model.Nom;
+            model.Email = string.IsNullOrWhiteSpace(model.Email) ? utilisateur.Email : model.Email;
+            model.Telephone = string.IsNullOrWhiteSpace(model.Telephone) ? utilisateur.Telephone ?? "" : model.Telephone;
         }
     }
 }

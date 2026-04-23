@@ -1,87 +1,82 @@
 @model IEnumerable<croupe_06_TournoiGolf.Models.Participant>
 @{
     ViewData["Title"] = "Gestion des Participants";
+    ViewData["HideTopbarPageInfo"] = true;
+    ViewData["CompactTopbarTitle"] = "Participants";
 }
 
-<div class="dashboard-header mb-4">
-    <div>
-        <h1 class="fw-bold">Gestion des <span class="text-success">Participants</span></h1>
-        <p class="text-muted">Inscriptions individuelles et joueurs commanditaires</p>
-    </div>
-</div>
+<section class="app-page-shell app-page-shell--wide">
+    @await Html.PartialAsync("_AppSectionHeader", new croupe_06_TournoiGolf.Models.ViewModels.AppSectionHeaderViewModel
+    {
+        Icon = "fas fa-users",
+        Eyebrow = "Administration",
+        Title = "Gestion des participants",
+        Description = "Consultez toutes les inscriptions individuelles et sponsorisées de la plateforme."
+    })
 
-<div class="premium-card shadow-sm border-0 rounded-4 overflow-hidden">
-    <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold"><i class="fas fa-users me-2 text-success"></i> Tous les participants (@Model.Count())</h5>
-    </div>
-    
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 custom-admin-table">
-                <thead class="bg-light">
+    <section class="app-surface-card app-table-card">
+        <div class="app-table-card__header">
+            <div>
+                <h2>Tous les participants</h2>
+                <p class="app-muted-note">@Model.Count() participant(s)</p>
+            </div>
+        </div>
+
+        <div class="app-table-wrap">
+            <table class="app-data-table">
+                <thead>
                     <tr>
-                        <th class="ps-4 py-3">Participant</th>
-                        <th class="py-3">Tournoi</th>
-                        <th class="py-3">Type</th>
-                        <th class="py-3">Source / Sponsor</th>
-                        <th class="py-3">Date d'inscription</th>
-                        <th class="text-end pe-4 py-3">Statut</th>
+                        <th>Participant</th>
+                        <th>Tournoi</th>
+                        <th>Type</th>
+                        <th>Source / Sponsor</th>
+                        <th>Date d'inscription</th>
+                        <th>Statut</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var p in Model)
                     {
                         <tr>
-                            <td class="ps-4 py-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm rounded-circle bg-success-light text-success me-3 d-flex align-items-center justify-content-center fw-bold">
-                                        #@p.ParticipantId.ToString("D3")
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-dark">@(p.Utilisateur?.Prenom ?? p.Prenom) @(p.Utilisateur?.Nom ?? p.Nom)</div>
-                                        <div class="small text-muted">@(p.Utilisateur?.Email ?? p.Email)</div>
-                                    </div>
-                                </div>
+                            <td>
+                                <strong>@(p.Utilisateur?.Prenom ?? p.Prenom) @(p.Utilisateur?.Nom ?? p.Nom)</strong>
+                                <div class="app-muted-note">@(p.Utilisateur?.Email ?? p.Email)</div>
                             </td>
-                            <td class="py-3">
-                                <div class="fw-600">@p.Tournoi.Nom</div>
-                                <div class="small text-muted">@p.Tournoi.DateTournoi.ToShortDateString()</div>
+                            <td>
+                                <strong>@p.Tournoi.Nom</strong>
+                                <div class="app-muted-note">@p.Tournoi.DateTournoi.ToShortDateString()</div>
                             </td>
-                            <td class="py-3">
+                            <td>
                                 @if (p.CommanditeId != null)
                                 {
-                                    <span class="badge rounded-pill bg-warning-light text-warning border-warning-light">Commandité</span>
+                                    <span class="app-status-badge app-status-badge--warning">Commandité</span>
                                 }
                                 else if (p.UtilisateurId != null && p.Utilisateur?.Role == "EMPLOYE")
                                 {
-                                    <span class="badge rounded-pill bg-info-light text-info border-info-light">Employé</span>
+                                    <span class="app-status-badge app-status-badge--success">Employé</span>
                                 }
                                 else
                                 {
-                                    <span class="badge rounded-pill bg-secondary-light text-secondary border-secondary-light">Individuel</span>
+                                    <span class="app-pill">Individuel</span>
                                 }
                             </td>
-                            <td class="py-3">
+                            <td>
                                 @if (p.Commandite != null)
                                 {
-                                    <div class="small fw-bold">@p.Commandite.Utilisateur.NomEntreprise</div>
-                                    <div class="small text-muted">Forfait @p.Commandite.TypeCommandite</div>
+                                    <strong>@p.Commandite.Utilisateur.NomEntreprise</strong>
+                                    <div class="app-muted-note">Forfait @p.Commandite.TypeCommandite</div>
                                 }
                                 else
                                 {
-                                    <span class="text-muted small">—</span>
+                                    <span class="app-muted-note">—</span>
                                 }
                             </td>
-                            <td class="py-3">
-                                <div class="small">@p.CreeLe.ToString("g")</div>
-                            </td>
-                            <td class="text-end pe-4 py-3">
-                                <span class="badge rounded-pill bg-success text-white">@p.StatutInscription</span>
-                            </td>
+                            <td>@p.CreeLe.ToString("g")</td>
+                            <td><span class="app-status-badge app-status-badge--success">@p.StatutInscription</span></td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
+    </section>
+</section>
